@@ -1,0 +1,89 @@
+/* Design tokens. Light is the default; dark overrides the color tokens.
+   The theme is set on <html data-theme="light|dark"> (see public/theme-init.js).
+   Business themes later override the same tokens at runtime. */
+:root {
+  --font-sans: 'Urbanist Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+
+  /* Text */
+  --color-ink: #19202b;
+  --color-ink-soft: #4a5565;
+  --color-muted: #9aa3b2;
+
+  /* Surfaces */
+  --color-surface: #ffffff;
+  --color-glass: rgb(255 255 255 / 0.72);
+  --color-glass-line: rgb(255 255 255 / 0.85);
+  --color-pill: rgb(255 255 255 / 0.78);
+  --color-pill-hover: rgb(255 255 255 / 0.95);
+  --color-line: rgb(25 32 43 / 0.1);
+
+  /* Buttons and badges (inverse of the text color) */
+  --color-btn-bg: #19202b;
+  --color-btn-fg: #ffffff;
+
+  /* Accent */
+  --color-accent: #2f80ed;
+  --color-accent-soft: #bfe3f5;
+
+  /* Page background */
+  --bg-edge: 234 237 240;
+  --page-bg: linear-gradient(
+    115deg,
+    #e9ecef 0%,
+    #d3d8de 24%,
+    #f3f4f6 40%,
+    #cdd2d9 58%,
+    #eceef1 76%,
+    #d7dce2 100%
+  );
+
+  /* Depth */
+  --drop-color: rgb(25 32 43 / 0.28);
+  --shadow-card: 0 1px 2px rgb(25 32 43 / 0.06), 0 12px 32px rgb(25 32 43 / 0.1);
+  --shadow-lift: 0 2px 4px rgb(25 32 43 / 0.08), 0 24px 48px rgb(25 32 43 / 0.18);
+
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --container: 1160px;
+  --gutter: clamp(16px, 4vw, 40px);
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --color-ink: #eef2f9;
+  --color-ink-soft: #a8b3c7;
+  --color-muted: #6d7b95;
+
+  --color-surface: #141d30;
+  --color-glass: rgb(255 255 255 / 0.06);
+  --color-glass-line: rgb(255 255 255 / 0.1);
+  --color-pill: rgb(255 255 255 / 0.08);
+  --color-pill-hover: rgb(255 255 255 / 0.15);
+  --color-line: rgb(255 255 255 / 0.12);
+
+  --color-btn-bg: #eef2f9;
+  --color-btn-fg: #0b1220;
+
+  --color-accent: #4d9bff;
+  --color-accent-soft: rgb(60 130 255 / 0.4);
+
+  --bg-edge: 10 16 30;
+  --page-bg:
+    radial-gradient(60% 45% at 88% 0%, rgb(30 100 255 / 0.22), transparent 70%),
+    radial-gradient(50% 40% at 0% 100%, rgb(20 80 220 / 0.2), transparent 70%),
+    linear-gradient(115deg, #0a111f 0%, #0f1a30 30%, #0b1424 52%, #101d36 74%, #0a111f 100%);
+
+  --drop-color: rgb(0 0 0 / 0.55);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px rgb(0 0 0 / 0.45);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.5), 0 24px 48px rgb(0 0 0 / 0.55);
+
+  color-scheme: dark;
+}
