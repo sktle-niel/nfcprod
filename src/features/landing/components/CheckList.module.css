@@ -1,0 +1,26 @@
+.list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  color: var(--color-ink-soft);
+  font-size: 0.98rem;
+}
+
+.check {
+  margin-top: 2px;
+  color: var(--color-btn-bg);
+}
+
+.tick {
+  stroke: var(--color-btn-fg);
+}

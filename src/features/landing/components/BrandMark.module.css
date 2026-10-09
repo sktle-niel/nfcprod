@@ -1,0 +1,18 @@
+.light,
+.dark {
+  display: block;
+  width: auto;
+  height: 100%;
+}
+
+.dark {
+  display: none;
+}
+
+:global([data-theme='dark']) .light {
+  display: none;
+}
+
+:global([data-theme='dark']) .dark {
+  display: block;
+}

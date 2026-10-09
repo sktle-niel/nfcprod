@@ -1,0 +1,109 @@
+.phone {
+  width: 100%;
+  aspect-ratio: 9 / 16.5;
+  container-type: inline-size;
+  padding: 8px;
+  border-radius: 14% / 6.8%;
+  background: #0b0d12;
+  box-shadow: var(--shadow-lift), inset 0 0 0 1.5px #2a2f3a;
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  padding: 11% 7% 6%;
+  border-radius: 12% / 5.6%;
+  background: #fbf7f2;
+  color: #2b2118;
+  overflow: hidden;
+  font-size: clamp(8px, 2.2cqi + 4px, 12px);
+}
+
+.notch {
+  position: absolute;
+  top: 2.6%;
+  left: 50%;
+  width: 30%;
+  height: 3.2%;
+  translate: -50% 0;
+  border-radius: var(--radius-pill);
+  background: #0b0d12;
+}
+
+.name {
+  margin: 0 0 0.9em;
+  font-family: var(--font-serif);
+  font-size: 1.9em;
+  line-height: 1;
+}
+
+.chips,
+.items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips {
+  display: flex;
+  gap: 0.5em;
+  margin-bottom: 1.1em;
+}
+
+.chip,
+.chipOn {
+  padding: 0.35em 0.9em;
+  border-radius: var(--radius-pill);
+  font-size: 0.85em;
+  font-weight: 600;
+  border: 1px solid rgb(43 33 24 / 0.15);
+}
+
+.chipOn {
+  background: #2b2118;
+  border-color: #2b2118;
+  color: #fbf7f2;
+}
+
+.items {
+  display: grid;
+  gap: 0.8em;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.8em;
+  padding: 0.7em;
+  border-radius: 1em;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(43 33 24 / 0.08);
+}
+
+.thumb {
+  width: 3em;
+  height: 3em;
+  border-radius: 0.8em;
+}
+
+.text {
+  display: grid;
+  gap: 0.15em;
+  min-width: 0;
+}
+
+.text strong {
+  font-size: 1em;
+  font-weight: 700;
+}
+
+.text small {
+  font-size: 0.8em;
+  color: #8a7a6a;
+}
+
+.price {
+  font-size: 0.95em;
+  font-weight: 700;
+}

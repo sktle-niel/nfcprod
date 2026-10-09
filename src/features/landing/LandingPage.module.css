@@ -1,0 +1,16 @@
+/* Brushed-silver backdrop with a diagonal sheen.
+   Painted once on a fixed layer: `background-attachment: fixed` repaints on every scroll frame. */
+.page {
+  position: relative;
+  min-height: 100dvh;
+  overflow-x: clip;
+  color: var(--color-ink);
+}
+
+.page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--page-bg);
+}

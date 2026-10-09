@@ -1,0 +1,121 @@
+.wrap {
+  display: grid;
+  justify-items: center;
+  margin-bottom: 72px;
+}
+
+
+.title {
+  margin: 0;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.body {
+  margin: 10px 0 36px;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.1rem, 2.8vw, 1.5rem);
+  color: var(--color-muted);
+}
+
+.grid {
+  display: grid;
+  width: 100%;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 28px 20px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  transition: transform 220ms var(--ease-out);
+}
+
+.best {
+  border: 2px solid var(--color-ink);
+}
+
+.flag {
+  position: absolute;
+  top: -14px;
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.price {
+  margin-top: 6px;
+  font-size: clamp(2.6rem, 9vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.icons {
+  display: flex;
+  gap: 12px;
+  margin-block: 6px 4px;
+}
+
+.icon {
+  width: 34px;
+  height: 34px;
+}
+
+.save {
+  margin-top: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    transform: translateY(-6px);
+  }
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    gap: 24px;
+  }
+
+  .best {
+    padding-block: 36px 32px;
+  }
+}

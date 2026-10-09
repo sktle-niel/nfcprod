@@ -1,0 +1,91 @@
+.section {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: 64px var(--gutter);
+  scroll-margin-top: 16px;
+}
+
+.title {
+  margin: 0 0 32px;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.card {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  max-width: 420px;
+  margin-inline: auto;
+  padding: 32px 24px 28px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+
+.badge {
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.priceBox {
+  display: grid;
+  gap: 2px;
+  min-width: 80%;
+  padding: 12px 20px 10px;
+  border: 2px solid var(--color-ink);
+  border-radius: var(--radius-md);
+}
+
+.priceBox small {
+  font-size: 0.8rem;
+  color: var(--color-ink-soft);
+}
+
+.priceBox strong {
+  font-size: clamp(2.4rem, 9vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.body {
+  margin: 0;
+  max-width: 30ch;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.cta {
+  justify-self: stretch;
+  margin-top: 8px;
+  padding: 15px 26px;
+  border-radius: var(--radius-sm);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 160ms var(--ease-out);
+}
+
+.cta:active {
+  transform: scale(0.98);
+}
