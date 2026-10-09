@@ -1,0 +1,68 @@
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+/* 16px minimum keeps iOS from zooming the page when a field is focused. */
+.input {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 1rem;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 84px;
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+}
+
+.input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgb(47 128 237 / 0.25);
+}
+
+.input[aria-invalid='true'] {
+  border-color: #d92d20;
+}
+
+.hint,
+.error {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.hint {
+  color: var(--color-ink-soft);
+}
+
+.error {
+  color: #d92d20;
+  font-weight: 600;
+}
+
+:global([data-theme='dark']) .error {
+  color: #ff8a80;
+}
+
+:global([data-theme='dark']) .input[aria-invalid='true'] {
+  border-color: #ff8a80;
+}

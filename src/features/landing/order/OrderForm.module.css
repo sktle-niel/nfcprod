@@ -1,0 +1,108 @@
+.form {
+  display: grid;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.section {
+  display: grid;
+  gap: 14px;
+}
+
+.heading {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.pair {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 560px) {
+  .pair {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Bot trap: off-screen rather than display:none, which some bots skip. */
+.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.consent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
+
+.consent input {
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  accent-color: var(--color-accent);
+}
+
+.error {
+  margin: 6px 0 0;
+  color: #d92d20;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+:global([data-theme='dark']) .error {
+  color: #ff8a80;
+}
+
+.status:empty {
+  display: none;
+}
+
+.status p {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: rgb(217 45 32 / 0.1);
+  color: #b42318;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+:global([data-theme='dark']) .status p {
+  color: #ffb4ab;
+}
+
+.submit {
+  min-height: 52px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out), opacity 150ms ease;
+}
+
+.submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}

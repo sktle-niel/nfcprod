@@ -119,3 +119,26 @@
     padding-block: 36px 32px;
   }
 }
+
+.cta {
+  justify-self: stretch;
+  min-height: 48px;
+  margin-top: 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out);
+}
+
+.cta:active {
+  transform: scale(0.97);
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}

@@ -1,0 +1,79 @@
+.fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px 8px 10px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease, opacity 150ms ease;
+}
+
+.on {
+  border-color: var(--color-accent);
+  background: rgb(47 128 237 / 0.1);
+}
+
+.dim {
+  opacity: 0.5;
+}
+
+span.chip {
+  cursor: default;
+}
+
+/* The real input stays focusable for keyboards but is visually replaced by the chip. */
+.control {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.chip:has(.control:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
+.error {
+  margin: 8px 0 0;
+  color: #d92d20;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+:global([data-theme='dark']) .error {
+  color: #ff8a80;
+}
