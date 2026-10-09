@@ -1,0 +1,644 @@
+/* ------------------------------------------------------------------ */
+/* Base: plain stacked sections (no scroll-driven animation).          */
+/* Used by browsers without scroll timelines and for reduced motion.   */
+/* ------------------------------------------------------------------ */
+
+.frame,
+.frame2 {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.frame {
+  display: grid;
+  gap: 28px;
+  padding-top: 84px;
+  padding-bottom: 56px;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.7rem, 10.5vw, 5.2rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-align: center;
+  color: var(--color-ink);
+  text-wrap: balance;
+  animation: rise 700ms var(--ease-out) both;
+}
+
+.line1,
+.line2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18em;
+}
+
+.badge {
+  display: inline-block;
+  height: 0.82em;
+  filter: drop-shadow(0 10px 14px var(--drop-color));
+}
+
+.badge img {
+  animation: bob 5s ease-in-out infinite;
+}
+
+.accent {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--color-muted);
+}
+
+.visual {
+  position: relative;
+  min-height: clamp(380px, 96vw, 560px);
+}
+
+.loop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: fade 900ms ease 200ms both;
+}
+
+.phonePos {
+  position: absolute;
+  left: 6%;
+  top: 0;
+  width: clamp(190px, 44%, 290px);
+  animation: rise 800ms var(--ease-out) 180ms both;
+}
+
+.card {
+  position: absolute;
+  animation: rise 800ms var(--ease-out) 260ms both;
+}
+
+.cardBack {
+  --r: 8deg;
+  right: 0;
+  top: 2%;
+  width: clamp(150px, 44%, 330px);
+}
+
+.cardFront {
+  --r: -6deg;
+  right: 4%;
+  bottom: 2%;
+  width: clamp(190px, 60%, 420px);
+}
+
+.float {
+  animation: float 7s ease-in-out infinite;
+}
+
+.cardBack .float {
+  animation-delay: -3s;
+}
+
+.cardImg {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 22px 28px var(--drop-color));
+  user-select: none;
+}
+
+.side {
+  display: grid;
+  gap: 20px;
+  align-content: end;
+  animation: rise 800ms var(--ease-out) 340ms both;
+}
+
+.side p {
+  margin: 0;
+  max-width: 28ch;
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--color-ink);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+
+.primary {
+  padding: 15px 26px;
+  border-radius: var(--radius-sm);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 160ms var(--ease-out);
+}
+
+.primary:active {
+  transform: scale(0.97);
+}
+
+.link {
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.anchor {
+  display: block;
+  height: 0;
+  scroll-margin-top: 16px;
+}
+
+.act2 {
+  padding-block: 56px;
+}
+
+.a2title {
+  margin: 0 0 32px;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.a2l2 {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+.rows {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-line);
+  box-shadow: var(--shadow-card);
+}
+
+.num {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.rowText {
+  display: grid;
+  gap: 2px;
+}
+
+.rowText strong {
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.rowText small {
+  font-size: 0.95rem;
+  color: var(--color-ink-soft);
+}
+
+.pop {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .rows {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .frame {
+    grid-template-columns: 1.45fr 0.75fr;
+    grid-template-areas:
+      'title title'
+      'visual side';
+    gap: 12px 32px;
+    padding-bottom: 88px;
+  }
+
+  .title {
+    grid-area: title;
+  }
+
+  .visual {
+    grid-area: visual;
+    min-height: 520px;
+  }
+
+  .side {
+    grid-area: side;
+    padding-bottom: 56px;
+  }
+
+  .phonePos {
+    left: 4%;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translateY(-10px) rotate(var(--r, 0deg));
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(3deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title,
+  .phonePos,
+  .card,
+  .side {
+    animation: fade 300ms ease both;
+  }
+
+  .float {
+    animation: none;
+    transform: rotate(var(--r, 0deg));
+  }
+
+  .badge img {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Enhanced: pinned scene driven by scroll position.                   */
+/* ------------------------------------------------------------------ */
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .track {
+      --px: 21cqw;
+      --py: 36cqh;
+      --ps: 1;
+      position: relative;
+      height: calc(100dvh + 120vh);
+    }
+
+    .stage,
+    .act2 {
+      position: sticky;
+      top: 0;
+      height: 100dvh;
+      overflow: clip;
+    }
+
+    .act2 {
+      margin-top: -100dvh;
+      padding: 0;
+      pointer-events: none;
+    }
+
+    .frame,
+    .frame2 {
+      position: relative;
+      display: block;
+      width: min(100% - 2 * var(--gutter), var(--container));
+      height: 100%;
+      padding: 0;
+      container-type: size;
+    }
+
+    .visual {
+      display: contents;
+    }
+
+    .anchor {
+      position: absolute;
+      top: 85vh;
+      left: 0;
+      width: 1px;
+      height: 1px;
+    }
+
+    /* ---- Act 1 layout ---- */
+    .title {
+      position: absolute;
+      inset: 11cqh 0 auto;
+    }
+
+    .loop {
+      inset: 22cqh -4cqw 8cqh -4cqw;
+      width: auto;
+      height: auto;
+    }
+
+    .phonePos {
+      top: 30cqh;
+      left: 6cqw;
+      width: 46cqw;
+    }
+
+    .cardBack {
+      top: 24cqh;
+      right: 0;
+      width: 40cqw;
+    }
+
+    .cardFront {
+      top: 46cqh;
+      right: -2cqw;
+      bottom: auto;
+      width: 56cqw;
+    }
+
+    .side {
+      position: absolute;
+      inset: auto 0 5cqh;
+      padding: 0;
+    }
+
+    /* ---- Act 1 exit (zoom out + fade) ---- */
+    .line1,
+    .accent {
+      animation: exitText var(--ease-in-out) both;
+      animation-timeline: scroll(root block);
+      animation-range: 12vh 46vh;
+    }
+
+    .badge {
+      animation: exitBadge var(--ease-in-out) both;
+      animation-timeline: scroll(root block);
+      animation-range: 12vh 52vh;
+    }
+
+    .side {
+      animation: rise 800ms var(--ease-out) 340ms both, exitSide var(--ease-in-out) both;
+      animation-timeline: auto, scroll(root block);
+      animation-range: normal, 8vh 34vh;
+    }
+
+    .loop {
+      animation: fade 900ms ease 200ms both, exitFade var(--ease-in-out) both;
+      animation-timeline: auto, scroll(root block);
+      animation-range: normal, 12vh 42vh;
+    }
+
+    .cardExit {
+      animation: exitBack var(--ease-in-out) both;
+      animation-timeline: scroll(root block);
+      animation-range: 14vh 54vh;
+    }
+
+    .cardExit {
+      will-change: transform, opacity;
+    }
+
+    .cardFront .cardExit {
+      animation-name: exitFront;
+    }
+
+    /* ---- Phone travels and shrinks ---- */
+    .phoneRig {
+      transform-origin: 0 0;
+      animation: movePhone var(--ease-in-out) both;
+      will-change: transform;
+      animation-timeline: scroll(root block);
+      animation-range: 14vh 66vh;
+    }
+
+    /* ---- Act 2 enter (fade in) ---- */
+    .a2title {
+      position: absolute;
+      inset: 11cqh 0 auto;
+      margin: 0;
+      font-size: clamp(2.2rem, 9cqw, 4rem);
+    }
+
+    .a2l1,
+    .a2l2 {
+      display: inline-block;
+      animation: enterUp var(--ease-out) both;
+      animation-timeline: scroll(root block);
+    }
+
+    .a2l1 {
+      animation-range: 32vh 62vh;
+    }
+
+    .a2l2 {
+      animation-range: 38vh 68vh;
+    }
+
+    .rows {
+      position: absolute;
+      inset: 28cqh 0 auto;
+      grid-template-columns: 1fr;
+    }
+
+    .row {
+      animation: enterUp var(--ease-out) both;
+      animation-timeline: scroll(root block);
+      animation-range: calc(40vh + var(--i) * 5vh) calc(70vh + var(--i) * 5vh);
+    }
+
+    .pop {
+      position: absolute;
+      top: 62cqh;
+      right: 12cqw;
+      display: block;
+      height: 12cqw;
+      filter: drop-shadow(0 12px 16px var(--drop-color));
+      animation: popIn var(--ease-out) both;
+      animation-timeline: scroll(root block);
+      animation-range: 58vh 84vh;
+    }
+
+    @media (min-width: 900px) {
+      .track {
+        --px: 58cqw;
+        --py: -4cqh;
+        --ps: 0.96;
+      }
+
+      .title {
+        top: 13cqh;
+      }
+
+      .loop {
+        inset: 24cqh 14cqw 6cqh -2cqw;
+      }
+
+      .phonePos {
+        top: 29cqh;
+        left: 4cqw;
+        width: min(25cqw, 31cqh);
+      }
+
+      .cardBack {
+        top: 27cqh;
+        left: 36cqw;
+        right: auto;
+        width: min(33cqw, 46cqh);
+      }
+
+      .cardFront {
+        top: 47cqh;
+        left: 27cqw;
+        right: auto;
+        width: min(40cqw, 56cqh);
+      }
+
+      .side {
+        inset: 64cqh 0 auto auto;
+        width: 26cqw;
+      }
+
+      .a2title {
+        top: 24cqh;
+        right: auto;
+        width: 50cqw;
+        font-size: clamp(2.4rem, 4.6cqw, 4rem);
+        text-align: left;
+      }
+
+      .rows {
+        top: 46cqh;
+        right: auto;
+        width: 46cqw;
+      }
+
+      .pop {
+        top: 20cqh;
+        right: auto;
+        left: 52cqw;
+        height: 6cqw;
+      }
+    }
+  }
+}
+
+@keyframes exitText {
+  to {
+    opacity: 0;
+    transform: translateY(-9cqh) scale(0.9);
+  }
+}
+
+@keyframes exitBadge {
+  to {
+    opacity: 0;
+    transform: translate(16cqw, -24cqh) rotate(24deg) scale(0.7);
+  }
+}
+
+@keyframes exitSide {
+  to {
+    opacity: 0;
+    transform: translateY(5cqh);
+  }
+}
+
+@keyframes exitFade {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes exitBack {
+  to {
+    opacity: 0;
+    transform: translate(8cqw, -34cqh) rotate(-6deg) scale(0.86);
+  }
+}
+
+@keyframes exitFront {
+  to {
+    opacity: 0;
+    transform: translate(12cqw, 40cqh) rotate(10deg) scale(0.82);
+  }
+}
+
+@keyframes movePhone {
+  to {
+    transform: translate(var(--px), var(--py)) scale(var(--ps));
+  }
+}
+
+@keyframes enterUp {
+  from {
+    opacity: 0;
+    transform: translateY(6cqh) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-25deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.18) rotate(6deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}

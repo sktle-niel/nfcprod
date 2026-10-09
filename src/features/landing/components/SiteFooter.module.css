@@ -1,0 +1,8 @@
+.footer {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: 32px var(--gutter) calc(32px + env(safe-area-inset-bottom));
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--color-ink-soft);
+}

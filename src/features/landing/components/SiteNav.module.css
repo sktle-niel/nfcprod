@@ -1,0 +1,110 @@
+.header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: 20px var(--gutter);
+}
+
+/* Soft fade so the nav stays readable over content scrolling underneath. */
+.header::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto;
+  height: 104px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--bg-edge) / 0.97) 0%,
+    rgb(var(--bg-edge) / 0.9) 50%,
+    rgb(var(--bg-edge) / 0)
+  );
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logoLight,
+.logoDark {
+  width: auto;
+  height: 30px;
+}
+
+.logoDark {
+  display: none;
+}
+
+:global([data-theme='dark']) .logoLight {
+  display: none;
+}
+
+:global([data-theme='dark']) .logoDark {
+  display: block;
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pill {
+  display: none;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-pill);
+  border: 1px solid var(--color-glass-line);
+}
+
+.pill a {
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+  text-decoration: none;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pill a:hover {
+    background: var(--color-pill-hover);
+    color: var(--color-ink);
+  }
+}
+
+.cta {
+  padding: 11px 20px;
+  border-radius: var(--radius-pill);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 160ms var(--ease-out);
+}
+
+.cta:active {
+  transform: scale(0.97);
+}
+
+@media (min-width: 760px) {
+  .logoLight,
+  .logoDark {
+    height: 36px;
+  }
+
+  .pill {
+    display: flex;
+  }
+}

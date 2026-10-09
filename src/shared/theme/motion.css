@@ -1,0 +1,22 @@
+/* Scroll-linked reveal: content fades in and settles as it enters the viewport.
+   Browsers without scroll timelines, and reduced-motion users, simply see the content. */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 5%) entry calc(60% + var(--i, 0) * 5%);
+    }
+  }
+}

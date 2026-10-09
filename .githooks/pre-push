@@ -1,0 +1,3 @@
+#!/bin/sh
+# Last gate before code leaves the machine.
+npm run verify || exit 1

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Blocks the commit if the staged diff has secrets or the project does not pass verify.
+node scripts/secret-scan.mjs --staged || exit 1
+npm run verify || exit 1
