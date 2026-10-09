@@ -262,6 +262,20 @@ Token policy:
 | `staff` (later) | Limited edits on own business (availability, products) |
 | `admin` | Platform tools, MFA required, every action audited |
 
+### 7.8 Orders and personal data ("Get now" form)
+
+The card bundles have a "Get now" form. It collects: chosen cards, full name, PH mobile number, province, city, barangay, street, and a landmark with the exact location. This is personal data (Data Privacy Act), so it follows these rules.
+
+- **Purpose limit:** used only to confirm, deliver and set up the order. The form says so and needs an explicit consent checkbox.
+- **Client checks are for speed only.** The server repeats every check (`src/entities/order/validate.ts` is the reference): length limits, character allow-list, PH mobile format, card count per bundle.
+- **The server decides the price** from the bundle id. The form never sends a price.
+- **Abuse controls:** hidden trap field (silent drop), rate limit per IP and per phone number (for example 3 orders per hour per IP), request size cap, bot challenge when abused, 429 with `Retry-After`.
+- **Transport:** HTTPS endpoint only (`VITE_ORDERS_ENDPOINT`), no cookies, no referrer, add the endpoint to CSP `connect-src`.
+- **Storage:** encrypted at rest, row-level security, readable only by the owner and assigned staff, not copied into logs, analytics or error reports. Order the personal fields apart from the order row so they can be deleted on their own.
+- **Retention:** delete delivery details after fulfilment plus a short support window (decide the number of days). Support access to the data is audited.
+- **Privacy notice:** a short notice and a link to the Privacy Policy must exist before launch (still to write).
+- **Today:** no backend is connected. Without an endpoint the form runs in demo mode and says nothing was sent.
+
 ## 8. Scalability and Bottleneck Avoidance
 
 - **Read path is static.** The public menu is a versioned JSON snapshot on a CDN. A viral tap burst never hits the database.

@@ -172,7 +172,8 @@ Each business only sees its own data (row-level security on `businessId`).
 4. ~~Currency~~ Decided: PHP.
 5. Reseller terms: do resellers earn per client, and how is that tracked outside the app?
 6. Do we need a hidden abuse ceiling on products per business (no plan limits for now)?
-7. Terms of Service and Privacy Policy text (owner emails are collected).
+7. Terms of Service and Privacy Policy text (owner emails and customer delivery details are collected).
+8. Where do "Get now" orders go (Supabase table, email, Messenger)? How long are delivery details kept?
 
 ## 11. Decision Log
 
@@ -194,4 +195,5 @@ Each business only sees its own data (row-level security on `businessId`).
 | 2026-10-09 | Landing smoothness: eased mouse-wheel scroll (small smooth-scroll library, landing only), no blur or fixed-attachment backgrounds under moving layers, shorter scroll distance | Scroll-driven motion looked steppy and costly to paint |
 | 2026-10-09 | Brand name: NFC Menu (logo, light and dark versions, favicon supplied by owner). Domain still undecided | Logo files in src/assets/brand |
 | 2026-10-09 | Light and dark theme: tokens on html data-theme, saved choice, follows system by default, circular reveal on toggle | Owner request |
+| 2026-10-09 | "Get now" order form on the card bundles collects delivery details (name, mobile, province, city, barangay, street, landmark). Runs in demo mode until an endpoint is set | Orders need a delivery address; see ARCHITECTURE section 7.8 for privacy and abuse rules |
 | 2026-10-09 | (superseded) Brand name undecided | Use a placeholder name in code and config until decided |
