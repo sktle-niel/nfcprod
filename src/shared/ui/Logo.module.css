@@ -1,0 +1,22 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.light,
+.dark {
+  width: auto;
+  height: var(--logo-height, 30px);
+}
+
+.dark {
+  display: none;
+}
+
+:global([data-theme='dark']) .light {
+  display: none;
+}
+
+:global([data-theme='dark']) .dark {
+  display: block;
+}

@@ -52,7 +52,7 @@ src/
     auth/         login, signup, session
     onboarding/   business type selection, preset apply
     dashboard/    editors (branding, theme, categories, products, modifiers)
-    admin/        later
+    admin/        Overview, Orders, Customers (sample data until the backend exists)
   entities/       domain types and pure logic (Business, Product, Variant, Modifier, Theme)
   shared/
     ui/           design-system components (Button, Card, Sheet, Input, Tabs, Skeleton ...)
@@ -273,6 +273,7 @@ The card bundles have a "Get now" form. It collects: chosen cards, full name, PH
 - **Transport:** HTTPS endpoint only (`VITE_ORDERS_ENDPOINT`), no cookies, no referrer, add the endpoint to CSP `connect-src`.
 - **Storage:** encrypted at rest, row-level security, readable only by the owner and assigned staff, not copied into logs, analytics or error reports. Order the personal fields apart from the order row so they can be deleted on their own.
 - **Retention:** delete delivery details after fulfilment plus a short support window (decide the number of days). Support access to the data is audited.
+- **Admin path:** the admin reads every order and changes its status through `AdminOrderRepository` (`src/data/adminOrders.ts`). It shows sample data, kept in memory, until a backend exists. For now the repository returns every order and the lists are cut into pages in the browser; with real data the repository has to filter, count and page on the server. A real adapter needs admin sign-in with MFA, row-level security, and an audit entry for each read and each status change.
 - **Privacy notice:** a short notice and a link to the Privacy Policy must exist before launch (still to write).
 - **Today:** no backend is connected. Without an endpoint the form runs in demo mode and says nothing was sent.
 

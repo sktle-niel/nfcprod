@@ -1,0 +1,153 @@
+.shell {
+  position: relative;
+  min-height: 100dvh;
+  color: var(--color-ink);
+}
+
+/* The same silver (light) and navy (dark) backdrop as the public site, painted once on a fixed layer. */
+.shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--page-bg);
+}
+
+.skip {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip:focus-visible {
+  transform: none;
+}
+
+.logo {
+  --logo-height: 28px;
+}
+
+.brand,
+.mobileBrand {
+  display: inline-flex;
+  text-decoration: none;
+}
+
+/* Phones: the logo sits in the top strip, the links in the tab bar. */
+.brand {
+  display: none;
+}
+
+.mobileBrand {
+  margin-right: auto;
+}
+
+.content {
+  min-width: 0;
+}
+
+/* The top strip and the page share one width, so their edges line up. */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 14px var(--gutter) 0;
+}
+
+/* Pinned to the right whether or not the "Sample data" tag is there yet, so nothing shifts when the data arrives. */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.demo {
+  padding: 3px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  color: var(--color-ink-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.main {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 12px var(--gutter) calc(104px + env(safe-area-inset-bottom));
+}
+
+.note {
+  margin: 40px 0;
+  color: var(--color-ink-soft);
+}
+
+.retry {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.retry:focus-visible,
+.brand:focus-visible,
+.mobileBrand:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Wide screens: a floating sidebar panel, like the cards of the public site. */
+@media (min-width: 1024px) {
+  .shell {
+    display: grid;
+    grid-template-columns: 272px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 32px);
+    margin: 16px 0 16px 16px;
+    padding: 24px 14px;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .brand {
+    display: inline-flex;
+    padding: 0 16px;
+  }
+
+  .mobileBrand {
+    display: none;
+  }
+
+  .topbar {
+    min-height: 64px;
+    padding-top: 20px;
+  }
+
+  .main {
+    padding-bottom: 56px;
+  }
+}

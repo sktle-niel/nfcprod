@@ -33,22 +33,8 @@
   text-decoration: none;
 }
 
-.logoLight,
-.logoDark {
-  width: auto;
-  height: 30px;
-}
-
-.logoDark {
-  display: none;
-}
-
-:global([data-theme='dark']) .logoLight {
-  display: none;
-}
-
-:global([data-theme='dark']) .logoDark {
-  display: block;
+.logo {
+  --logo-height: 30px;
 }
 
 .actions {
@@ -99,9 +85,8 @@
 }
 
 @media (min-width: 760px) {
-  .logoLight,
-  .logoDark {
-    height: 36px;
+  .logo {
+    --logo-height: 36px;
   }
 
   .pill {

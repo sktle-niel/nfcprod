@@ -59,6 +59,7 @@ Scope: **menu showing and landing page only.** No payments, no ordering, no cust
 1. See all clients, their status, and their subscription.
 2. Manage presets and templates.
 3. Support tools (impersonate for support, deactivate a client).
+4. Orders and customers: see everyone who ordered, call them, and move each order from New to Confirmed to Delivered (or Cancelled).
 
 ## 4. Business-Type Presets
 
@@ -151,6 +152,7 @@ Each business only sees its own data (row-level security on `businessId`).
 
 ### Phase 5 — Platform features
 - [ ] Reseller (partner) accounts and invite / claim links
+- [x] Admin area at `/admin`: Overview, Orders, Customers (sample data until the backend and admin sign-in exist)
 - [ ] Admin panel
 - [ ] Analytics: taps, views, popular items
 - [ ] Multi-branch, multi-language
@@ -197,3 +199,4 @@ Each business only sees its own data (row-level security on `businessId`).
 | 2026-10-09 | Light and dark theme: tokens on html data-theme, saved choice, follows system by default, circular reveal on toggle | Owner request |
 | 2026-10-09 | "Get now" order form on the card bundles collects delivery details (name, mobile, province, city, barangay, street, landmark). Runs in demo mode until an endpoint is set | Orders need a delivery address; see ARCHITECTURE section 7.8 for privacy and abuse rules |
 | 2026-10-09 | (superseded) Brand name undecided | Use a placeholder name in code and config until decided |
+| 2026-10-13 | Admin area at `/admin` with a sidebar (a tab bar on phones), in the same colors and tokens as the public site. Overview: headline numbers for the last 7, 30 or 90 days. Orders: filters, a list and the order beside it, status New / Confirmed / Delivered / Cancelled. Customers: made from the orders. Lists show ten to a page, and every page shows skeletons while the orders load. Built on `AdminOrderRepository`; shows sample data until the backend and admin sign-in exist | Owner needs to see who ordered and work through the orders. A real adapter must wait for admin sign-in (ARCHITECTURE sections 7.7 and 7.8) |

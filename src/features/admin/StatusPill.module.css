@@ -1,0 +1,43 @@
+/* --pill-bg and --pill-fg let a parent (the selected row) recolor the pill. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--pill-bg, var(--color-line));
+  color: var(--pill-fg, var(--color-ink));
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.pill[data-status='new'] {
+  background: var(--pill-bg, color-mix(in srgb, var(--color-accent) 16%, transparent));
+}
+
+.pill[data-status='new'] .dot {
+  background: var(--pill-dot, var(--color-accent));
+}
+
+.pill[data-status='delivered'] {
+  color: var(--pill-fg, var(--color-ink-soft));
+}
+
+.pill[data-status='cancelled'] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--color-line);
+  color: var(--pill-fg, var(--color-ink-soft));
+}
+
+.pill[data-status='cancelled'] .dot {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}

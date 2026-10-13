@@ -14,9 +14,14 @@
   animation: fade 200ms ease both;
 }
 
-/* Page behind the dialog stays put. */
+/* Page behind the dialog stays put. The scrollbar gutter stays reserved so the page does not widen
+   when its scrollbar goes away; the empty strip is tinted like the page under the backdrop
+   (same rgb(8 12 22) at 60%). */
 :global(html:has(dialog[open])) {
   overflow: hidden;
+  scrollbar-gutter: stable;
+  background-color: color-mix(in srgb, rgb(var(--bg-edge)) 40%, rgb(8 12 22));
+  transition: background-color 200ms ease;
 }
 
 .sheet {
@@ -24,17 +29,37 @@
   padding: 22px 20px 24px;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: none;
+  scroll-padding-top: 64px;
   border-radius: var(--radius-lg);
   background: var(--color-surface);
   box-shadow: var(--shadow-lift);
   animation: pop 220ms var(--ease-out) both;
 }
 
-.head {
+/* Still scrolls; only the bar is hidden (scrollbar-width: Firefox, Chrome; ::-webkit-scrollbar: Safari). */
+.sheet textarea {
+  scrollbar-width: none;
+}
+
+.sheet::-webkit-scrollbar,
+.sheet textarea::-webkit-scrollbar {
+  display: none;
+}
+
+/* Zero-height row stuck to the top of the sheet, so the close button stays in reach while the form scrolls. */
+.closeBar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: flex-end;
+  height: 0;
+}
+
+/* Room for the close button beside the title. */
+.head {
+  padding-right: 54px;
 }
 
 .title {
@@ -59,10 +84,10 @@
   padding: 0;
   border: 1px solid var(--color-line);
   border-radius: var(--radius-pill);
-  background: transparent;
+  background-color: var(--color-surface);
   color: var(--color-ink);
   cursor: pointer;
-  transition: background-color 150ms ease, transform 150ms var(--ease-out);
+  transition: transform 150ms var(--ease-out);
 }
 
 .close:active {
@@ -126,7 +151,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .close:hover {
-    background: var(--color-pill-hover);
+    background-image: linear-gradient(var(--color-pill-hover), var(--color-pill-hover));
   }
 }
 
