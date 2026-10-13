@@ -40,22 +40,22 @@ export function OrderDialog({ bundleId, onClose, repository = orders }: Props) {
       }}
     >
       <div className={styles.sheet}>
-        <header className={styles.head}>
-          <div>
-            <h2 id={titleId} className={styles.title}>
-              {done ? copy.order.success.title : copy.order.title}
-            </h2>
-            {!done && bundle && (
-              <p className={styles.sub}>
-                {name} · {formatPeso(bundle.price)}
-              </p>
-            )}
-          </div>
+        <div className={styles.closeBar}>
           <button type="button" className={styles.close} aria-label={copy.order.close} onClick={() => ref.current?.close()}>
             <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
               <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" fill="none" />
             </svg>
           </button>
+        </div>
+        <header className={styles.head}>
+          <h2 id={titleId} className={styles.title}>
+            {done ? copy.order.success.title : copy.order.title}
+          </h2>
+          {!done && bundle && (
+            <p className={styles.sub}>
+              {name} · {formatPeso(bundle.price)}
+            </p>
+          )}
         </header>
 
         {done ? (

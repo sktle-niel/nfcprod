@@ -1,0 +1,66 @@
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: inherit;
+  text-decoration: none;
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* The selected order is the inverse pill, like the active link of the sidebar. */
+.row[aria-current='true'] {
+  --pill-bg: color-mix(in srgb, var(--color-btn-fg) 18%, transparent);
+  --pill-fg: var(--color-btn-fg);
+  --pill-dot: var(--color-btn-fg);
+  --avatar-bg: color-mix(in srgb, var(--color-btn-fg) 18%, transparent);
+  --avatar-fg: var(--color-btn-fg);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+}
+
+.main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  color: var(--color-ink-soft);
+  font-size: 0.82rem;
+}
+
+.row[aria-current='true'] .meta {
+  color: color-mix(in srgb, var(--color-btn-fg) 75%, transparent);
+}
+
+.side {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+
+.total {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .row:not([aria-current='true']):hover {
+    background: var(--color-line);
+  }
+}

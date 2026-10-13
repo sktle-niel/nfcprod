@@ -1,0 +1,82 @@
+/* Phones: a tab bar pinned to the bottom edge, clear of the home indicator. */
+.nav {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 40;
+  padding: 6px var(--gutter) calc(6px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-line);
+  background: var(--color-surface);
+}
+
+.list {
+  display: flex;
+  justify-content: space-around;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 72px;
+  min-height: 52px;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--color-ink-soft);
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link[aria-current='page'] {
+  background: var(--color-line);
+  color: var(--color-ink);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Wide screens: the links stack inside the sidebar panel. */
+@media (min-width: 1024px) {
+  .nav {
+    position: static;
+    margin-top: 28px;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .list {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .link {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 46px;
+    padding: 0 16px;
+    border-radius: var(--radius-pill);
+    font-size: 0.95rem;
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+
+  .link[aria-current='page'] {
+    background: var(--color-btn-bg);
+    color: var(--color-btn-fg);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
+  .link:not([aria-current='page']):hover {
+    background: var(--color-line);
+    color: var(--color-ink);
+  }
+}

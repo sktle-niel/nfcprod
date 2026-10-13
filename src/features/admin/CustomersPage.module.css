@@ -1,0 +1,19 @@
+.search {
+  width: 340px;
+  max-width: 100%;
+}
+
+.panel {
+  padding: 8px 20px;
+}
+
+.none {
+  margin: 24px 0;
+  color: var(--color-ink-soft);
+}
+
+@media (min-width: 900px) {
+  .panel {
+    padding: 8px;
+  }
+}

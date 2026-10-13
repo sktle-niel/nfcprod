@@ -20,8 +20,23 @@ export const routes: RouteObject[] = [
         lazy: async () => ({ Component: (await import('@/features/dashboard/DashboardPage')).DashboardPage }),
       },
       {
-        path: '/admin/*',
-        lazy: async () => ({ Component: (await import('@/features/admin/AdminPage')).AdminPage }),
+        path: '/admin',
+        lazy: async () => ({ Component: (await import('@/features/admin/AdminLayout')).AdminLayout }),
+        children: [
+          {
+            index: true,
+            lazy: async () => ({ Component: (await import('@/features/admin/OverviewPage')).OverviewPage }),
+          },
+          {
+            path: 'orders/:reference?',
+            lazy: async () => ({ Component: (await import('@/features/admin/OrdersPage')).OrdersPage }),
+          },
+          {
+            path: 'customers',
+            lazy: async () => ({ Component: (await import('@/features/admin/CustomersPage')).CustomersPage }),
+          },
+          { path: '*', element: <NotFound /> },
+        ],
       },
       { path: '*', element: <NotFound /> },
     ],
