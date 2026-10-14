@@ -5,4 +5,6 @@ export const env = {
   supabaseAnonKey: import.meta.env['VITE_SUPABASE_ANON_KEY']?.trim() ?? '',
   // Where "Get now" orders are sent (https only). Empty means demo mode: nothing is sent.
   ordersEndpoint: import.meta.env['VITE_ORDERS_ENDPOINT']?.trim() ?? '',
+  // Where the province, city and barangay lists come from (https only). Empty means the public PSGC API.
+  locationsApi: import.meta.env['VITE_LOCATIONS_API']?.trim() ?? '',
 } as const
