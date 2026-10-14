@@ -1,18 +1,21 @@
-import { useId, useRef, useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { copy } from '@/config/copy'
+import { locations as publicLocations, type LocationRepository } from '@/data/locations'
 import { OrderError, type OrderFailure, type OrderRepository } from '@/data/orders'
 import type { BundleId, OrderReceipt } from '@/entities/order/order'
-import { PH_PROVINCES } from '@/entities/order/provinces'
 import { validateOrder, type FieldError, type FieldName } from '@/entities/order/validate'
 import { Field } from '@/shared/ui/Field'
 import { CardPicker } from './CardPicker'
 import styles from './OrderForm.module.css'
+import { PlaceFields } from './PlaceFields'
 
 type Errors = Partial<Record<FieldName, FieldError>>
 
 type Props = {
   bundleId: BundleId
   repository: OrderRepository
+  /** Where the province, city and barangay lists come from. */
+  locations?: LocationRepository | undefined
   onDone: (receipt: OrderReceipt, phone: string) => void
 }
 
@@ -27,10 +30,9 @@ function errorText(field: FieldName, code: FieldError): string {
   return text[code]
 }
 
-export function OrderForm({ bundleId, repository, onDone }: Props) {
+export function OrderForm({ bundleId, repository, locations = publicLocations, onDone }: Props) {
   const { fields } = copy.order
   const formRef = useRef<HTMLFormElement>(null)
-  const listId = useId()
   const [errors, setErrors] = useState<Errors>({})
   const [failure, setFailure] = useState<OrderFailure | null>(null)
   const [sending, setSending] = useState(false)
@@ -70,7 +72,7 @@ export function OrderForm({ bundleId, repository, onDone }: Props) {
       setErrors(result.errors)
       setFailure(null)
       const first = FIELD_ORDER.find((field) => result.errors[field])
-      const target = first && formRef.current?.querySelector<HTMLElement>(`[name="${first}"]`)
+      const target = first && formRef.current?.querySelector<HTMLElement>(`[data-field="${first}"], [name="${first}"]:not([type="hidden"])`)
       target?.focus()
       return
     }
@@ -99,19 +101,9 @@ export function OrderForm({ bundleId, repository, onDone }: Props) {
 
       <div className={styles.section}>
         <h3 className={styles.heading}>{copy.order.deliveryTitle}</h3>
-        <div className={styles.pair}>
-          <Field name="province" label={fields.province.label} placeholder={fields.province.placeholder} autoComplete="address-level1" maxLength={60} list={listId} error={message('province')} />
-          <Field name="city" label={fields.city.label} placeholder={fields.city.placeholder} autoComplete="address-level2" maxLength={60} error={message('city')} />
-        </div>
-        <datalist id={listId}>
-          {PH_PROVINCES.map((province) => (
-            <option key={province} value={province} />
-          ))}
-        </datalist>
-        <div className={styles.pair}>
-          <Field name="barangay" label={fields.barangay.label} placeholder={fields.barangay.placeholder} autoComplete="address-level3" maxLength={60} error={message('barangay')} />
+        <PlaceFields repository={locations} errors={{ province: message('province'), city: message('city'), barangay: message('barangay') }}>
           <Field name="street" label={fields.street.label} placeholder={fields.street.placeholder} autoComplete="address-line1" maxLength={120} error={message('street')} />
-        </div>
+        </PlaceFields>
         <Field name="landmark" multiline label={fields.landmark.label} placeholder={fields.landmark.placeholder} hint={fields.landmark.hint} autoComplete="off" maxLength={200} error={message('landmark')} />
       </div>
 

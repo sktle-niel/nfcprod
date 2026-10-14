@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { copy } from '@/config/copy'
+import type { LocationRepository } from '@/data/locations'
 import { orders, type OrderRepository } from '@/data/orders'
 import type { BundleId, OrderReceipt } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
@@ -11,10 +12,11 @@ type Props = {
   bundleId: BundleId
   onClose: () => void
   repository?: OrderRepository
+  locations?: LocationRepository | undefined
 }
 
 /** Modal "Get now" form. Uses the native dialog for focus trapping, Esc and the backdrop. */
-export function OrderDialog({ bundleId, onClose, repository = orders }: Props) {
+export function OrderDialog({ bundleId, onClose, repository = orders, locations }: Props) {
   const ref = useRef<HTMLDialogElement>(null)
   const titleId = useId()
   const [done, setDone] = useState<{ receipt: OrderReceipt; phone: string } | null>(null)
@@ -70,7 +72,7 @@ export function OrderDialog({ bundleId, onClose, repository = orders }: Props) {
             </button>
           </div>
         ) : (
-          <OrderForm bundleId={bundleId} repository={repository} onDone={(receipt, phone) => setDone({ receipt, phone })} />
+          <OrderForm bundleId={bundleId} repository={repository} locations={locations} onDone={(receipt, phone) => setDone({ receipt, phone })} />
         )}
       </div>
     </dialog>

@@ -12,8 +12,9 @@ type Props = {
   autoComplete?: string
   placeholder?: string
   maxLength: number
-  list?: string
   required?: boolean
+  /** Fills the field when it first shows. The field stays uncontrolled. */
+  defaultValue?: string | undefined
 }
 
 /** Label, input (or textarea) and error text wired together for screen readers. */
@@ -28,18 +29,20 @@ export function Field({
   autoComplete,
   placeholder,
   maxLength,
-  list,
   required = true,
+  defaultValue,
 }: Props) {
   const id = useId()
   const describedBy = [hint ? `${id}-hint` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ')
   const shared = {
     id,
     name,
+    'data-field': name,
     maxLength,
     required,
     placeholder,
     autoComplete,
+    defaultValue,
     className: styles.input,
     'aria-invalid': error ? true : undefined,
     'aria-describedby': describedBy || undefined,
@@ -53,7 +56,7 @@ export function Field({
       {multiline ? (
         <textarea {...shared} rows={3} />
       ) : (
-        <input {...shared} type={type} inputMode={inputMode} list={list} />
+        <input {...shared} type={type} inputMode={inputMode} />
       )}
       {hint && !error && (
         <p id={`${id}-hint`} className={styles.hint}>
