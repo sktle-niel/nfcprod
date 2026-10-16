@@ -1,14 +1,14 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { copy } from '@/config/copy'
 import { orders, type OrderRepository } from '@/data/orders'
-import type { BundleId, OrderReceipt } from '@/entities/order/order'
+import type { OnSaleBundleId, OrderReceipt } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
 import { bundles } from '../landing.data'
 import styles from './OrderDialog.module.css'
 import { OrderForm } from './OrderForm'
 
 type Props = {
-  bundleId: BundleId
+  bundleId: OnSaleBundleId
   onClose: () => void
   repository?: OrderRepository
 }

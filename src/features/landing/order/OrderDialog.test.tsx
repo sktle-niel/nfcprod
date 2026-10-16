@@ -4,12 +4,12 @@ import { describe, expect, it, vi } from 'vitest'
 import { OrderError, type OrderRepository } from '@/data/orders'
 import { OrderDialog } from './OrderDialog'
 
-function setup(bundleId: 'one' | 'two' | 'three' = 'one', repository?: OrderRepository) {
+function setup(repository?: OrderRepository) {
   const repo: OrderRepository = repository ?? {
     submit: vi.fn().mockResolvedValue({ reference: 'NM-TEST1', demo: false }),
   }
   const onClose = vi.fn()
-  render(<OrderDialog bundleId={bundleId} onClose={onClose} repository={repo} />)
+  render(<OrderDialog bundleId="one" onClose={onClose} repository={repo} />)
   return { repo, onClose, user: userEvent.setup() }
 }
 
@@ -24,10 +24,10 @@ async function fillDetails(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('OrderDialog', () => {
-  it('opens as a modal with the bundle name and price', () => {
-    setup('two')
+  it('opens as a modal with the card name and price', () => {
+    setup()
     expect(screen.getByRole('dialog', { name: /get your nfc card/i })).toBeInTheDocument()
-    expect(screen.getByText('Any 2 cards · ₱780')).toBeInTheDocument()
+    expect(screen.getByText('1 NFC card · ₱499')).toBeInTheDocument()
   })
 
   it('shows what is missing and sends nothing for an empty form', async () => {
@@ -39,7 +39,7 @@ describe('OrderDialog', () => {
   })
 
   it('submits a complete order with the phone number normalized', async () => {
-    const { repo, user } = setup('one')
+    const { repo, user } = setup()
     await user.click(screen.getByLabelText(/google review/i))
     await fillDetails(user)
     await user.click(screen.getByLabelText(/i agree/i))
@@ -58,25 +58,25 @@ describe('OrderDialog', () => {
     )
   })
 
-  it('needs exactly two cards for the two-card bundle', async () => {
-    const { repo, user } = setup('two')
-    await user.click(screen.getByLabelText(/facebook/i))
+  it('offers the three cards as one choice', () => {
+    setup()
+    expect(screen.getByRole('group', { name: /choose 1 card/i })).toBeInTheDocument()
+    expect(screen.getAllByRole('radio')).toHaveLength(3)
+  })
+
+  it('needs a card before sending', async () => {
+    const { repo, user } = setup()
     await fillDetails(user)
     await user.click(screen.getByLabelText(/i agree/i))
     await user.click(screen.getByRole('button', { name: /place order/i }))
-    expect(await screen.findByText(/choose exactly the number of cards/i)).toBeInTheDocument()
+    expect(await screen.findByText(/choose your card/i)).toBeInTheDocument()
     expect(repo.submit).not.toHaveBeenCalled()
-  })
-
-  it('does not ask for a choice in the three-card bundle', () => {
-    setup('three')
-    expect(screen.getByText(/your 3 cards/i)).toBeInTheDocument()
-    expect(screen.queryByRole('checkbox', { name: /facebook/i })).not.toBeInTheDocument()
   })
 
   it('tells the customer when the server cannot be reached', async () => {
     const repo: OrderRepository = { submit: vi.fn().mockRejectedValue(new OrderError('network')) }
-    const { user } = setup('three', repo)
+    const { user } = setup(repo)
+    await user.click(screen.getByLabelText(/facebook/i))
     await fillDetails(user)
     await user.click(screen.getByLabelText(/i agree/i))
     await user.click(screen.getByRole('button', { name: /place order/i }))
@@ -85,7 +85,7 @@ describe('OrderDialog', () => {
   })
 
   it('silently ignores a filled trap field', async () => {
-    const { repo, user } = setup('three')
+    const { repo, user } = setup()
     await fillDetails(user)
     await user.type(document.querySelector<HTMLInputElement>('input[name="website"]')!, 'http://spam.example')
     await user.click(screen.getByRole('button', { name: /place order/i }))

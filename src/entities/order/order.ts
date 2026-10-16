@@ -4,6 +4,10 @@ export type Platform = (typeof PLATFORMS)[number]
 export const BUNDLE_IDS = ['one', 'two', 'three'] as const
 export type BundleId = (typeof BUNDLE_IDS)[number]
 
+/** Bundles a new order can choose. "two" and "three" are no longer sold, but old orders still carry them. */
+export const ON_SALE_BUNDLE_IDS = ['one'] as const satisfies readonly BundleId[]
+export type OnSaleBundleId = (typeof ON_SALE_BUNDLE_IDS)[number]
+
 /** How many cards each bundle includes. The server must derive the price from the bundle id, never from the client. */
 export const BUNDLE_CARD_COUNT: Record<BundleId, number> = { one: 1, two: 2, three: 3 }
 
@@ -23,7 +27,7 @@ export type RawOrder = {
 
 /** A checked and cleaned order, safe to send. */
 export type Order = {
-  bundleId: BundleId
+  bundleId: OnSaleBundleId
   platforms: Platform[]
   fullName: string
   /** Normalized to +639XXXXXXXXX */
@@ -47,7 +51,9 @@ export const ORDER_STATUSES = ['new', 'confirmed', 'delivered', 'cancelled'] as 
 export type OrderStatus = (typeof ORDER_STATUSES)[number]
 
 /** An order as the admin reads it back. The server adds the reference, the time, the status and the price. */
-export type OrderRecord = Omit<Order, 'consent'> & {
+export type OrderRecord = Omit<Order, 'consent' | 'bundleId'> & {
+  /** Any bundle, including the ones no longer sold. */
+  bundleId: BundleId
   status: OrderStatus
   reference: string
   /** ISO 8601 time the order was received. */

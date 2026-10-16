@@ -268,7 +268,7 @@ The card bundles have a "Get now" form. It collects: chosen cards, full name, PH
 
 - **Purpose limit:** used only to confirm, deliver and set up the order. The form says so and needs an explicit consent checkbox.
 - **Client checks are for speed only.** The server repeats every check (`src/entities/order/validate.ts` is the reference): length limits, character allow-list, PH mobile format, card count per bundle.
-- **The server decides the price** from the bundle id. The form never sends a price.
+- **The server decides the price** from the bundle id. The form never sends a price. Only bundles on sale can be ordered (`ON_SALE_BUNDLE_IDS`, today one card at ₱499); old orders keep their bundle.
 - **Abuse controls:** hidden trap field (silent drop), rate limit per IP and per phone number (for example 3 orders per hour per IP), request size cap, bot challenge when abused, 429 with `Retry-After`.
 - **Transport:** HTTPS endpoint only (`VITE_ORDERS_ENDPOINT`), no cookies, no referrer, add the endpoint to CSP `connect-src`.
 - **Storage:** encrypted at rest, row-level security, readable only by the owner and assigned staff, not copied into logs, analytics or error reports. Order the personal fields apart from the order row so they can be deleted on their own.

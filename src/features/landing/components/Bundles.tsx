@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from 'react'
 import { copy } from '@/config/copy'
-import type { BundleId } from '@/entities/order/order'
+import type { OnSaleBundleId } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
 import { bundles } from '../landing.data'
 import { OrderDialog } from '../order/OrderDialog'
@@ -12,7 +12,7 @@ const platforms = ['facebook', 'instagram', 'google'] as const
 
 export function Bundles() {
   const { bundles: text } = copy.landing.pricing
-  const [ordering, setOrdering] = useState<BundleId | null>(null)
+  const [ordering, setOrdering] = useState<OnSaleBundleId | null>(null)
 
   return (
     <div className={styles.wrap}>
@@ -24,12 +24,7 @@ export function Bundles() {
         {bundles.map((bundle, i) => {
           const item = text.items[bundle.id]
           return (
-            <li
-              key={bundle.id}
-              className={`${styles.card} ${bundle.best ? styles.best : ''} reveal`}
-              style={{ '--i': i + 2 } as CSSProperties}
-            >
-              {bundle.best && <span className={styles.flag}>{text.best}</span>}
+            <li key={bundle.id} className={`${styles.card} reveal`} style={{ '--i': i + 2 } as CSSProperties}>
               <h4 className={styles.name}>{item.name}</h4>
               <strong className={styles.price}>{formatPeso(bundle.price)}</strong>
               <CheckList items={item.perks} />
@@ -38,11 +33,6 @@ export function Bundles() {
                   <PlatformIcon key={p} platform={p} className={styles.icon} />
                 ))}
               </span>
-              {bundle.save !== null && (
-                <span className={styles.save}>
-                  {text.save} {formatPeso(bundle.save)}
-                </span>
-              )}
               <button
                 type="button"
                 className={styles.cta}
