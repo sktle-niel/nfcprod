@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BUNDLE_CARD_COUNT } from '@/entities/order/order'
+import { MAX_QUANTITY, PLATFORMS } from '@/entities/order/order'
 import { normalizePhone } from '@/entities/order/validate'
 import { createMockAdminOrders } from './adminOrders'
 import { SAMPLE_AS_OF, sampleOrders } from './adminOrders.sample'
@@ -17,8 +17,11 @@ describe('sample orders', () => {
   })
 
   it.each(sampleOrders.map((order) => [order.reference, order] as const))('%s follows the order rules', (_, order) => {
-    expect(order.platforms).toHaveLength(BUNDLE_CARD_COUNT[order.bundleId])
-    expect(new Set(order.platforms).size).toBe(order.platforms.length)
+    const platforms = order.items.map((item) => item.platform)
+    expect(platforms.length).toBeGreaterThan(0)
+    expect(platforms.every((platform) => PLATFORMS.includes(platform))).toBe(true)
+    expect(new Set(platforms).size).toBe(platforms.length)
+    expect(order.items.every((item) => Number.isInteger(item.quantity) && item.quantity >= 1 && item.quantity <= MAX_QUANTITY)).toBe(true)
     expect(normalizePhone(order.phone)).toBe(order.phone)
     expect(Number.isInteger(order.total)).toBe(true)
   })

@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { RawOrder } from './order'
-import { cleanText, normalizePhone, validateOrder } from './validate'
+import { cleanText, normalizePhone, validateOrder, type FieldError } from './validate'
 
 const valid: RawOrder = {
-  bundleId: 'one',
-  platforms: ['google'],
+  items: [{ platform: 'google', quantity: 1 }],
   fullName: 'Juan Dela Cruz Jr.',
   phone: '0917 123 4567',
   province: 'Cebu',
@@ -48,14 +47,14 @@ describe('validateOrder', () => {
     if (result.ok) {
       expect(result.order.phone).toBe('+639171234567')
       expect(result.order.fullName).toBe('Juan Dela Cruz Jr.')
-      expect(result.order.platforms).toEqual(['google'])
+      expect(result.order.items).toEqual([{ platform: 'google', quantity: 1 }])
     }
   })
 
   it('reports every missing field', () => {
     const result = validateOrder({
       ...valid,
-      platforms: [],
+      items: [],
       fullName: '',
       phone: '',
       province: '',
@@ -101,23 +100,34 @@ describe('validateOrder', () => {
     if (!result.ok) expect(result.errors.landmark).toBe('tooLong')
   })
 
-  it.each([
-    ['one', [], 'required'],
-    ['one', ['facebook', 'google'], 'wrongCount'],
-    ['one', ['tiktok'], 'invalid'],
-    ['ten', ['google'], 'invalid'],
-    ['two', ['facebook', 'google'], 'invalid'],
-    ['three', ['facebook', 'instagram', 'google'], 'invalid'],
-  ])('checks the card choice for bundle %s with %j', (bundleId, platforms, expected) => {
-    const result = validateOrder({ ...valid, bundleId, platforms })
+  it.each<[RawOrder['items'], FieldError]>([
+    [[], 'required'],
+    [[{ platform: 'tiktok', quantity: 1 }], 'invalid'],
+    [
+      [
+        { platform: 'google', quantity: 1 },
+        { platform: 'google', quantity: 2 },
+      ],
+      'invalid',
+    ],
+    [[{ platform: 'google', quantity: 0 }], 'quantity'],
+    [[{ platform: 'google', quantity: 21 }], 'quantity'],
+    [[{ platform: 'google', quantity: 1.5 }], 'quantity'],
+    [[{ platform: 'google', quantity: Number.NaN }], 'quantity'],
+  ])('checks the cards %j', (items, expected) => {
+    const result = validateOrder({ ...valid, items })
     expect(result.ok).toBe(false)
     if (!result.ok) expect(result.errors.platforms).toBe(expected)
   })
 
-  it('counts a repeated card once', () => {
-    const result = validateOrder({ ...valid, platforms: ['facebook', 'facebook'] })
+  it('keeps a quantity for each chosen card', () => {
+    const items = [
+      { platform: 'facebook', quantity: 2 },
+      { platform: 'google', quantity: 20 },
+    ]
+    const result = validateOrder({ ...valid, items })
     expect(result.ok).toBe(true)
-    if (result.ok) expect(result.order.platforms).toEqual(['facebook'])
+    if (result.ok) expect(result.order.items).toEqual(items)
   })
 
   it('needs consent', () => {

@@ -1,20 +1,19 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { copy } from '@/config/copy'
 import { orders, type OrderRepository } from '@/data/orders'
-import type { OnSaleBundleId, OrderReceipt } from '@/entities/order/order'
+import type { OrderReceipt } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
-import { bundles } from '../landing.data'
+import { cardPrice } from '../landing.data'
 import styles from './OrderDialog.module.css'
 import { OrderForm } from './OrderForm'
 
 type Props = {
-  bundleId: OnSaleBundleId
   onClose: () => void
   repository?: OrderRepository
 }
 
 /** Modal "Get now" form. Uses the native dialog for focus trapping, Esc and the backdrop. */
-export function OrderDialog({ bundleId, onClose, repository = orders }: Props) {
+export function OrderDialog({ onClose, repository = orders }: Props) {
   const ref = useRef<HTMLDialogElement>(null)
   const titleId = useId()
   const [done, setDone] = useState<{ receipt: OrderReceipt; phone: string } | null>(null)
@@ -23,9 +22,6 @@ export function OrderDialog({ bundleId, onClose, repository = orders }: Props) {
     const dialog = ref.current
     if (dialog && !dialog.open) dialog.showModal()
   }, [])
-
-  const bundle = bundles.find((item) => item.id === bundleId)
-  const name = copy.landing.pricing.bundles.items[bundleId].name
 
   return (
     <dialog
@@ -51,9 +47,9 @@ export function OrderDialog({ bundleId, onClose, repository = orders }: Props) {
           <h2 id={titleId} className={styles.title}>
             {done ? copy.order.success.title : copy.order.title}
           </h2>
-          {!done && bundle && (
+          {!done && (
             <p className={styles.sub}>
-              {name} · {formatPeso(bundle.price)}
+              {copy.landing.pricing.card.name} · {copy.order.each.replace('{price}', formatPeso(cardPrice))}
             </p>
           )}
         </header>
@@ -70,7 +66,7 @@ export function OrderDialog({ bundleId, onClose, repository = orders }: Props) {
             </button>
           </div>
         ) : (
-          <OrderForm bundleId={bundleId} repository={repository} onDone={(receipt, phone) => setDone({ receipt, phone })} />
+          <OrderForm repository={repository} onDone={(receipt, phone) => setDone({ receipt, phone })} />
         )}
       </div>
     </dialog>

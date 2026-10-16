@@ -1,12 +1,4 @@
-import {
-  BUNDLE_CARD_COUNT,
-  ON_SALE_BUNDLE_IDS,
-  PLATFORMS,
-  type OnSaleBundleId,
-  type Order,
-  type Platform,
-  type RawOrder,
-} from './order'
+import { MAX_QUANTITY, PLATFORMS, type Order, type Platform, type RawOrder } from './order'
 
 export type FieldName =
   | 'platforms'
@@ -19,7 +11,7 @@ export type FieldName =
   | 'landmark'
   | 'consent'
 
-export type FieldError = 'required' | 'tooShort' | 'tooLong' | 'invalid' | 'wrongCount'
+export type FieldError = 'required' | 'tooShort' | 'tooLong' | 'invalid' | 'quantity'
 
 export type ValidationResult =
   | { ok: true; order: Order }
@@ -66,12 +58,21 @@ const RULES = {
   landmark: { min: 8, max: 200, pattern: LANDMARK },
 } satisfies Record<string, TextRule>
 
-function isOnSale(value: string): value is OnSaleBundleId {
-  return (ON_SALE_BUNDLE_IDS as readonly string[]).includes(value)
-}
-
 function isPlatform(value: string): value is Platform {
   return (PLATFORMS as readonly string[]).includes(value)
+}
+
+function isQuantity(value: number): boolean {
+  return Number.isInteger(value) && value >= 1 && value <= MAX_QUANTITY
+}
+
+/** At least one card, each platform once, and a whole quantity from 1 to MAX_QUANTITY for each. */
+function checkItems(items: RawOrder['items']): FieldError | null {
+  if (items.length === 0) return 'required'
+  const platforms = items.map((item) => item.platform)
+  if (!platforms.every(isPlatform) || new Set(platforms).size !== platforms.length) return 'invalid'
+  if (!items.every((item) => isQuantity(item.quantity))) return 'quantity'
+  return null
 }
 
 /** The server must repeat these checks. This only gives the customer fast feedback. */
@@ -95,25 +96,19 @@ export function validateOrder(raw: RawOrder): ValidationResult {
   if (cleanText(raw.phone) === '') errors.phone = 'required'
   else if (phone === null) errors.phone = 'invalid'
 
-  const bundleId = raw.bundleId
-  const platforms = [...new Set(raw.platforms)]
-  if (!isOnSale(bundleId) || !platforms.every(isPlatform)) {
-    errors.platforms = 'invalid'
-  } else if (platforms.length !== BUNDLE_CARD_COUNT[bundleId]) {
-    errors.platforms = platforms.length === 0 ? 'required' : 'wrongCount'
-  }
+  const itemsError = checkItems(raw.items)
+  if (itemsError) errors.platforms = itemsError
 
   if (!raw.consent) errors.consent = 'required'
 
-  if (Object.keys(errors).length > 0 || phone === null || !isOnSale(bundleId)) {
+  if (Object.keys(errors).length > 0 || phone === null) {
     return { ok: false, errors }
   }
 
   return {
     ok: true,
     order: {
-      bundleId,
-      platforms: platforms.filter(isPlatform),
+      items: raw.items.flatMap((item) => (isPlatform(item.platform) ? [{ platform: item.platform, quantity: item.quantity }] : [])),
       ...text,
       phone,
       consent: true,

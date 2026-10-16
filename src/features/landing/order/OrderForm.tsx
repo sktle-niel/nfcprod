@@ -1,7 +1,7 @@
 import { useId, useRef, useState, type FormEvent } from 'react'
 import { copy } from '@/config/copy'
 import { OrderError, type OrderFailure, type OrderRepository } from '@/data/orders'
-import type { OnSaleBundleId, OrderReceipt } from '@/entities/order/order'
+import { MAX_QUANTITY, type OrderReceipt } from '@/entities/order/order'
 import { PH_PROVINCES } from '@/entities/order/provinces'
 import { validateOrder, type FieldError, type FieldName } from '@/entities/order/validate'
 import { Field } from '@/shared/ui/Field'
@@ -11,7 +11,6 @@ import styles from './OrderForm.module.css'
 type Errors = Partial<Record<FieldName, FieldError>>
 
 type Props = {
-  bundleId: OnSaleBundleId
   repository: OrderRepository
   onDone: (receipt: OrderReceipt, phone: string) => void
 }
@@ -22,12 +21,12 @@ const FIELD_ORDER: FieldName[] = ['platforms', 'fullName', 'phone', 'province', 
 function errorText(field: FieldName, code: FieldError): string {
   const text = copy.order.errors
   if (field === 'consent') return text.consent
-  if (field === 'platforms') return code === 'wrongCount' ? text.wrongCount : text.choose
+  if (field === 'platforms') return code === 'quantity' ? text.quantity.replace('{max}', String(MAX_QUANTITY)) : text.choose
   if (code === 'invalid') return field === 'phone' ? text.phone : field === 'fullName' ? text.fullName : text.invalid
   return text[code]
 }
 
-export function OrderForm({ bundleId, repository, onDone }: Props) {
+export function OrderForm({ repository, onDone }: Props) {
   const { fields } = copy.order
   const formRef = useRef<HTMLFormElement>(null)
   const listId = useId()
@@ -53,9 +52,14 @@ export function OrderForm({ bundleId, repository, onDone }: Props) {
       return
     }
 
+    // Every chosen platform sends its own quantity field, named after it.
+    const items = data.getAll('platforms').map((value) => {
+      const platform = String(value)
+      return { platform, quantity: Number(text(`quantity-${platform}`)) }
+    })
+
     const result = validateOrder({
-      bundleId,
-      platforms: data.getAll('platforms').map(String),
+      items,
       fullName: text('fullName'),
       phone: text('phone'),
       province: text('province'),
@@ -90,7 +94,7 @@ export function OrderForm({ bundleId, repository, onDone }: Props) {
 
   return (
     <form ref={formRef} className={styles.form} onSubmit={handleSubmit} noValidate>
-      <CardPicker bundleId={bundleId} error={message('platforms')} />
+      <CardPicker error={message('platforms')} />
 
       <div className={styles.section}>
         <Field name="fullName" label={fields.fullName.label} placeholder={fields.fullName.placeholder} autoComplete="name" maxLength={80} error={message('fullName')} />

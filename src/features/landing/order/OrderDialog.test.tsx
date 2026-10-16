@@ -9,7 +9,7 @@ function setup(repository?: OrderRepository) {
     submit: vi.fn().mockResolvedValue({ reference: 'NM-TEST1', demo: false }),
   }
   const onClose = vi.fn()
-  render(<OrderDialog bundleId="one" onClose={onClose} repository={repo} />)
+  render(<OrderDialog onClose={onClose} repository={repo} />)
   return { repo, onClose, user: userEvent.setup() }
 }
 
@@ -27,7 +27,7 @@ describe('OrderDialog', () => {
   it('opens as a modal with the card name and price', () => {
     setup()
     expect(screen.getByRole('dialog', { name: /get your nfc card/i })).toBeInTheDocument()
-    expect(screen.getByText('1 NFC card · ₱499')).toBeInTheDocument()
+    expect(screen.getByText('NFC card · ₱499 each')).toBeInTheDocument()
   })
 
   it('shows what is missing and sends nothing for an empty form', async () => {
@@ -40,7 +40,7 @@ describe('OrderDialog', () => {
 
   it('submits a complete order with the phone number normalized', async () => {
     const { repo, user } = setup()
-    await user.click(screen.getByLabelText(/google review/i))
+    await user.click(screen.getByRole('checkbox', { name: /google review/i }))
     await fillDetails(user)
     await user.click(screen.getByLabelText(/i agree/i))
     await user.click(screen.getByRole('button', { name: /place order/i }))
@@ -49,8 +49,7 @@ describe('OrderDialog', () => {
     expect(repo.submit).toHaveBeenCalledTimes(1)
     expect(repo.submit).toHaveBeenCalledWith(
       expect.objectContaining({
-        bundleId: 'one',
-        platforms: ['google'],
+        items: [{ platform: 'google', quantity: 1 }],
         phone: '+639171234567',
         province: 'Cebu',
         consent: true,
@@ -58,10 +57,42 @@ describe('OrderDialog', () => {
     )
   })
 
-  it('offers the three cards as one choice', () => {
-    setup()
-    expect(screen.getByRole('group', { name: /choose 1 card/i })).toBeInTheDocument()
-    expect(screen.getAllByRole('radio')).toHaveLength(3)
+  it('adds a quantity for every chosen card and totals the price', async () => {
+    const { user } = setup()
+    await user.click(screen.getByRole('checkbox', { name: /facebook/i }))
+    await user.click(screen.getByRole('checkbox', { name: /instagram/i }))
+    await user.click(screen.getByRole('checkbox', { name: /google review/i }))
+    expect(screen.getAllByRole('textbox', { name: /quantity/i })).toHaveLength(3)
+    expect(screen.getByText('3 cards · ₱1,497')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /more facebook cards/i }))
+    expect(screen.getByRole('textbox', { name: /facebook quantity/i })).toHaveValue('2')
+    expect(screen.getByText('4 cards · ₱1,996')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('checkbox', { name: /instagram/i }))
+    expect(screen.getAllByRole('textbox', { name: /quantity/i })).toHaveLength(2)
+  })
+
+  it('sends the quantity of each card', async () => {
+    const { repo, user } = setup()
+    await user.click(screen.getByRole('checkbox', { name: /facebook/i }))
+    await user.click(screen.getByRole('checkbox', { name: /google review/i }))
+    const google = screen.getByRole('textbox', { name: /google review quantity/i })
+    await user.clear(google)
+    await user.type(google, '5')
+    await fillDetails(user)
+    await user.click(screen.getByLabelText(/i agree/i))
+    await user.click(screen.getByRole('button', { name: /place order/i }))
+
+    expect(await screen.findByText(/NM-TEST1/)).toBeInTheDocument()
+    expect(repo.submit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        items: [
+          { platform: 'facebook', quantity: 1 },
+          { platform: 'google', quantity: 5 },
+        ],
+      }),
+    )
   })
 
   it('needs a card before sending', async () => {
@@ -69,14 +100,25 @@ describe('OrderDialog', () => {
     await fillDetails(user)
     await user.click(screen.getByLabelText(/i agree/i))
     await user.click(screen.getByRole('button', { name: /place order/i }))
-    expect(await screen.findByText(/choose your card/i)).toBeInTheDocument()
+    expect(await screen.findByText(/choose at least one card/i)).toBeInTheDocument()
+    expect(repo.submit).not.toHaveBeenCalled()
+  })
+
+  it('asks for a quantity from 1 to 20', async () => {
+    const { repo, user } = setup()
+    await user.click(screen.getByRole('checkbox', { name: /facebook/i }))
+    await user.clear(screen.getByRole('textbox', { name: /facebook quantity/i }))
+    await fillDetails(user)
+    await user.click(screen.getByLabelText(/i agree/i))
+    await user.click(screen.getByRole('button', { name: /place order/i }))
+    expect(await screen.findByText(/from 1 to 20/i)).toBeInTheDocument()
     expect(repo.submit).not.toHaveBeenCalled()
   })
 
   it('tells the customer when the server cannot be reached', async () => {
     const repo: OrderRepository = { submit: vi.fn().mockRejectedValue(new OrderError('network')) }
     const { user } = setup(repo)
-    await user.click(screen.getByLabelText(/facebook/i))
+    await user.click(screen.getByRole('checkbox', { name: /facebook/i }))
     await fillDetails(user)
     await user.click(screen.getByLabelText(/i agree/i))
     await user.click(screen.getByRole('button', { name: /place order/i }))

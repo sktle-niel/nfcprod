@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { copy } from '@/config/copy'
-import { BUNDLE_IDS, PLATFORMS } from '@/entities/order/order'
+import { PLATFORMS } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
 import { useAdminData } from './adminData'
 import { BarList, BarListSkeleton } from './BarList'
@@ -14,7 +14,7 @@ import { Panel } from './Panel'
 import { SegmentedControl } from './SegmentedControl'
 import { Sparkline } from './Sparkline'
 import { StatTile } from './StatTile'
-import { before, bucketSize, buckets, change, lastDays, topProvinces, totals, within } from './stats'
+import { before, bucketSize, buckets, change, lastDays, SIZES, topProvinces, totals, within } from './stats'
 
 const text = copy.admin.overview
 const ranges = text.ranges.map((range) => ({ value: range.days, label: range.label }))
@@ -104,7 +104,7 @@ export function OverviewPage() {
           loading={loading}
           bodyHeight={LIST_HEIGHT}
         >
-          <BarList rows={BUNDLE_IDS.map((id) => ({ label: copy.admin.bundles[id], value: current.bundles[id] }))} />
+          <BarList rows={SIZES.map((size) => ({ label: copy.admin.sizes[size], value: current.sizes[size] }))} />
         </StatTile>
         <StatTile
           label={text.cards}
