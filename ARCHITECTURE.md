@@ -33,7 +33,8 @@ Status: **frontend first**. Backend and infrastructure sections are the target d
                                          Database + object storage
 ```
 
-Three surfaces, one codebase:
+Four surfaces, one codebase:
+- **Platform landing** `/`: anonymous marketing page with pricing, card bundles and the "Get now" order form (section 7.8).
 - **Public menu** `/m/:slug`: anonymous, read-only, cached, lightest bundle.
 - **Owner dashboard** `/dashboard/*`: authenticated, edits one business.
 - **Admin** `/admin/*`: platform staff only, strongest controls.
@@ -48,12 +49,13 @@ Each surface is a separate lazy-loaded route group so the public bundle never ca
 src/
   app/            app shell, router, providers, error boundary
   features/
+    landing/      platform landing page (pricing, card bundles, "Get now" order form)
     menu/         public menu (categories, product, variant and add-on picker)
     auth/         login, signup, session
     onboarding/   business type selection, preset apply
     dashboard/    editors (branding, theme, categories, products, modifiers)
     admin/        Overview, Orders, Customers (sample data until the backend exists)
-  entities/       domain types and pure logic (Business, Product, Variant, Modifier, Theme)
+  entities/       domain types and pure logic (Business, Product, Variant, Modifier, Theme, Order)
   shared/
     ui/           design-system components (Button, Card, Sheet, Input, Tabs, Skeleton ...)
     theme/        tokens, theme provider, theme-to-CSS-variables
@@ -61,7 +63,7 @@ src/
     hooks/        generic hooks
   data/           data layer: interface + adapters (mock now, real API later)
   presets/        business type presets as plain data
-  config/         env access, feature flags, constants
+  config/         env access, all user-facing copy, feature flags, constants
 ```
 
 Dependency rule (one direction only):
@@ -96,8 +98,9 @@ interface OwnerRepository {
 }
 ```
 
-- Today: `mock` adapter returns sample businesses (coffee, fine dining, hybrid).
-- Later: `http` adapter calls the real API. The UI does not change.
+- Today: only the order repositories exist. `OrderRepository` (`src/data/orders.ts`) has a mock adapter, and an `http` adapter that is used when `VITE_ORDERS_ENDPOINT` is an `https:` URL (or localhost). `AdminOrderRepository` (`src/data/adminOrders.ts`) is mock only.
+- Phase 1: a `mock` menu adapter returns sample businesses (coffee, fine dining, hybrid).
+- Later: `http` adapters call the real API. The UI does not change.
 - Components never call `fetch` directly.
 
 ### 3.4 Theme engine
@@ -118,6 +121,7 @@ User 1--* Business 1--* Category 1--* Product 1--* Variant
                    Product *--* ModifierGroup
 Business: id, ownerId, slug, name, types[], theme, settings, plan, status, version
 Preset:   type, defaultCategories, defaultTheme, defaultFeatures
+Order:    reference, bundleId, platforms[], delivery details, status, total, createdAt
 ```
 
 Rules:
@@ -126,6 +130,7 @@ Rules:
 - Draft and published copies are separate, so owners edit safely and publish in one atomic step.
 - Slugs: lowercase, a-z 0-9 and hyphen, reserved-word blocklist, unique, with a redirect table so the link on an NFC card never breaks.
 - Every tenant row carries `businessId`. All queries filter by it.
+- `Order` is platform data, not tenant data: a card sale from the landing page, so it has no `businessId`. Its delivery details are personal data and follow section 7.8. Status goes New, then Confirmed, then Delivered, or Cancelled.
 
 ## 5. Backend Architecture (target, not built yet)
 
@@ -271,7 +276,7 @@ The card bundles have a "Get now" form. It collects: chosen cards, full name, PH
 - **The server decides the price** from the bundle id. The form never sends a price.
 - **Abuse controls:** hidden trap field (silent drop), rate limit per IP and per phone number (for example 3 orders per hour per IP), request size cap, bot challenge when abused, 429 with `Retry-After`.
 - **Transport:** HTTPS endpoint only (`VITE_ORDERS_ENDPOINT`), no cookies, no referrer, add the endpoint to CSP `connect-src`.
-- **Storage:** encrypted at rest, row-level security, readable only by the owner and assigned staff, not copied into logs, analytics or error reports. Order the personal fields apart from the order row so they can be deleted on their own.
+- **Storage:** encrypted at rest, row-level security, readable only by the owner and assigned staff, not copied into logs, analytics or error reports. Keep the personal fields apart from the order row so they can be deleted on their own.
 - **Retention:** delete delivery details after fulfilment plus a short support window (decide the number of days). Support access to the data is audited.
 - **Admin path:** the admin reads every order and changes its status through `AdminOrderRepository` (`src/data/adminOrders.ts`). It shows sample data, kept in memory, until a backend exists. For now the repository returns every order and the lists are cut into pages in the browser; with real data the repository has to filter, count and page on the server. A real adapter needs admin sign-in with MFA, row-level security, and an audit entry for each read and each status change.
 - **Privacy notice:** a short notice and a link to the Privacy Policy must exist before launch (still to write).
@@ -294,7 +299,7 @@ The card bundles have a "Get now" form. It collects: chosen cards, full name, PH
 ## 9. Maintainability
 
 - TypeScript strict, schema-derived types, one source of truth.
-- ESLint/oxlint + formatter + typecheck + tests in one `npm run verify` (add a secret scan and `npm audit`).
+- Typecheck, oxlint, tests, secret scan and `npm audit` in one `npm run verify`. No formatter yet.
 - Tests: pure logic unit tests (theme, presets merge, money, slug, validation), component tests for the menu, a few end-to-end flows (tap link, view menu, pick add-on). Security tests: cross-tenant access, rate limit, input rejection.
 - Conventional commits, small PRs, changelog for releases.
 - Docs updated with the change (`ARCHITECTURE.md`, decision log).
@@ -385,6 +390,6 @@ Until there is a team: the project owner is the single owner of all of the above
 | Validation library | Zod vs Valibot (smaller) | Step 5 |
 | Styling approach | **Decided: CSS Modules + CSS variable tokens** (`src/shared/theme/tokens.css`) | Done |
 | Hosting / CDN | To pick with WAF and rate limits in mind | Before launch |
-| Brand name / domain | Undecided. Use `APP_NAME` config placeholder | Before first card is printed |
+| Brand name / domain | **Brand decided: NFC Menu** (`env.appName` reads `VITE_APP_NAME`, default NFC Menu). Domain still undecided | Domain: before the first card is printed |
 
 Decided: no payments, no ordering, no customer accounts (menu and landing page only). Owners sign up with email. Resellers set up clients through claim links.

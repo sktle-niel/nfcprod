@@ -4,7 +4,7 @@ Tap an NFC card, and a business's digital menu opens in the phone browser. No ap
 
 Built for cafés, restaurants and other businesses with a menu. Each owner gets a customizable menu site (colors, background, products, sizes, add-ons) and an NFC card that opens it. Review and social cards (Google, Facebook, Instagram) are sold alongside.
 
-**Status:** frontend first. The platform landing page is built (pricing, scroll-driven hero, light and dark theme). The public menu page, theme engine, owner dashboard and backend come next.
+**Status:** frontend first. Built so far: the platform landing page (pricing, scroll-driven hero, light and dark theme), the "Get now" order form on the card bundles (demo mode until an orders endpoint is set), and the admin area at `/admin` (Overview, Orders, Customers) on sample data. The public menu page, theme engine, owner dashboard and backend come next.
 
 ## Stack
 
