@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { copy } from '@/config/copy'
-import { BUNDLE_CARD_COUNT, PLATFORMS, type BundleId, type Platform } from '@/entities/order/order'
+import { BUNDLE_CARD_COUNT, PLATFORMS, type OnSaleBundleId, type Platform } from '@/entities/order/order'
 import { PlatformIcon } from '../components/PlatformIcon'
 import styles from './CardPicker.module.css'
 
-type Props = { bundleId: BundleId; error?: string | undefined }
+type Props = { bundleId: OnSaleBundleId; error?: string | undefined }
 
 /** Which cards the customer wants: one, any two, or all three, depending on the bundle. */
 export function CardPicker({ bundleId, error }: Props) {

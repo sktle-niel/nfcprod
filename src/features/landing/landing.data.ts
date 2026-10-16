@@ -1,3 +1,4 @@
+import type { OnSaleBundleId } from '@/entities/order/order'
 import facebook from '@/assets/cards/facebook.webp'
 import google from '@/assets/cards/google.webp'
 import instagram from '@/assets/cards/instagram.webp'
@@ -34,9 +35,5 @@ export const packagePrice = 179900
 // Placeholder until sign-up exists (Phase 2).
 export const CTA_HREF = '/dashboard'
 
-// Review-card bundles. Prices and savings are integer centavos.
-export const bundles = [
-  { id: 'one', price: 58000, save: null, best: false },
-  { id: 'two', price: 78000, save: 38000, best: false },
-  { id: 'three', price: 139900, save: 77900, best: true },
-] as const
+// Review cards on sale. Prices are integer centavos.
+export const bundles = [{ id: 'one', price: 49900 }] as const satisfies readonly { id: OnSaleBundleId; price: number }[]

@@ -1,8 +1,8 @@
 import {
   BUNDLE_CARD_COUNT,
-  BUNDLE_IDS,
+  ON_SALE_BUNDLE_IDS,
   PLATFORMS,
-  type BundleId,
+  type OnSaleBundleId,
   type Order,
   type Platform,
   type RawOrder,
@@ -66,8 +66,8 @@ const RULES = {
   landmark: { min: 8, max: 200, pattern: LANDMARK },
 } satisfies Record<string, TextRule>
 
-function isBundleId(value: string): value is BundleId {
-  return (BUNDLE_IDS as readonly string[]).includes(value)
+function isOnSale(value: string): value is OnSaleBundleId {
+  return (ON_SALE_BUNDLE_IDS as readonly string[]).includes(value)
 }
 
 function isPlatform(value: string): value is Platform {
@@ -97,7 +97,7 @@ export function validateOrder(raw: RawOrder): ValidationResult {
 
   const bundleId = raw.bundleId
   const platforms = [...new Set(raw.platforms)]
-  if (!isBundleId(bundleId) || !platforms.every(isPlatform)) {
+  if (!isOnSale(bundleId) || !platforms.every(isPlatform)) {
     errors.platforms = 'invalid'
   } else if (platforms.length !== BUNDLE_CARD_COUNT[bundleId]) {
     errors.platforms = platforms.length === 0 ? 'required' : 'wrongCount'
@@ -105,7 +105,7 @@ export function validateOrder(raw: RawOrder): ValidationResult {
 
   if (!raw.consent) errors.consent = 'required'
 
-  if (Object.keys(errors).length > 0 || phone === null || !isBundleId(bundleId)) {
+  if (Object.keys(errors).length > 0 || phone === null || !isOnSale(bundleId)) {
     return { ok: false, errors }
   }
 

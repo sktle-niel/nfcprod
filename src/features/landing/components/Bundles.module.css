@@ -24,10 +24,14 @@
   color: var(--color-muted);
 }
 
+/* Cards keep one width and stay centered, whether one or several are on sale. */
 .grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 360px));
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  gap: 28px;
+  gap: 24px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -44,23 +48,6 @@
   box-shadow: var(--shadow-card);
   text-align: center;
   transition: transform 220ms var(--ease-out);
-}
-
-.best {
-  border: 2px solid var(--color-ink);
-}
-
-.flag {
-  position: absolute;
-  top: -14px;
-  padding: 6px 16px;
-  border-radius: var(--radius-pill);
-  background: var(--color-btn-bg);
-  color: var(--color-btn-fg);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .name {
@@ -90,33 +77,9 @@
   height: 34px;
 }
 
-.save {
-  margin-top: 8px;
-  padding: 6px 14px;
-  border-radius: var(--radius-pill);
-  background: var(--color-btn-bg);
-  color: var(--color-btn-fg);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 @media (hover: hover) and (pointer: fine) {
   .card:hover {
     transform: translateY(-6px);
-  }
-}
-
-@media (min-width: 900px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-    align-items: center;
-    gap: 24px;
-  }
-
-  .best {
-    padding-block: 36px 32px;
   }
 }
 

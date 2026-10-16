@@ -1,7 +1,7 @@
 import { useId, useRef, useState, type FormEvent } from 'react'
 import { copy } from '@/config/copy'
 import { OrderError, type OrderFailure, type OrderRepository } from '@/data/orders'
-import type { BundleId, OrderReceipt } from '@/entities/order/order'
+import type { OnSaleBundleId, OrderReceipt } from '@/entities/order/order'
 import { PH_PROVINCES } from '@/entities/order/provinces'
 import { validateOrder, type FieldError, type FieldName } from '@/entities/order/validate'
 import { Field } from '@/shared/ui/Field'
@@ -11,7 +11,7 @@ import styles from './OrderForm.module.css'
 type Errors = Partial<Record<FieldName, FieldError>>
 
 type Props = {
-  bundleId: BundleId
+  bundleId: OnSaleBundleId
   repository: OrderRepository
   onDone: (receipt: OrderReceipt, phone: string) => void
 }

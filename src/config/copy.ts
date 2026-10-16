@@ -36,21 +36,11 @@ export const copy = {
       bundles: {
         title: 'Turn every customer into a review',
         body: 'Simple tap. More follows, reviews & visibility.',
-        best: 'Best value',
-        save: 'Save',
         getNow: 'Get now',
         items: {
           one: {
             name: '1 NFC card',
             perks: ['Free setup & guide', 'Choose 1: Facebook, Instagram or Google review'],
-          },
-          two: {
-            name: 'Any 2 cards',
-            perks: ['Free setup & guide', 'Choose any 2: Facebook, Instagram or Google review'],
-          },
-          three: {
-            name: 'All 3 cards',
-            perks: ['Free setup & guide', 'Facebook + Instagram + Google review'],
           },
         },
       },
@@ -60,7 +50,7 @@ export const copy = {
   order: {
     title: 'Get your NFC card',
     close: 'Close',
-    cardsLegend: { one: 'Choose 1 card', two: 'Choose any 2 cards', three: 'Your 3 cards' },
+    cardsLegend: { one: 'Choose 1 card' },
     cardNames: { facebook: 'Facebook', instagram: 'Instagram', google: 'Google review' },
     deliveryTitle: 'Delivery details',
     fields: {

@@ -102,21 +102,22 @@ describe('validateOrder', () => {
   })
 
   it.each([
+    ['one', [], 'required'],
     ['one', ['facebook', 'google'], 'wrongCount'],
-    ['two', ['facebook'], 'wrongCount'],
-    ['three', ['facebook', 'google'], 'wrongCount'],
-    ['two', ['facebook', 'facebook'], 'wrongCount'],
     ['one', ['tiktok'], 'invalid'],
     ['ten', ['google'], 'invalid'],
+    ['two', ['facebook', 'google'], 'invalid'],
+    ['three', ['facebook', 'instagram', 'google'], 'invalid'],
   ])('checks the card choice for bundle %s with %j', (bundleId, platforms, expected) => {
     const result = validateOrder({ ...valid, bundleId, platforms })
     expect(result.ok).toBe(false)
     if (!result.ok) expect(result.errors.platforms).toBe(expected)
   })
 
-  it('accepts all three cards for the full bundle', () => {
-    const result = validateOrder({ ...valid, bundleId: 'three', platforms: ['facebook', 'instagram', 'google'] })
+  it('counts a repeated card once', () => {
+    const result = validateOrder({ ...valid, platforms: ['facebook', 'facebook'] })
     expect(result.ok).toBe(true)
+    if (result.ok) expect(result.order.platforms).toEqual(['facebook'])
   })
 
   it('needs consent', () => {
