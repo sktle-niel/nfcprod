@@ -18,8 +18,9 @@
 }
 
 .title {
+  --title-size: clamp(2.7rem, 10.5vw, 5.2rem);
   margin: 0;
-  font-size: clamp(2.7rem, 10.5vw, 5.2rem);
+  font-size: var(--title-size);
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -330,7 +331,10 @@
 @supports (animation-timeline: scroll()) {
   @media (prefers-reduced-motion: no-preference) {
     .track {
-      --px: 21cqw;
+      /* Hero unit: 1cqw on phones. On wider, shorter frames (tablets) the height caps it,
+         so the act 1 composition scales down and stays centered instead of overlapping. */
+      --u: min(1cqw, 0.5cqh);
+      --px: calc(21 * var(--u));
       --py: 36cqh;
       --ps: 1;
       position: relative;
@@ -377,36 +381,38 @@
     .title {
       position: absolute;
       inset: 11cqh 0 auto;
+      /* Capped by the hero unit: otherwise the title wraps or grows into the cards. */
+      font-size: min(var(--title-size), 12 * var(--u));
     }
 
     .loop {
-      inset: 22cqh -4cqw 8cqh -4cqw;
+      inset: 22cqh calc(50cqw - 54 * var(--u)) 8cqh;
       width: auto;
       height: auto;
     }
 
     .phonePos {
       top: 30cqh;
-      left: 6cqw;
-      width: 46cqw;
+      left: calc(50cqw - 44 * var(--u));
+      width: calc(46 * var(--u));
     }
 
     .cardBack {
       top: 24cqh;
-      right: 0;
-      width: 40cqw;
+      right: calc(50cqw - 50 * var(--u));
+      width: calc(40 * var(--u));
     }
 
     .cardFront {
       top: 46cqh;
-      right: -2cqw;
+      right: calc(50cqw - 52 * var(--u));
       bottom: auto;
-      width: 56cqw;
+      width: calc(56 * var(--u));
     }
 
     .side {
       position: absolute;
-      inset: auto 0 5cqh;
+      inset: auto calc(50cqw - 50 * var(--u)) 5cqh;
       padding: 0;
     }
 
@@ -497,9 +503,9 @@
     .pop {
       position: absolute;
       top: 62cqh;
-      right: 12cqw;
+      right: calc(50cqw - 38 * var(--u));
       display: block;
-      height: 12cqw;
+      height: calc(12 * var(--u));
       filter: drop-shadow(0 12px 16px var(--drop-color));
       animation: popIn var(--ease-out) both;
       animation-timeline: scroll(root block);
@@ -515,6 +521,7 @@
 
       .title {
         top: 13cqh;
+        font-size: var(--title-size);
       }
 
       .loop {
