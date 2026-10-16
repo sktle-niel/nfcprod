@@ -106,7 +106,7 @@
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 0;
+  border: 1.5px solid var(--color-line);
   border-radius: var(--radius-pill);
   background: var(--color-pill);
   color: var(--color-ink);
