@@ -1,7 +1,7 @@
 import { copy } from '@/config/copy'
 import { formatPeso } from '@/shared/lib/money'
 import { CTA_HREF, packagePrice } from '../landing.data'
-import { Bundles } from './Bundles'
+import { CardOffer } from './CardOffer'
 import { CheckList } from './CheckList'
 import styles from './Pricing.module.css'
 
@@ -12,7 +12,7 @@ export function Pricing() {
       <h2 id="pricing-title" className={`${styles.title} reveal`}>
         {pricing.title}
       </h2>
-      <Bundles />
+      <CardOffer />
       <article className={`${styles.card} reveal`}>
         <span className={styles.badge}>{pricing.badge}</span>
         <h3 className={styles.name}>{pricing.name}</h3>

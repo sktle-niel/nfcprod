@@ -18,13 +18,13 @@ Segment 4 is the fastest door-opener: the review cards work for any business, so
 ## 2. Offer ladder (land and expand)
 
 ```
-₱499   1 NFC card          entry, impulse buy
+₱499   NFC card (each)     entry, impulse buy; mix platforms and quantities
 ₱1,799 NFC + Website       flagship, recurring need (menu changes)
 ```
 
 Included in every offer: **free setup and guide** (sales point #1: "no work for you").
 
-Since 2026-10-16 the cards sell one at a time at ₱499. The "Any 2 cards" and "All 3 cards" bundles were dropped (see the decision log in `PROJECT_FLOW.md`).
+Since 2026-10-16 every card costs ₱499, and since 2026-10-17 one order can mix platforms and quantities. The "Any 2 cards" and "All 3 cards" bundles were dropped (see the decision log in `PROJECT_FLOW.md`).
 
 Recommendations:
 1. Check margins before any promo: card cost, domain cost, setup time, reseller commission. "Free hosting + domain" must still leave profit after year 1. Decide the renewal price now (domain renews yearly) so there are no surprises later.

@@ -264,11 +264,11 @@ Token policy:
 
 ### 7.8 Orders and personal data ("Get now" form)
 
-The card bundles have a "Get now" form. It collects: chosen cards, full name, PH mobile number, province, city, barangay, street, and a landmark with the exact location. This is personal data (Data Privacy Act), so it follows these rules.
+The review card offer has a "Get now" form. It collects: the chosen cards and how many of each, full name, PH mobile number, province, city, barangay, street, and a landmark with the exact location. This is personal data (Data Privacy Act), so it follows these rules.
 
 - **Purpose limit:** used only to confirm, deliver and set up the order. The form says so and needs an explicit consent checkbox.
-- **Client checks are for speed only.** The server repeats every check (`src/entities/order/validate.ts` is the reference): length limits, character allow-list, PH mobile format, card count per bundle.
-- **The server decides the price** from the bundle id. The form never sends a price. Only bundles on sale can be ordered (`ON_SALE_BUNDLE_IDS`, today one card at ₱499); old orders keep their bundle.
+- **Client checks are for speed only.** The server repeats every check (`src/entities/order/validate.ts` is the reference): length limits, character allow-list, PH mobile format, the card lines (each platform once, a whole quantity from 1 to 20, `MAX_QUANTITY`).
+- **The server decides the price** from the items: number of cards times the card price (today ₱499 each). The form never sends a price.
 - **Abuse controls:** hidden trap field (silent drop), rate limit per IP and per phone number (for example 3 orders per hour per IP), request size cap, bot challenge when abused, 429 with `Retry-After`.
 - **Transport:** HTTPS endpoint only (`VITE_ORDERS_ENDPOINT`), no cookies, no referrer, add the endpoint to CSP `connect-src`.
 - **Storage:** encrypted at rest, row-level security, readable only by the owner and assigned staff, not copied into logs, analytics or error reports. Order the personal fields apart from the order row so they can be deleted on their own.

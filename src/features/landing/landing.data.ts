@@ -1,4 +1,3 @@
-import type { OnSaleBundleId } from '@/entities/order/order'
 import facebook from '@/assets/cards/facebook.webp'
 import google from '@/assets/cards/google.webp'
 import instagram from '@/assets/cards/instagram.webp'
@@ -35,5 +34,5 @@ export const packagePrice = 179900
 // Placeholder until sign-up exists (Phase 2).
 export const CTA_HREF = '/dashboard'
 
-// Review cards on sale. Prices are integer centavos.
-export const bundles = [{ id: 'one', price: 49900 }] as const satisfies readonly { id: OnSaleBundleId; price: number }[]
+// Price of one review card in integer centavos. The server decides what is charged.
+export const cardPrice = 49900

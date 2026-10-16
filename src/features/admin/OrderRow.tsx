@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { copy } from '@/config/copy'
-import type { OrderRecord } from '@/entities/order/order'
+import { countCards, type OrderRecord } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
+import { plural } from '@/shared/lib/plural'
 import { Avatar } from './Avatar'
 import { formatDay } from './format'
 import styles from './OrderRow.module.css'
@@ -48,7 +49,7 @@ export function OrderRow({ order, selected = false, search = '' }: Props) {
       <span className={styles.main}>
         <span className={styles.name}>{order.fullName}</span>
         <span className={styles.meta}>
-          {formatDay(order.createdAt)} · {copy.admin.bundles[order.bundleId]}
+          {formatDay(order.createdAt)} · {plural(countCards(order.items), copy.admin.cards)}
         </span>
       </span>
       <span className={styles.side}>

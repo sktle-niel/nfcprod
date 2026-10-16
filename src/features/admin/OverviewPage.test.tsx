@@ -15,9 +15,11 @@ const records = [
     fullName: 'Ben Reyes',
     createdAt: '2026-10-05T05:00:00Z',
     status: 'new',
-    bundleId: 'three',
     total: 139900,
-    platforms: ['facebook', 'instagram', 'google'],
+    items: [
+      { platform: 'facebook', quantity: 1 },
+      { platform: 'google', quantity: 2 },
+    ],
     province: 'Cebu',
   }),
   makeOrder({
@@ -25,9 +27,11 @@ const records = [
     fullName: 'Cara Diaz',
     createdAt: '2026-09-20T05:00:00Z',
     status: 'delivered',
-    bundleId: 'two',
     total: 78000,
-    platforms: ['instagram', 'google'],
+    items: [
+      { platform: 'instagram', quantity: 1 },
+      { platform: 'google', quantity: 1 },
+    ],
     province: 'Bohol',
   }),
   makeOrder({ reference: 'NFC-DDDDDD', fullName: 'Dan Lim', createdAt: '2026-09-01T05:00:00Z', status: 'delivered' }),
@@ -54,14 +58,14 @@ describe('OverviewPage', () => {
     expect(screen.getAllByText('vs previous 30 days')).toHaveLength(4)
   })
 
-  it('breaks the numbers down by bundle and by platform', () => {
+  it('breaks the numbers down by order size and by platform', () => {
     renderAdminPage(<OverviewPage />, '/admin', { records })
-    const bundles = tile('Average order')
-    expect(bundles.getByText('1 card').nextElementSibling).toHaveTextContent('1')
-    expect(bundles.getByText('2 cards').nextElementSibling).toHaveTextContent('1')
-    expect(bundles.getByText('3 cards').nextElementSibling).toHaveTextContent('1')
+    const sizes = tile('Average order')
+    expect(sizes.getByText('1 card').nextElementSibling).toHaveTextContent('1')
+    expect(sizes.getByText('2 cards').nextElementSibling).toHaveTextContent('1')
+    expect(sizes.getByText('3+ cards').nextElementSibling).toHaveTextContent('1')
     const platforms = tile('Cards sold')
-    expect(platforms.getByText('Google review').nextElementSibling).toHaveTextContent('3')
+    expect(platforms.getByText('Google review').nextElementSibling).toHaveTextContent('4')
     expect(platforms.getByText('Facebook').nextElementSibling).toHaveTextContent('1')
   })
 

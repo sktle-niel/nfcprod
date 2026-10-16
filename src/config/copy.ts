@@ -33,16 +33,12 @@ export const copy = {
         'Customers browse the menu on their phone',
       ],
       cta: 'Get started',
-      bundles: {
+      card: {
         title: 'Turn every customer into a review',
         body: 'Simple tap. More follows, reviews & visibility.',
+        name: 'NFC card',
+        perks: ['Free setup & guide', 'Facebook, Instagram or Google review', 'Mix and match platforms and quantities'],
         getNow: 'Get now',
-        items: {
-          one: {
-            name: '1 NFC card',
-            perks: ['Free setup & guide', 'Choose 1: Facebook, Instagram or Google review'],
-          },
-        },
       },
     },
     footer: 'All rights reserved.',
@@ -50,7 +46,15 @@ export const copy = {
   order: {
     title: 'Get your NFC card',
     close: 'Close',
-    cardsLegend: { one: 'Choose 1 card' },
+    each: '{price} each',
+    cards: {
+      legend: 'Choose your cards',
+      hint: 'Pick one or more, then set how many of each.',
+      quantity: '{name} quantity',
+      fewer: 'Fewer {name} cards',
+      more: 'More {name} cards',
+      count: { one: '1 card', many: '{n} cards' },
+    },
     cardNames: { facebook: 'Facebook', instagram: 'Instagram', google: 'Google review' },
     deliveryTitle: 'Delivery details',
     fields: {
@@ -80,8 +84,8 @@ export const copy = {
       invalid: 'Remove special characters.',
       phone: 'Enter a PH mobile number, like 0917 123 4567.',
       fullName: 'Use letters, spaces and . - only.',
-      choose: 'Choose your card.',
-      wrongCount: 'Choose exactly the number of cards in your bundle.',
+      choose: 'Choose at least one card.',
+      quantity: 'Enter a number from 1 to {max} for each card.',
       consent: 'Please agree to continue.',
       summary: 'Please fix the highlighted fields.',
       submit: {
@@ -118,7 +122,8 @@ export const copy = {
       summary: '{from}–{to} of {total}',
       position: '{page} / {count}',
     },
-    bundles: { one: '1 card', two: '2 cards', three: '3 cards' },
+    cards: { one: '1 card', many: '{n} cards' },
+    sizes: { one: '1 card', two: '2 cards', more: '3+ cards' },
     status: { new: 'New', confirmed: 'Confirmed', delivered: 'Delivered', cancelled: 'Cancelled' },
     overview: {
       title: 'Overview',
@@ -144,8 +149,8 @@ export const copy = {
       search: 'Search name, mobile or reference',
       statusFilter: 'Status',
       allStatuses: 'All',
-      bundle: 'Bundle',
-      allBundles: 'All bundles',
+      size: 'Size',
+      allSizes: 'All sizes',
       period: 'Period',
       allTime: 'All time',
       none: 'No matching orders',

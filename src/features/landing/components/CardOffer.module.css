@@ -24,22 +24,9 @@
   color: var(--color-muted);
 }
 
-/* Cards keep one width and stay centered, whether one or several are on sale. */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 360px));
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  gap: 24px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
 .card {
-  position: relative;
   display: grid;
+  width: min(100%, 360px);
   justify-items: center;
   gap: 8px;
   padding: 28px 20px 24px;
