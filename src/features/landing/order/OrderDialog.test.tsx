@@ -57,20 +57,41 @@ describe('OrderDialog', () => {
     )
   })
 
-  it('adds a quantity for every chosen card and totals the price', async () => {
+  it('adds a quantity for every chosen card and keeps the total in view', async () => {
     const { user } = setup()
+    expect(screen.getByRole('status')).toHaveTextContent('Total · 0 cards₱0')
     await user.click(screen.getByRole('checkbox', { name: /facebook/i }))
     await user.click(screen.getByRole('checkbox', { name: /instagram/i }))
     await user.click(screen.getByRole('checkbox', { name: /google review/i }))
     expect(screen.getAllByRole('textbox', { name: /quantity/i })).toHaveLength(3)
-    expect(screen.getByText('3 cards · ₱1,497')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('Total · 3 cards₱1,497')
 
     await user.click(screen.getByRole('button', { name: /more facebook cards/i }))
     expect(screen.getByRole('textbox', { name: /facebook quantity/i })).toHaveValue('2')
-    expect(screen.getByText('4 cards · ₱1,996')).toBeInTheDocument()
+    expect(screen.getByText('₱998')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('Total · 4 cards₱1,996')
 
     await user.click(screen.getByRole('checkbox', { name: /instagram/i }))
     expect(screen.getAllByRole('textbox', { name: /quantity/i })).toHaveLength(2)
+  })
+
+  it('sets every chosen card at once', async () => {
+    const { user } = setup()
+    await user.click(screen.getByRole('checkbox', { name: /facebook/i }))
+    await user.click(screen.getByRole('checkbox', { name: /google review/i }))
+    await user.click(screen.getByRole('button', { name: 'Set all to 5' }))
+    expect(screen.getByRole('textbox', { name: /facebook quantity/i })).toHaveValue('5')
+    expect(screen.getByRole('textbox', { name: /google review quantity/i })).toHaveValue('5')
+    expect(screen.getByRole('status')).toHaveTextContent('Total · 10 cards₱4,990')
+  })
+
+  it('replaces the number when the customer types over it', async () => {
+    const { user } = setup()
+    await user.click(screen.getByRole('checkbox', { name: /facebook/i }))
+    const field = screen.getByRole('textbox', { name: /facebook quantity/i })
+    await user.click(field)
+    await user.keyboard('7')
+    expect(field).toHaveValue('7')
   })
 
   it('sends the quantity of each card', async () => {

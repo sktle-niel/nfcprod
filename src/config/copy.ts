@@ -60,8 +60,11 @@ export const copy = {
       quantity: '{name} quantity',
       fewer: 'Fewer {name} cards',
       more: 'More {name} cards',
+      setAll: 'Set all to',
+      setAllTo: 'Set all to {n}',
       count: { one: '1 card', many: '{n} cards' },
     },
+    total: 'Total',
     cardNames: { facebook: 'Facebook', instagram: 'Instagram', google: 'Google review' },
     deliveryTitle: 'Delivery details',
     fields: {

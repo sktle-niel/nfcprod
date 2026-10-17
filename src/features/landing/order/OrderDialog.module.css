@@ -24,9 +24,12 @@
   transition: background-color 200ms ease;
 }
 
+/* The side and bottom padding are variables so the sticky order footer can reach the sheet edges. */
 .sheet {
+  --sheet-pad-x: 20px;
+  --sheet-pad-bottom: 24px;
   max-height: min(92dvh, 860px);
-  padding: 22px 20px 24px;
+  padding: 22px var(--sheet-pad-x) var(--sheet-pad-bottom);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: none;
@@ -142,8 +145,8 @@
   }
 
   .sheet {
+    --sheet-pad-bottom: calc(24px + env(safe-area-inset-bottom));
     max-height: 94dvh;
-    padding-bottom: calc(24px + env(safe-area-inset-bottom));
     border-radius: 24px 24px 0 0;
     animation: rise 280ms var(--ease-out) both;
   }

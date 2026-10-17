@@ -85,6 +85,38 @@
   color: #ffb4ab;
 }
 
+/* The total and the order button stay in view while the form scrolls, edge to edge in the sheet.
+   Sticky offsets count from inside the sheet's padding, so the bottom offset cancels it. */
+.footer {
+  position: sticky;
+  bottom: calc(-1 * var(--sheet-pad-bottom));
+  z-index: 1;
+  display: grid;
+  gap: 10px;
+  margin: 0 calc(-1 * var(--sheet-pad-x)) calc(-1 * var(--sheet-pad-bottom));
+  padding: 12px var(--sheet-pad-x) var(--sheet-pad-bottom);
+  border-top: 1px solid var(--color-line);
+  background: var(--color-surface);
+}
+
+.summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.summary strong {
+  color: var(--color-ink);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
 .submit {
   min-height: 52px;
   border: 0;
