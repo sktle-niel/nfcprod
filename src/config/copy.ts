@@ -1,7 +1,7 @@
 // All user-facing text lives here (English only for now), so translations can be added later.
 export const copy = {
   landing: {
-    nav: { how: 'How it works', cards: 'Cards', pricing: 'Pricing', cta: 'Get started' },
+    nav: { how: 'How it works', cards: 'Cards', pricing: 'Pricing', login: 'Log in', dashboard: 'Dashboard', cta: 'Get started' },
     hero: {
       line1: 'Your menu, one tap',
       accent: 'away',
@@ -105,7 +105,56 @@ export const copy = {
   menu: {
     comingSoon: 'Menu coming soon.',
   },
-  dashboard: { title: 'Dashboard' },
+  dashboard: {
+    title: 'Dashboard',
+    signedInAs: 'Signed in as {name} ({email})',
+    logOut: 'Log out',
+  },
+  auth: {
+    close: 'Close',
+    google: 'Continue with Google',
+    or: 'or',
+    show: 'Show',
+    hide: 'Hide',
+    showLabel: 'Show password',
+    hideLabel: 'Hide password',
+    demo: 'Demo mode: no server is connected yet. Accounts last until this tab is closed or reloaded.',
+    fields: {
+      name: { label: 'Full name', placeholder: 'Juan Dela Cruz' },
+      email: { label: 'Email', placeholder: 'you@yourbusiness.com' },
+      password: { label: 'Password', hint: 'At least 8 characters. A short phrase is easy to remember.' },
+    },
+    signUp: {
+      title: 'Create your account',
+      body: 'Set up your NFC menu and website in minutes.',
+      submit: 'Create account',
+      sending: 'Creating account',
+      notice: 'We use your email only for your account and service updates.',
+      switch: 'Already have an account?',
+      switchLink: 'Log in',
+    },
+    logIn: {
+      title: 'Welcome back',
+      body: 'Log in to manage your menu.',
+      submit: 'Log in',
+      sending: 'Logging in',
+      switch: 'New here?',
+      switchLink: 'Create an account',
+    },
+    errors: {
+      required: 'This is required.',
+      tooShort: 'This is too short.',
+      tooLong: 'This is too long.',
+      name: 'Use letters, spaces and . - only.',
+      email: 'Enter an email like you@yourbusiness.com.',
+      passwordShort: 'Use at least 8 characters.',
+      summary: 'Please fix the highlighted fields.',
+      emailTaken: 'An account with this email already exists. Log in instead.',
+      invalidCredentials: 'Wrong email or password.',
+      rateLimited: 'Too many tries. Please wait a few minutes.',
+      network: 'Could not reach the server. Check your connection and try again.',
+    },
+  },
   admin: {
     skip: 'Skip to content',
     demo: 'Sample data',

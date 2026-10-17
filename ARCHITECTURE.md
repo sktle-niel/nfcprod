@@ -130,7 +130,7 @@ Rules:
 ## 5. Backend Architecture (target, not built yet)
 
 - **Style:** a simple stateless API (REST or RPC), validated at the boundary, thin handlers, logic in services, data access in repositories.
-- **Auth:** managed provider or hardened in-house. Passwords hashed with a modern slow hash (Argon2id or bcrypt). Short-lived access token plus rotating refresh token in an HttpOnly, Secure, SameSite cookie.
+- **Auth:** managed provider or hardened in-house. Passwords hashed with a modern slow hash (Argon2id or bcrypt). Short-lived access token plus rotating refresh token in an HttpOnly, Secure, SameSite cookie. Owners sign in with Google or with email and password (Supabase Auth); the email is the username. Supabase JS keeps the session in localStorage by default, which section 7.3 forbids, so the session must use cookies (Supabase's cookie-based server sessions or a small server in front). Until then `AuthRepository` (`src/data/auth.ts`) is a mock: accounts live in the tab's memory, passwords only as salted hashes, nothing in storage.
 - **Tenancy:** row-level security on `businessId`. The owner id comes from the session, never from the request body.
 - **Storage:** object storage for images. Uploads go through signed URLs with type and size limits. The server re-checks type by content (magic bytes), re-encodes images, and strips metadata.
 - **Publish pipeline:** on publish, build one denormalized, versioned JSON snapshot of the menu, store it, and push it to the CDN. The public page reads only this snapshot, never the live tables.

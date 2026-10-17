@@ -34,6 +34,19 @@ describe('routes', () => {
     expect(screen.getByRole('navigation', { name: 'Admin' })).toBeInTheDocument()
   })
 
+  it.each([
+    ['/signup', 'Create your account'],
+    ['/login', 'Welcome back'],
+  ])('opens the account modal at %s', async (path, title) => {
+    renderAt(path)
+    expect(await screen.findByRole('dialog', { name: title }, { timeout: 5000 })).toBeInTheDocument()
+  })
+
+  it('gives a visitor without an account the sign-up modal instead of the dashboard', async () => {
+    renderAt('/dashboard')
+    expect(await screen.findByRole('dialog', { name: 'Create your account' }, { timeout: 5000 })).toBeInTheDocument()
+  })
+
   it.each(['/m/Admin%20Panel', '/m/..%2Fsecret', '/m/ab', '/nope'])('shows not found for %s', async (path) => {
     renderAt(path)
     expect(await screen.findByRole('heading', { name: /page not found/i })).toBeInTheDocument()

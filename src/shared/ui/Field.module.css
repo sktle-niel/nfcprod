@@ -24,6 +24,22 @@
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
+/* Room for a button inside the right end of the input. */
+.control {
+  position: relative;
+}
+
+.withTrailing {
+  padding-right: 84px;
+}
+
+.trailing {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+}
+
 textarea.input {
   resize: vertical;
   min-height: 84px;
