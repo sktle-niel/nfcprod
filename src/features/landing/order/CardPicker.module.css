@@ -136,19 +136,60 @@
 }
 
 .step:focus-visible,
-.quantity:focus-visible {
+.quantity:focus-visible,
+.quickButton:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-.total {
-  margin: 12px 0 0;
-  font-size: 0.95rem;
-  font-weight: 700;
+/* "Set all to 1 · 2 · 5 · 10": one tap gives every chosen card the same number. */
+.quick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
 }
 
-.total:empty {
-  margin: 0;
+.quickLabel {
+  margin-right: 4px;
+  color: var(--color-ink-soft);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.quickButton {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out);
+}
+
+.quickButton:active {
+  transform: scale(0.96);
+}
+
+.lineText {
+  display: grid;
+  line-height: 1.2;
+}
+
+.subtotal {
+  color: var(--color-ink-soft);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.subtotal:empty {
+  display: none;
 }
 
 .error {

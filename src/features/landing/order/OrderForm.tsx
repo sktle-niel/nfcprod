@@ -4,9 +4,13 @@ import { OrderError, type OrderFailure, type OrderRepository } from '@/data/orde
 import { MAX_QUANTITY, type OrderReceipt } from '@/entities/order/order'
 import { PH_PROVINCES } from '@/entities/order/provinces'
 import { validateOrder, type FieldError, type FieldName } from '@/entities/order/validate'
+import { formatPeso } from '@/shared/lib/money'
+import { plural } from '@/shared/lib/plural'
 import { Field } from '@/shared/ui/Field'
+import { cardPrice } from '../landing.data'
 import { CardPicker } from './CardPicker'
 import styles from './OrderForm.module.css'
+import { cardTotal, type Quantities } from './quantities'
 
 type Errors = Partial<Record<FieldName, FieldError>>
 
@@ -33,6 +37,8 @@ export function OrderForm({ repository, onDone }: Props) {
   const [errors, setErrors] = useState<Errors>({})
   const [failure, setFailure] = useState<OrderFailure | null>(null)
   const [sending, setSending] = useState(false)
+  const [quantities, setQuantities] = useState<Quantities>({})
+  const count = cardTotal(quantities)
 
   const message = (field: FieldName) => {
     const code = errors[field]
@@ -94,7 +100,7 @@ export function OrderForm({ repository, onDone }: Props) {
 
   return (
     <form ref={formRef} className={styles.form} onSubmit={handleSubmit} noValidate>
-      <CardPicker error={message('platforms')} />
+      <CardPicker quantities={quantities} onChange={setQuantities} error={message('platforms')} />
 
       <div className={styles.section}>
         <Field name="fullName" label={fields.fullName.label} placeholder={fields.fullName.placeholder} autoComplete="name" maxLength={80} error={message('fullName')} />
@@ -139,9 +145,17 @@ export function OrderForm({ repository, onDone }: Props) {
         {failure && <p>{copy.order.errors.submit[failure]}</p>}
       </div>
 
-      <button type="submit" className={styles.submit} disabled={sending}>
-        {sending ? copy.order.sending : copy.order.submit}
-      </button>
+      <div className={styles.footer}>
+        <p className={styles.summary} role="status">
+          <span>
+            {copy.order.total} · {plural(count, copy.order.cards.count)}
+          </span>
+          <strong>{formatPeso(count * cardPrice)}</strong>
+        </p>
+        <button type="submit" className={styles.submit} disabled={sending}>
+          {sending ? copy.order.sending : copy.order.submit}
+        </button>
+      </div>
     </form>
   )
 }

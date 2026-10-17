@@ -1,4 +1,7 @@
+import { cleanText, PERSON_NAME } from '@/shared/lib/text'
 import { MAX_QUANTITY, PLATFORMS, type Order, type Platform, type RawOrder } from './order'
+
+export { cleanText }
 
 export type FieldName =
   | 'platforms'
@@ -17,20 +20,9 @@ export type ValidationResult =
   | { ok: true; order: Order }
   | { ok: false; errors: Partial<Record<FieldName, FieldError>> }
 
-// Names: letters, spaces and . ' - only. Places and addresses also allow digits and , # ( ) / &.
-const NAME = /^[\p{L}\p{M}][\p{L}\p{M} .'’-]*$/u
+// Names use PERSON_NAME. Places and addresses also allow digits and , # ( ) / &.
 const PLACE = /^[\p{L}\p{M}\p{N} .,#'’()/&-]+$/u
 const LANDMARK = /^[\p{L}\p{M}\p{N} .,#'’()/&:;-]+$/u
-
-/** Trim, collapse whitespace, drop control characters. */
-export function cleanText(value: string): string {
-  return value
-    .normalize('NFKC')
-    // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u001f\u007f]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
 
 /** Accepts 09XXXXXXXXX, 9XXXXXXXXX, 639XXXXXXXXX and +639XXXXXXXXX. Returns +639XXXXXXXXX or null. */
 export function normalizePhone(value: string): string | null {
@@ -50,7 +42,7 @@ function checkText(value: string, rule: TextRule): FieldError | null {
 }
 
 const RULES = {
-  fullName: { min: 2, max: 80, pattern: NAME },
+  fullName: { min: 2, max: 80, pattern: PERSON_NAME },
   province: { min: 2, max: 60, pattern: PLACE },
   city: { min: 2, max: 60, pattern: PLACE },
   barangay: { min: 2, max: 60, pattern: PLACE },

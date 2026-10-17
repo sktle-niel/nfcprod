@@ -1,44 +1,41 @@
-import { useState } from 'react'
 import { copy } from '@/config/copy'
 import { MAX_QUANTITY, PLATFORMS, type Platform } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
-import { plural } from '@/shared/lib/plural'
 import { PlatformIcon } from '../components/PlatformIcon'
 import { cardPrice } from '../landing.data'
 import styles from './CardPicker.module.css'
+import { chosenPlatforms, clampQuantity, toQuantity, type Quantities } from './quantities'
 
-type Props = { error?: string | undefined }
+type Props = {
+  quantities: Quantities
+  onChange: (next: Quantities) => void
+  error?: string | undefined
+}
 
-/** Whole numbers only, so an empty or half-typed field counts as no cards until it is fixed. */
-function toQuantity(value: string): number {
-  return /^\d+$/.test(value) ? Number(value) : 0
+/** Amounts set with one tap for every chosen card, for example one card per table. */
+const QUICK = [1, 2, 5, 10] as const
+
+/** Selects the whole number, so typing replaces it instead of adding digits to it. */
+function selectAll({ currentTarget }: { currentTarget: HTMLInputElement }) {
+  currentTarget.setSelectionRange(0, currentTarget.value.length)
 }
 
 /** Which cards the customer wants and how many of each. Every chosen platform gets its own quantity. */
-export function CardPicker({ error }: Props) {
+export function CardPicker({ quantities, onChange, error }: Props) {
   const text = copy.order.cards
-  // What the customer typed for each chosen platform. A platform that is not chosen has no entry.
-  const [quantities, setQuantities] = useState<Partial<Record<Platform, string>>>({})
-  const chosen = PLATFORMS.filter((platform) => quantities[platform] !== undefined)
-  const count = chosen.reduce((sum, platform) => sum + toQuantity(quantities[platform] ?? ''), 0)
+  const chosen = chosenPlatforms(quantities)
 
   function toggle(platform: Platform) {
-    setQuantities((current) => {
-      const next = { ...current }
-      if (next[platform] === undefined) next[platform] = '1'
-      else delete next[platform]
-      return next
-    })
+    const next = { ...quantities }
+    if (next[platform] === undefined) next[platform] = '1'
+    else delete next[platform]
+    onChange(next)
   }
 
-  function setQuantity(platform: Platform, value: string) {
-    setQuantities((current) => ({ ...current, [platform]: value }))
-  }
-
-  function step(platform: Platform, by: number) {
-    const value = toQuantity(quantities[platform] ?? '') + by
-    setQuantity(platform, String(Math.min(MAX_QUANTITY, Math.max(1, value))))
-  }
+  const setQuantity = (platform: Platform, value: string) => onChange({ ...quantities, [platform]: value })
+  const step = (platform: Platform, by: number) =>
+    setQuantity(platform, String(clampQuantity(toQuantity(quantities[platform]) + by)))
+  const setAll = (value: number) => onChange(Object.fromEntries(chosen.map((platform) => [platform, String(value)])))
 
   return (
     <fieldset className={styles.fieldset} aria-describedby={error ? 'cards-error' : undefined}>
@@ -65,57 +62,78 @@ export function CardPicker({ error }: Props) {
       </div>
 
       {chosen.length > 0 && (
-        <ul className={styles.lines}>
-          {chosen.map((platform) => {
-            const name = copy.order.cardNames[platform]
-            const value = quantities[platform] ?? ''
-            const quantity = toQuantity(value)
-            return (
-              <li key={platform} className={styles.line}>
-                <span className={styles.lineName}>
-                  <PlatformIcon platform={platform} className={styles.icon} />
-                  {name}
-                </span>
-                <span className={styles.stepper}>
-                  <button
-                    type="button"
-                    className={styles.step}
-                    aria-label={text.fewer.replace('{name}', name)}
-                    disabled={quantity <= 1}
-                    onClick={() => step(platform, -1)}
-                  >
-                    −
-                  </button>
-                  <input
-                    className={styles.quantity}
-                    name={`quantity-${platform}`}
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="off"
-                    maxLength={2}
-                    aria-label={text.quantity.replace('{name}', name)}
-                    value={value}
-                    onChange={(event) => setQuantity(platform, event.target.value.replace(/\D/g, ''))}
-                  />
-                  <button
-                    type="button"
-                    className={styles.step}
-                    aria-label={text.more.replace('{name}', name)}
-                    disabled={quantity >= MAX_QUANTITY}
-                    onClick={() => step(platform, 1)}
-                  >
-                    +
-                  </button>
-                </span>
-              </li>
-            )
-          })}
-        </ul>
+        <>
+          <div className={styles.quick}>
+            <span className={styles.quickLabel} aria-hidden="true">
+              {text.setAll}
+            </span>
+            {QUICK.map((value) => (
+              <button
+                key={value}
+                type="button"
+                className={styles.quickButton}
+                aria-label={text.setAllTo.replace('{n}', String(value))}
+                onClick={() => setAll(value)}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+
+          <ul className={styles.lines}>
+            {chosen.map((platform) => {
+              const name = copy.order.cardNames[platform]
+              const value = quantities[platform] ?? ''
+              const quantity = toQuantity(value)
+              return (
+                <li key={platform} className={styles.line}>
+                  <span className={styles.lineName}>
+                    <PlatformIcon platform={platform} className={styles.icon} />
+                    <span className={styles.lineText}>
+                      {name}
+                      <small className={styles.subtotal}>{quantity > 0 ? formatPeso(quantity * cardPrice) : ''}</small>
+                    </span>
+                  </span>
+                  <span className={styles.stepper}>
+                    <button
+                      type="button"
+                      className={styles.step}
+                      aria-label={text.fewer.replace('{name}', name)}
+                      disabled={quantity <= 1}
+                      onClick={() => step(platform, -1)}
+                    >
+                      −
+                    </button>
+                    <input
+                      className={styles.quantity}
+                      name={`quantity-${platform}`}
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
+                      maxLength={2}
+                      aria-label={text.quantity.replace('{name}', name)}
+                      value={value}
+                      onFocus={selectAll}
+                      onClick={selectAll}
+                      onChange={(event) => setQuantity(platform, event.target.value.replace(/\D/g, ''))}
+                    />
+                    <button
+                      type="button"
+                      className={styles.step}
+                      aria-label={text.more.replace('{name}', name)}
+                      disabled={quantity >= MAX_QUANTITY}
+                      onClick={() => step(platform, 1)}
+                    >
+                      +
+                    </button>
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        </>
       )}
 
-      <p className={styles.total} aria-live="polite">
-        {count > 0 && `${plural(count, text.count)} · ${formatPeso(count * cardPrice)}`}
-      </p>
       {error && (
         <p id="cards-error" className={styles.error}>
           {error}
