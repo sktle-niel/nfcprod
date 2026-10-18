@@ -1,7 +1,13 @@
-type Props = { platform: 'facebook' | 'instagram' | 'google'; className?: string | undefined }
+import { useId } from 'react'
+import type { Platform } from '@/entities/order/order'
+
+type Props = { platform: Platform; className?: string | undefined }
 
 // Simple inline brand marks (no extra requests, no tracking).
 export function PlatformIcon({ platform, className }: Props) {
+  // A page can show the Instagram mark several times, and every gradient needs an id of its own.
+  const gradientId = useId()
+
   if (platform === 'facebook') {
     return (
       <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
@@ -17,14 +23,14 @@ export function PlatformIcon({ platform, className }: Props) {
     return (
       <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
         <defs>
-          <linearGradient id="ig-grad" x1="0" y1="1" x2="1" y2="0">
+          <linearGradient id={gradientId} x1="0" y1="1" x2="1" y2="0">
             <stop offset="0" stopColor="#feda75" />
             <stop offset="0.35" stopColor="#fa7e1e" />
             <stop offset="0.6" stopColor="#d62976" />
             <stop offset="1" stopColor="#4f5bd5" />
           </linearGradient>
         </defs>
-        <rect width="24" height="24" rx="7" fill="url(#ig-grad)" />
+        <rect width="24" height="24" rx="7" fill={`url(#${gradientId})`} />
         <rect x="5" y="5" width="14" height="14" rx="4.2" fill="none" stroke="#fff" strokeWidth="1.8" />
         <circle cx="12" cy="12" r="3.2" fill="none" stroke="#fff" strokeWidth="1.8" />
         <circle cx="16.4" cy="7.6" r="1" fill="#fff" />

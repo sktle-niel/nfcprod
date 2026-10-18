@@ -9,23 +9,37 @@
   overflow: visible;
 }
 
+/* Room for longer forms, such as the card order. */
+.wide {
+  width: min(560px, 100vw);
+}
+
 .dialog::backdrop {
-  background: rgb(8 12 22 / 0.6);
+  background: rgb(var(--scrim) / 0.6);
   animation: fade 200ms ease both;
 }
 
-/* Page behind the dialog stays put, with its scrollbar gutter kept so nothing shifts. */
+/* Page behind the dialog stays put. The scrollbar gutter stays reserved so the page does not widen
+   when its scrollbar goes away; the empty strip is tinted like the page under the backdrop
+   (the same scrim at 60%). */
 :global(html:has(dialog[open])) {
   overflow: hidden;
   scrollbar-gutter: stable;
+  background-color: color-mix(in srgb, rgb(var(--bg-edge)) 40%, rgb(var(--scrim)));
+  transition: background-color 200ms ease;
 }
 
+/* The side and bottom padding are variables so content can reach the sheet edges, like the sticky
+   order footer. The top scroll padding keeps a focused field clear of the close button. */
 .sheet {
+  --sheet-pad-x: 20px;
+  --sheet-pad-bottom: 24px;
   max-height: min(92dvh, 860px);
-  padding: 22px 20px 24px;
+  padding: 22px var(--sheet-pad-x) var(--sheet-pad-bottom);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: none;
+  scroll-padding-top: 64px;
   border-radius: var(--radius-lg);
   background: var(--color-surface);
   box-shadow: var(--shadow-lift);
@@ -33,7 +47,12 @@
 }
 
 /* Still scrolls; only the bar is hidden (scrollbar-width: Firefox, Chrome; ::-webkit-scrollbar: Safari). */
-.sheet::-webkit-scrollbar {
+.sheet textarea {
+  scrollbar-width: none;
+}
+
+.sheet::-webkit-scrollbar,
+.sheet textarea::-webkit-scrollbar {
   display: none;
 }
 
@@ -107,8 +126,8 @@
   }
 
   .sheet {
+    --sheet-pad-bottom: calc(24px + env(safe-area-inset-bottom));
     max-height: 94dvh;
-    padding-bottom: calc(24px + env(safe-area-inset-bottom));
     border-radius: 24px 24px 0 0;
     animation: rise 280ms var(--ease-out) both;
   }
