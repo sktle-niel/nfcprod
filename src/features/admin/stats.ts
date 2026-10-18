@@ -1,5 +1,5 @@
-import { BUNDLE_IDS, PLATFORMS } from '@/entities/order/order'
-import type { BundleId, OrderRecord, Platform } from '@/entities/order/order'
+import { PLATFORMS, countCards } from '@/entities/order/order'
+import type { OrderRecord, Platform } from '@/entities/order/order'
 
 export const DAY = 86_400_000
 
@@ -36,6 +36,15 @@ export function counted(records: readonly OrderRecord[]): OrderRecord[] {
   return records.filter((order) => order.status !== 'cancelled')
 }
 
+/** Order sizes the admin groups by: 1 card, 2 cards, or 3 and more. */
+export const SIZES = ['one', 'two', 'more'] as const
+export type Size = (typeof SIZES)[number]
+
+export function sizeOf(order: OrderRecord): Size {
+  const count = countCards(order.items)
+  return count <= 1 ? 'one' : count === 2 ? 'two' : 'more'
+}
+
 export type Totals = {
   orders: number
   /** Integer centavos. */
@@ -44,20 +53,20 @@ export type Totals = {
   average: number
   /** How many cards of each platform were sold. */
   cards: Record<Platform, number>
-  /** How many orders of each bundle. */
-  bundles: Record<BundleId, number>
+  /** How many orders of each size. */
+  sizes: Record<Size, number>
 }
 
 export function totals(records: readonly OrderRecord[]): Totals {
   const list = counted(records)
   const revenue = list.reduce((sum, order) => sum + order.total, 0)
   const cards = Object.fromEntries(PLATFORMS.map((platform) => [platform, 0])) as Record<Platform, number>
-  const bundles = Object.fromEntries(BUNDLE_IDS.map((id) => [id, 0])) as Record<BundleId, number>
+  const sizes = Object.fromEntries(SIZES.map((size) => [size, 0])) as Record<Size, number>
   for (const order of list) {
-    bundles[order.bundleId] += 1
-    for (const platform of order.platforms) cards[platform] += 1
+    sizes[sizeOf(order)] += 1
+    for (const item of order.items) cards[item.platform] += item.quantity
   }
-  return { orders: list.length, revenue, average: list.length ? Math.round(revenue / list.length) : 0, cards, bundles }
+  return { orders: list.length, revenue, average: list.length ? Math.round(revenue / list.length) : 0, cards, sizes }
 }
 
 /** Percent change from `previous` to `current`, or null when there is nothing to compare with. */

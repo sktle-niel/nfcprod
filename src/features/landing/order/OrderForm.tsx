@@ -2,17 +2,20 @@ import { useRef, useState, type FormEvent } from 'react'
 import { copy } from '@/config/copy'
 import { locations as publicLocations, type LocationRepository } from '@/data/locations'
 import { OrderError, type OrderFailure, type OrderRepository } from '@/data/orders'
-import type { BundleId, OrderReceipt } from '@/entities/order/order'
+import { MAX_QUANTITY, type OrderReceipt } from '@/entities/order/order'
+import { PH_PROVINCES } from '@/entities/order/provinces'
 import { validateOrder, type FieldError, type FieldName } from '@/entities/order/validate'
+import { formatPeso } from '@/shared/lib/money'
+import { plural } from '@/shared/lib/plural'
 import { Field } from '@/shared/ui/Field'
+import { cardPrice } from '../landing.data'
 import { CardPicker } from './CardPicker'
 import styles from './OrderForm.module.css'
-import { PlaceFields } from './PlaceFields'
+import { cardTotal, type Quantities } from './quantities'
 
 type Errors = Partial<Record<FieldName, FieldError>>
 
 type Props = {
-  bundleId: BundleId
   repository: OrderRepository
   /** Where the province, city and barangay lists come from. */
   locations?: LocationRepository | undefined
@@ -25,17 +28,19 @@ const FIELD_ORDER: FieldName[] = ['platforms', 'fullName', 'phone', 'province', 
 function errorText(field: FieldName, code: FieldError): string {
   const text = copy.order.errors
   if (field === 'consent') return text.consent
-  if (field === 'platforms') return code === 'wrongCount' ? text.wrongCount : text.choose
+  if (field === 'platforms') return code === 'quantity' ? text.quantity.replace('{max}', String(MAX_QUANTITY)) : text.choose
   if (code === 'invalid') return field === 'phone' ? text.phone : field === 'fullName' ? text.fullName : text.invalid
   return text[code]
 }
 
-export function OrderForm({ bundleId, repository, locations = publicLocations, onDone }: Props) {
+export function OrderForm({ repository, onDone }: Props) {
   const { fields } = copy.order
   const formRef = useRef<HTMLFormElement>(null)
   const [errors, setErrors] = useState<Errors>({})
   const [failure, setFailure] = useState<OrderFailure | null>(null)
   const [sending, setSending] = useState(false)
+  const [quantities, setQuantities] = useState<Quantities>({})
+  const count = cardTotal(quantities)
 
   const message = (field: FieldName) => {
     const code = errors[field]
@@ -55,9 +60,14 @@ export function OrderForm({ bundleId, repository, locations = publicLocations, o
       return
     }
 
+    // Every chosen platform sends its own quantity field, named after it.
+    const items = data.getAll('platforms').map((value) => {
+      const platform = String(value)
+      return { platform, quantity: Number(text(`quantity-${platform}`)) }
+    })
+
     const result = validateOrder({
-      bundleId,
-      platforms: data.getAll('platforms').map(String),
+      items,
       fullName: text('fullName'),
       phone: text('phone'),
       province: text('province'),
@@ -92,7 +102,7 @@ export function OrderForm({ bundleId, repository, locations = publicLocations, o
 
   return (
     <form ref={formRef} className={styles.form} onSubmit={handleSubmit} noValidate>
-      <CardPicker bundleId={bundleId} error={message('platforms')} />
+      <CardPicker quantities={quantities} onChange={setQuantities} error={message('platforms')} />
 
       <div className={styles.section}>
         <Field name="fullName" label={fields.fullName.label} placeholder={fields.fullName.placeholder} autoComplete="name" maxLength={80} error={message('fullName')} />
@@ -127,9 +137,17 @@ export function OrderForm({ bundleId, repository, locations = publicLocations, o
         {failure && <p>{copy.order.errors.submit[failure]}</p>}
       </div>
 
-      <button type="submit" className={styles.submit} disabled={sending}>
-        {sending ? copy.order.sending : copy.order.submit}
-      </button>
+      <div className={styles.footer}>
+        <p className={styles.summary} role="status">
+          <span>
+            {copy.order.total} · {plural(count, copy.order.cards.count)}
+          </span>
+          <strong>{formatPeso(count * cardPrice)}</strong>
+        </p>
+        <button type="submit" className={styles.submit} disabled={sending}>
+          {sending ? copy.order.sending : copy.order.submit}
+        </button>
+      </div>
     </form>
   )
 }

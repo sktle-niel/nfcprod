@@ -110,8 +110,8 @@ Each business only sees its own data (row-level security on `businessId`).
 |---|---|---|
 | Frontend | React + Vite + TypeScript | Scaffolded in this repo |
 | Routing | React Router | `/m/:slug` public, `/dashboard/*` owner, `/admin/*` us |
-| Styling | CSS variables for the theme | Theme tokens set per business at runtime |
-| Backend / DB / Auth / Storage | To decide (see section 10) | Needs auth, DB, image storage |
+| Styling | CSS Modules + CSS variable tokens | Theme tokens set per business at runtime (`src/shared/theme/tokens.css`) |
+| Backend / DB / Auth / Storage | Supabase (Postgres, Auth, Storage, row-level security) | Decided, not built yet. Free plan for development, paid plan before the first real client |
 | Hosting | To decide | Fast loading on mobile data is key |
 | NFC | NDEF URL record | Plain link on the card, no app needed |
 
@@ -131,7 +131,7 @@ Each business only sees its own data (row-level security on `businessId`).
 - [ ] Mock data for 3 sample businesses (coffee, fine dining, hybrid)
 
 ### Phase 2 — Auth and onboarding
-- [ ] Sign up and log in
+- [x] Sign up and log in modal: Google or email and password (demo auth in memory until Supabase Auth is connected)
 - [ ] Onboarding: business type selection (multi-select)
 - [ ] Apply presets (categories, theme, features)
 - [ ] Slug picker and availability check
@@ -153,7 +153,7 @@ Each business only sees its own data (row-level security on `businessId`).
 ### Phase 5 — Platform features
 - [ ] Reseller (partner) accounts and invite / claim links
 - [x] Admin area at `/admin`: Overview, Orders, Customers (sample data until the backend and admin sign-in exist)
-- [ ] Admin panel
+- [ ] Rest of the admin flow (section 3.3): clients and subscriptions, presets and templates, support tools
 - [ ] Analytics: taps, views, popular items
 - [ ] Multi-branch, multi-language
 - [ ] Optional later: reservation link, call-waiter (no payments, no ordering)
@@ -201,4 +201,7 @@ Each business only sees its own data (row-level security on `businessId`).
 | 2026-10-09 | "Get now" order form on the card bundles collects delivery details (name, mobile, province, city, barangay, street, landmark). Runs in demo mode until an endpoint is set | Orders need a delivery address; see ARCHITECTURE section 7.8 for privacy and abuse rules |
 | 2026-10-09 | (superseded) Brand name undecided | Use a placeholder name in code and config until decided |
 | 2026-10-13 | Admin area at `/admin` with a sidebar (a tab bar on phones), in the same colors and tokens as the public site. Overview: headline numbers for the last 7, 30 or 90 days. Orders: filters, a list and the order beside it, status New / Confirmed / Delivered / Cancelled. Customers: made from the orders. Lists show ten to a page, and every page shows skeletons while the orders load. Built on `AdminOrderRepository`; shows sample data until the backend and admin sign-in exist | Owner needs to see who ordered and work through the orders. A real adapter must wait for admin sign-in (ARCHITECTURE sections 7.7 and 7.8) |
-| 2026-10-15 | Province, city and barangay in the "Get now" form are chosen from the free public PSGC API (`psgc.gitlab.io`), not typed. If a list cannot be loaded or a place is missing, the three fields turn into text boxes. Sitio and purok go in the street field. "City of Cebu" is shown as "Cebu City" | A complete address that is spelled the same way every time, remote places included. The API is a free community service with 2022 data, so typing stays as the safety net (ARCHITECTURE section 7.8) |
+| 2026-10-16 | Review cards sell one at a time at ₱499. The "Any 2 cards" and "All 3 cards" bundles are no longer sold or accepted; old orders keep their bundle | Owner decision |
+| 2026-10-17 | One product, "NFC card", at ₱499 each. The order form takes a quantity for every chosen card (Facebook, Instagram, Google review), 1 to 20 of each per order. Orders hold items (platform and quantity) instead of a bundle; the admin groups them by size (1, 2, 3+ cards) | Owner request. The cap of 20 per platform is a default against abuse; raise it on request |
+| 2026-10-17 | NFC + Website package becomes a subscription: ₱479 a month, or ₱3,999 a year (about ₱333 a month, 30% less than 12 months; under ₱4,000 to win yearly sign-ups). The pricing card opens on 1 year and sits beside the ₱499 NFC card | Owner decision |
+| 2026-10-17 | Owners need an account before the dashboard: sign up or log in with Google, or with email and password (the email is the username). "Get started" opens the sign-up modal (a modal, not a separate page) when nobody is logged in, then goes on to the dashboard; card orders through "Get now" stay without an account | Owner request. Email is needed for verification and password reset anyway; guest card orders keep the ₱499 purchase quick |

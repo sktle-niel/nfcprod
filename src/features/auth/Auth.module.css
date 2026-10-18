@@ -1,0 +1,152 @@
+.brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.logo {
+  --logo-height: 28px;
+}
+
+.content {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.google {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .google:hover:not(:disabled) {
+    background: var(--color-pill-hover);
+  }
+}
+
+/* "—— or ——" between Google and the email form. */
+.or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-size: 0.85rem;
+}
+
+.or::before,
+.or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-line);
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+}
+
+.reveal {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-pill);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.status:empty {
+  display: none;
+}
+
+.status p {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-bg);
+  color: var(--color-danger-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.submit {
+  min-height: 52px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.google:disabled,
+.submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.notice,
+.footer {
+  margin: 0;
+  color: var(--color-ink-soft);
+  text-align: center;
+}
+
+.notice {
+  font-size: 0.8rem;
+}
+
+.footer {
+  font-size: 0.92rem;
+}
+
+/* Reads as a link: it swaps between sign-up and log-in inside the same modal. */
+.switch {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.google:focus-visible,
+.reveal:focus-visible,
+.submit:focus-visible,
+.switch:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.demo {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-tint);
+  color: var(--color-ink);
+  font-size: 0.82rem;
+  text-align: center;
+}

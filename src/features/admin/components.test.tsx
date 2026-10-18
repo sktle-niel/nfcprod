@@ -130,6 +130,13 @@ describe('MiniBars and Sparkline', () => {
     expect(within(table).getByRole('row', { name: /Oct 13/ })).toHaveTextContent('4')
   })
 
+  it('hides that table through a box around it, since a table alone ignores overflow and stretches the page', () => {
+    render(<Sparkline points={points} caption="Orders" />)
+    const table = screen.getByRole('table', { name: 'Orders' })
+    expect(table.parentElement?.tagName).toBe('DIV')
+    expect(table).not.toHaveAttribute('class')
+  })
+
   it('marks the latest value of the trend', () => {
     render(<Sparkline points={points} caption="Revenue" format={(value) => `P${value}`} />)
     expect(document.querySelector('span[title]')).toHaveAttribute('title', 'Oct 13: P4')

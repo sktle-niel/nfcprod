@@ -1,0 +1,110 @@
+/* The shell both price cards share, so they line up side by side with their buttons on one line. */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 24px 28px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  transition: transform 220ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    transform: translateY(-6px);
+  }
+}
+
+.badge {
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.priceBox {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-width: 80%;
+  padding: 14px 20px 12px;
+  border: 2px solid var(--color-ink);
+  border-radius: var(--radius-md);
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.price strong {
+  font-size: clamp(2.4rem, 9vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.price small {
+  color: var(--color-ink-soft);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.note {
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.body {
+  margin: 0;
+  max-width: 30ch;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+/* Fits a link and a button. The auto margin pushes it to the bottom of a stretched card. */
+.cta {
+  align-self: stretch;
+  margin-top: auto;
+  padding: 15px 26px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out);
+}
+
+.cta:active {
+  transform: scale(0.98);
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}

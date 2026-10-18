@@ -28,15 +28,14 @@ export const demoMenu = {
   ],
 } as const
 
-// Package price in integer centavos.
-export const packagePrice = 179900
+// NFC + Website package in integer centavos, by the month or by the year. The year sits under
+// ₱4,000 to win yearly sign-ups: about ₱333 a month, 30% less than 12 months.
+export const packagePlans = {
+  month: 47900,
+  year: 399900,
+} as const
+export type Billing = keyof typeof packagePlans
+export const BILLINGS: readonly Billing[] = ['month', 'year']
 
-// Placeholder until sign-up exists (Phase 2).
-export const CTA_HREF = '/dashboard'
-
-// Review-card bundles. Prices and savings are integer centavos.
-export const bundles = [
-  { id: 'one', price: 58000, save: null, best: false },
-  { id: 'two', price: 78000, save: 38000, best: false },
-  { id: 'three', price: 139900, save: 77900, best: true },
-] as const
+// Price of one review card in integer centavos. The server decides what is charged.
+export const cardPrice = 49900

@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { copy } from '@/config/copy'
-import { BUNDLE_IDS, ORDER_STATUSES } from '@/entities/order/order'
+import { ORDER_STATUSES } from '@/entities/order/order'
 import type { OrderStatus } from '@/entities/order/order'
 import { useAdminData } from './adminData'
 import { filterOrders } from './filterOrders'
@@ -14,7 +14,7 @@ import { paginate, showTop } from './paging'
 import { Panel } from './Panel'
 import { SegmentedControl } from './SegmentedControl'
 import { toStatus } from './status'
-import { lastDays } from './stats'
+import { lastDays, SIZES } from './stats'
 import ui from './ui.module.css'
 
 const text = copy.admin.orders
@@ -23,7 +23,7 @@ const PAGE_SIZE = 10
 
 /**
  * Every order, filtered and paged, with the one you picked beside it. On phones it is the list first and
- * the order on its own screen (/admin/orders/NFC-...). The status, bundle, period and page sit in the
+ * the order on its own screen (/admin/orders/NFC-...). The status, size, period and page sit in the
  * address, so a link, Back and Forward bring the same list back. None of it is personal data. The search
  * text is, so it stays in the page.
  */
@@ -36,7 +36,7 @@ export function OrdersPage() {
   const [query, setQuery] = useState('')
 
   const status = toStatus(params.get('status')) ?? 'all'
-  const bundle = BUNDLE_IDS.find((id) => id === params.get('bundle')) ?? 'all'
+  const size = SIZES.find((id) => id === params.get('size')) ?? 'all'
   const days = periods.find((period) => String(period.days) === params.get('period'))?.days ?? 0
 
   /** Sets (or, with null, removes) values in the address. */
@@ -60,8 +60,8 @@ export function OrdersPage() {
   const from = days === 0 ? null : lastDays(asOf, days).from
   // The status counts ignore the status filter itself, so every tab shows how many it would give.
   const matching = useMemo(
-    () => filterOrders(records, { query, status: 'all', bundle, from }),
-    [records, query, bundle, from],
+    () => filterOrders(records, { query, status: 'all', size, from }),
+    [records, query, size, from],
   )
   const shown = status === 'all' ? matching : matching.filter((order) => order.status === status)
 
@@ -119,15 +119,15 @@ export function OrdersPage() {
         />
         <select
           className={ui.field}
-          aria-label={text.bundle}
-          value={bundle}
+          aria-label={text.size}
+          value={size}
           disabled={loading}
-          onChange={(event) => filter({ bundle: BUNDLE_IDS.find((id) => id === event.target.value) ?? null })}
+          onChange={(event) => filter({ size: SIZES.find((id) => id === event.target.value) ?? null })}
         >
-          <option value="all">{text.allBundles}</option>
-          {BUNDLE_IDS.map((id) => (
+          <option value="all">{text.allSizes}</option>
+          {SIZES.map((id) => (
             <option key={id} value={id}>
-              {copy.admin.bundles[id]}
+              {copy.admin.sizes[id]}
             </option>
           ))}
         </select>

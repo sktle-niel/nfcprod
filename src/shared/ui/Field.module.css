@@ -24,6 +24,22 @@
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
+/* Room for a button inside the right end of the input. */
+.control {
+  position: relative;
+}
+
+.withTrailing {
+  padding-right: 84px;
+}
+
+.trailing {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+}
+
 textarea.input {
   resize: vertical;
   min-height: 84px;
@@ -36,11 +52,11 @@ textarea.input {
 .input:focus-visible {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgb(47 128 237 / 0.25);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .input[aria-invalid='true'] {
-  border-color: #d92d20;
+  border-color: var(--color-danger);
 }
 
 /* A select wears the input look. Its own arrow is hidden and a chevron is drawn on the wrapper instead. */
@@ -95,14 +111,6 @@ textarea.input {
 }
 
 .error {
-  color: #d92d20;
+  color: var(--color-danger);
   font-weight: 600;
-}
-
-:global([data-theme='dark']) .error {
-  color: #ff8a80;
-}
-
-:global([data-theme='dark']) .input[aria-invalid='true'] {
-  border-color: #ff8a80;
 }
