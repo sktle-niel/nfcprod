@@ -10,17 +10,17 @@
 }
 
 .dialog::backdrop {
-  background: rgb(8 12 22 / 0.6);
+  background: rgb(var(--scrim) / 0.6);
   animation: fade 200ms ease both;
 }
 
 /* Page behind the dialog stays put. The scrollbar gutter stays reserved so the page does not widen
    when its scrollbar goes away; the empty strip is tinted like the page under the backdrop
-   (same rgb(8 12 22) at 60%). */
+   (the same scrim at 60%). */
 :global(html:has(dialog[open])) {
   overflow: hidden;
   scrollbar-gutter: stable;
-  background-color: color-mix(in srgb, rgb(var(--bg-edge)) 40%, rgb(8 12 22));
+  background-color: color-mix(in srgb, rgb(var(--bg-edge)) 40%, rgb(var(--scrim)));
   transition: background-color 200ms ease;
 }
 
@@ -120,7 +120,7 @@
 .demo {
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  background: rgb(47 128 237 / 0.12);
+  background: var(--color-accent-tint);
   font-size: 0.9rem;
   font-weight: 600;
 }

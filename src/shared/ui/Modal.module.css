@@ -10,7 +10,7 @@
 }
 
 .dialog::backdrop {
-  background: rgb(8 12 22 / 0.6);
+  background: rgb(var(--scrim) / 0.6);
   animation: fade 200ms ease both;
 }
 

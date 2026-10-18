@@ -26,6 +26,18 @@
   --color-accent: #2f80ed;
   --color-accent-soft: #bfe3f5;
 
+  /* Accent tints for chosen chips, notes and focus rings. They follow the accent of the theme. */
+  --color-accent-tint: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-focus-ring: color-mix(in srgb, var(--color-accent) 25%, transparent);
+
+  /* Errors: field text and borders (danger), the message box above a submit button (ink on bg) */
+  --color-danger: #d92d20;
+  --color-danger-ink: #b42318;
+  --color-danger-bg: rgb(217 45 32 / 0.1);
+
+  /* Modal backdrop as R G B, so it can take an alpha */
+  --scrim: 8 12 22;
+
   /* Page background */
   --bg-edge: 234 237 240;
   --page-bg: linear-gradient(
@@ -74,6 +86,9 @@
 
   --color-accent: #4d9bff;
   --color-accent-soft: rgb(60 130 255 / 0.4);
+
+  --color-danger: #ff8a80;
+  --color-danger-ink: #ffb4ab;
 
   --bg-edge: 10 16 30;
   --page-bg:

@@ -81,14 +81,10 @@
   margin: 0;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  background: rgb(217 45 32 / 0.1);
-  color: #b42318;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-ink);
   font-size: 0.9rem;
   font-weight: 600;
-}
-
-:global([data-theme='dark']) .status p {
-  color: #ffb4ab;
 }
 
 .submit {
@@ -149,7 +145,7 @@
   margin: 0;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  background: var(--color-accent-tint);
   color: var(--color-ink);
   font-size: 0.82rem;
   text-align: center;

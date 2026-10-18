@@ -43,7 +43,7 @@
 
 .on {
   border-color: var(--color-accent);
-  background: rgb(47 128 237 / 0.1);
+  background: var(--color-accent-tint);
 }
 
 /* The real input stays focusable for keyboards but is visually replaced by the chip. */
@@ -194,11 +194,7 @@
 
 .error {
   margin: 8px 0 0;
-  color: #d92d20;
+  color: var(--color-danger);
   font-size: 0.82rem;
   font-weight: 600;
-}
-
-:global([data-theme='dark']) .error {
-  color: #ff8a80;
 }

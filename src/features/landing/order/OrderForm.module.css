@@ -58,13 +58,9 @@
 
 .error {
   margin: 6px 0 0;
-  color: #d92d20;
+  color: var(--color-danger);
   font-size: 0.82rem;
   font-weight: 600;
-}
-
-:global([data-theme='dark']) .error {
-  color: #ff8a80;
 }
 
 .status:empty {
@@ -75,14 +71,10 @@
   margin: 0;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  background: rgb(217 45 32 / 0.1);
-  color: #b42318;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-ink);
   font-size: 0.9rem;
   font-weight: 600;
-}
-
-:global([data-theme='dark']) .status p {
-  color: #ffb4ab;
 }
 
 /* The total and the order button stay in view while the form scrolls, edge to edge in the sheet.
