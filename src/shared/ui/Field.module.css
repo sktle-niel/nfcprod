@@ -59,6 +59,46 @@ textarea.input {
   border-color: var(--color-danger);
 }
 
+/* A select wears the input look. Its own arrow is hidden and a chevron is drawn on the wrapper instead. */
+.selectWrap {
+  position: relative;
+}
+
+.selectWrap::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--color-ink-soft);
+  border-bottom: 2px solid var(--color-ink-soft);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.select {
+  appearance: none;
+  padding-right: 44px;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+/* The empty first option is the prompt, so it reads like a placeholder. */
+.select:required:invalid {
+  color: var(--color-muted);
+}
+
+.select option {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .hint,
 .error {
   margin: 0;

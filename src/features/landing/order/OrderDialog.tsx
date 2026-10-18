@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { copy } from '@/config/copy'
+import type { LocationRepository } from '@/data/locations'
 import { orders, type OrderRepository } from '@/data/orders'
 import type { OrderReceipt } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
@@ -11,10 +12,12 @@ import { OrderForm } from './OrderForm'
 type Props = {
   onClose: () => void
   repository?: OrderRepository
+  /** Where the province, city and barangay lists come from. */
+  locations?: LocationRepository | undefined
 }
 
 /** Modal "Get now" form on the shared modal sheet. After a sent order it shows the reference. */
-export function OrderDialog({ onClose, repository = orders }: Props) {
+export function OrderDialog({ onClose, repository = orders, locations }: Props) {
   const text = copy.order
   const [done, setDone] = useState<{ receipt: OrderReceipt; phone: string } | null>(null)
 
@@ -45,7 +48,7 @@ export function OrderDialog({ onClose, repository = orders }: Props) {
             </button>
           </div>
         ) : (
-          <OrderForm repository={repository} onDone={(receipt, phone) => setDone({ receipt, phone })} />
+          <OrderForm repository={repository} locations={locations} onDone={(receipt, phone) => setDone({ receipt, phone })} />
         )
       }
     </Modal>
