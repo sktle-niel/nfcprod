@@ -12,12 +12,13 @@ type Props = {
   autoComplete?: string
   placeholder?: string
   maxLength: number
-  list?: string
   required?: boolean
   /** Sits inside the right end of the input, for example a show-password button. */
   trailing?: ReactNode
   /** Typed exactly: no capital first letter, no spell check. On by default for email and password. */
   exact?: boolean
+  /** Fills the field when it first shows. The field stays uncontrolled. */
+  defaultValue?: string | undefined
 }
 
 /** Label, input (or textarea) and error text wired together for screen readers. */
@@ -32,26 +33,28 @@ export function Field({
   autoComplete,
   placeholder,
   maxLength,
-  list,
   required = true,
   trailing,
   exact = type === 'email' || type === 'password',
+  defaultValue,
 }: Props) {
   const id = useId()
   const describedBy = [hint ? `${id}-hint` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ')
   const shared = {
     id,
     name,
+    'data-field': name,
     maxLength,
     required,
     placeholder,
     autoComplete,
+    defaultValue,
     className: trailing ? `${styles.input} ${styles.withTrailing}` : styles.input,
     'aria-invalid': error ? true : undefined,
     'aria-describedby': describedBy || undefined,
   }
   const typing = exact ? { autoCapitalize: 'none', spellCheck: false } : {}
-  const input = <input {...shared} {...typing} type={type} inputMode={inputMode} list={list} />
+  const input = <input {...shared} {...typing} type={type} inputMode={inputMode} />
 
   return (
     <div className={styles.field}>

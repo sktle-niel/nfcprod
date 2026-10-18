@@ -18,17 +18,6 @@
   color: var(--color-ink-soft);
 }
 
-.pair {
-  display: grid;
-  gap: 14px;
-}
-
-@media (min-width: 560px) {
-  .pair {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
 /* Bot trap: off-screen rather than display:none, which some bots skip. */
 .trap {
   position: absolute;
