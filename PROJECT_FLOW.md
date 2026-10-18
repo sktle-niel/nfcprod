@@ -176,6 +176,7 @@ Each business only sees its own data (row-level security on `businessId`).
 6. Do we need a hidden abuse ceiling on products per business (no plan limits for now)?
 7. Terms of Service and Privacy Policy text (owner emails and customer delivery details are collected).
 8. Where do "Get now" orders go (Supabase table, email, Messenger)? How long are delivery details kept?
+9. The place lists come from a free community API with 2022 data (no Maguindanao split, no new municipalities). Keep it, or host our own copy of the latest PSA data before launch?
 
 ## 11. Decision Log
 
@@ -200,6 +201,7 @@ Each business only sees its own data (row-level security on `businessId`).
 | 2026-10-09 | "Get now" order form on the card bundles collects delivery details (name, mobile, province, city, barangay, street, landmark). Runs in demo mode until an endpoint is set | Orders need a delivery address; see ARCHITECTURE section 7.8 for privacy and abuse rules |
 | 2026-10-09 | (superseded) Brand name undecided | Use a placeholder name in code and config until decided |
 | 2026-10-13 | Admin area at `/admin` with a sidebar (a tab bar on phones), in the same colors and tokens as the public site. Overview: headline numbers for the last 7, 30 or 90 days. Orders: filters, a list and the order beside it, status New / Confirmed / Delivered / Cancelled. Customers: made from the orders. Lists show ten to a page, and every page shows skeletons while the orders load. Built on `AdminOrderRepository`; shows sample data until the backend and admin sign-in exist | Owner needs to see who ordered and work through the orders. A real adapter must wait for admin sign-in (ARCHITECTURE sections 7.7 and 7.8) |
+| 2026-10-15 | Province, city and barangay in the "Get now" form are chosen from the free public PSGC API (`psgc.gitlab.io`), not typed. If a list cannot be loaded or a place is missing, the three fields turn into text boxes. Sitio and purok go in the street field. "City of Cebu" is shown as "Cebu City" | A complete address that is spelled the same way every time, remote places included. The API is a free community service with 2022 data, so typing stays as the safety net (ARCHITECTURE section 7.8) |
 | 2026-10-16 | Review cards sell one at a time at ₱499. The "Any 2 cards" and "All 3 cards" bundles are no longer sold or accepted; old orders keep their bundle | Owner decision |
 | 2026-10-17 | One product, "NFC card", at ₱499 each. The order form takes a quantity for every chosen card (Facebook, Instagram, Google review), 1 to 20 of each per order. Orders hold items (platform and quantity) instead of a bundle; the admin groups them by size (1, 2, 3+ cards) | Owner request. The cap of 20 per platform is a default against abuse; raise it on request |
 | 2026-10-17 | NFC + Website package becomes a subscription: ₱479 a month, or ₱3,999 a year (about ₱333 a month, 30% less than 12 months; under ₱4,000 to win yearly sign-ups). The pricing card opens on 1 year and sits beside the ₱499 NFC card | Owner decision |
