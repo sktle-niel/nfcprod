@@ -99,7 +99,7 @@ Coffee and equipment suppliers, POS and printer vendors, signage shops, packagin
 
 **Days 1 to 30 (prove it)**
 - Finish the landing page and a **demo menu** (`/m/demo`).
-- Replace the placeholder "Get started" link with a real contact path (Messenger or Viber link or an inquiry form).
+- ~~Replace the placeholder "Get started" link~~ Done: "Get started" opens the owner sign-up, and "Get your card" leads to the "Get now" order form (decision log, 2026-10-17). Decide if a Messenger or Viber link for questions is still needed.
 - Recruit 3 resellers. Sign up 10 pilot businesses **(assumption)**. Build their menus free.
 - Collect photos, short quotes and tap videos from the pilots (with permission).
 
@@ -148,13 +148,13 @@ Needs product support: tap counts, referral code tracking, and an "activity" vie
 
 1. Renewal price and terms after year 1 (domain and hosting).
 2. Reseller rule and rate, and the payout day.
-3. The "Get started" destination (Messenger, Viber, form, or phone).
+3. ~~The "Get started" destination~~ Decided 2026-10-17: it opens the owner sign-up. Card orders go through "Get now".
 4. Domain (the brand name is NFC Menu; the domain is still needed before printing cards).
 5. Who builds the pilot menus (you or the reseller).
 
 ## 11. Build tasks that support this plan (frontend)
 
-- [ ] Real "Get started" and "Get your card" destination (replace the placeholder link)
+- [x] Real "Get started" and "Get your card" destination: "Get started" opens the owner sign-up, "Get your card" goes to pricing and the "Get now" order form
 - [ ] `/m/demo` public demo menu to show on the tap
 - [ ] `?ref=` code kept through the page and added to the contact link
 - [ ] Short FAQ section (objections above)

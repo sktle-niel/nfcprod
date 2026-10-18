@@ -110,8 +110,8 @@ Each business only sees its own data (row-level security on `businessId`).
 |---|---|---|
 | Frontend | React + Vite + TypeScript | Scaffolded in this repo |
 | Routing | React Router | `/m/:slug` public, `/dashboard/*` owner, `/admin/*` us |
-| Styling | CSS variables for the theme | Theme tokens set per business at runtime |
-| Backend / DB / Auth / Storage | To decide (see section 10) | Needs auth, DB, image storage |
+| Styling | CSS Modules + CSS variable tokens | Theme tokens set per business at runtime (`src/shared/theme/tokens.css`) |
+| Backend / DB / Auth / Storage | Supabase (Postgres, Auth, Storage, row-level security) | Decided, not built yet. Free plan for development, paid plan before the first real client |
 | Hosting | To decide | Fast loading on mobile data is key |
 | NFC | NDEF URL record | Plain link on the card, no app needed |
 
@@ -153,7 +153,7 @@ Each business only sees its own data (row-level security on `businessId`).
 ### Phase 5 — Platform features
 - [ ] Reseller (partner) accounts and invite / claim links
 - [x] Admin area at `/admin`: Overview, Orders, Customers (sample data until the backend and admin sign-in exist)
-- [ ] Admin panel
+- [ ] Rest of the admin flow (section 3.3): clients and subscriptions, presets and templates, support tools
 - [ ] Analytics: taps, views, popular items
 - [ ] Multi-branch, multi-language
 - [ ] Optional later: reservation link, call-waiter (no payments, no ordering)
