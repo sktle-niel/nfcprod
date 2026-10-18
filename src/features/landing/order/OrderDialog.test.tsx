@@ -57,6 +57,18 @@ describe('OrderDialog', () => {
     )
   })
 
+  it('closes with Done once the order is in', async () => {
+    const { onClose, user } = setup()
+    await user.click(screen.getByRole('checkbox', { name: /google review/i }))
+    await fillDetails(user)
+    await user.click(screen.getByLabelText(/i agree/i))
+    await user.click(screen.getByRole('button', { name: /place order/i }))
+
+    await user.click(await screen.findByRole('button', { name: 'Done' }))
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('dialog', { hidden: true })).not.toHaveAttribute('open')
+  })
+
   it('adds a quantity for every chosen card and keeps the total in view', async () => {
     const { user } = setup()
     expect(screen.getByRole('status')).toHaveTextContent('Total · 0 cards₱0')
