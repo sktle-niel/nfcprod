@@ -41,11 +41,14 @@ function checkText(value: string, rule: TextRule): FieldError | null {
   return null
 }
 
+/** What a province, city or barangay name must look like. Place lists from outside are cleaned until they fit this. */
+export const PLACE_NAME = { min: 2, max: 60, pattern: PLACE } satisfies TextRule
+
 const RULES = {
   fullName: { min: 2, max: 80, pattern: PERSON_NAME },
-  province: { min: 2, max: 60, pattern: PLACE },
-  city: { min: 2, max: 60, pattern: PLACE },
-  barangay: { min: 2, max: 60, pattern: PLACE },
+  province: PLACE_NAME,
+  city: PLACE_NAME,
+  barangay: PLACE_NAME,
   street: { min: 3, max: 120, pattern: PLACE },
   landmark: { min: 8, max: 200, pattern: LANDMARK },
 } satisfies Record<string, TextRule>
