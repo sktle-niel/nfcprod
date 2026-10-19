@@ -19,6 +19,8 @@
 }
 
 .badge {
+  display: inline-flex;
+  align-items: center;
   padding: 8px 18px;
   border-radius: var(--radius-pill);
   background: var(--color-btn-bg);
@@ -40,6 +42,7 @@
 
 .priceBox {
   display: grid;
+  align-content: center;
   justify-items: center;
   gap: 4px;
   min-width: 80%;
@@ -83,6 +86,14 @@
   color: var(--color-ink);
 }
 
+/* The check list and anything under it (the platform icons). */
+.perks {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 16px;
+}
+
 /* Fits a link and a button. The auto margin pushes it to the bottom of a stretched card. */
 .cta {
   align-self: stretch;
@@ -107,4 +118,34 @@
 .cta:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
+}
+
+/* Every card has six parts: badge, name, price, body, perks, button. With subgrid each part sits on a row
+   shared by all cards, so prices and buttons line up even when a name wraps or a list runs longer. */
+@supports (grid-template-rows: subgrid) {
+  .card {
+    display: grid;
+    grid-row: span 6;
+    grid-template-rows: subgrid;
+    justify-items: center;
+    row-gap: 16px;
+  }
+
+  .badge {
+    align-self: start;
+  }
+
+  .name {
+    align-self: center;
+  }
+
+  /* Fills its row, so every price box has the same height. */
+  .priceBox {
+    align-self: stretch;
+  }
+
+  .cta {
+    align-self: end;
+    justify-self: stretch;
+  }
 }

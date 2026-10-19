@@ -152,7 +152,7 @@ Each business only sees its own data (row-level security on `businessId`).
 
 ### Phase 5 — Platform features
 - [ ] Reseller (partner) accounts and invite / claim links
-- [x] Admin area at `/admin`: Overview, Orders, Customers (sample data until the backend and admin sign-in exist)
+- [x] Admin area at `/admin`: Overview, Orders, Customers, Pricing (sample data until the backend and admin sign-in exist)
 - [ ] Rest of the admin flow (section 3.3): clients and subscriptions, presets and templates, support tools
 - [ ] Analytics: taps, views, popular items
 - [ ] Multi-branch, multi-language
@@ -206,3 +206,6 @@ Each business only sees its own data (row-level security on `businessId`).
 | 2026-10-17 | One product, "NFC card", at ₱499 each. The order form takes a quantity for every chosen card (Facebook, Instagram, Google review), 1 to 20 of each per order. Orders hold items (platform and quantity) instead of a bundle; the admin groups them by size (1, 2, 3+ cards) | Owner request. The cap of 20 per platform is a default against abuse; raise it on request |
 | 2026-10-17 | NFC + Website package becomes a subscription: ₱479 a month, or ₱3,999 a year (about ₱333 a month, 30% less than 12 months; under ₱4,000 to win yearly sign-ups). The pricing card opens on 1 year and sits beside the ₱499 NFC card | Owner decision |
 | 2026-10-17 | Owners need an account before the dashboard: sign up or log in with Google, or with email and password (the email is the username). "Get started" opens the sign-up modal (a modal, not a separate page) when nobody is logged in, then goes on to the dashboard; card orders through "Get now" stay without an account | Owner request. Email is needed for verification and password reset anyway; guest card orders keep the ₱499 purchase quick |
+| 2026-10-19 | Pricing shows three cards side by side: NFC card, NFC + Website monthly, NFC + Website annual (with the "Save 30%" mark). The monthly / yearly switch is gone. Every card keeps its badge, name, price, text, list and button on shared rows, so prices and buttons line up | Owner request: each plan easy to compare at a glance |
+| 2026-10-19 | NFC card price drops from ₱499 to ₱379 each. Old orders keep the total they were placed at | Owner decision |
+| 2026-10-19 | Prices are set by the admin at `/admin/pricing` (NFC card, NFC + Website monthly and annual), not in code. The landing page and the order form read them; the Save mark and "You save" note follow from the monthly and annual prices. Kept in memory until a backend and admin sign-in exist | Owner request: change prices without a code change |

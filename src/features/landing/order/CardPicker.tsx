@@ -2,11 +2,12 @@ import { copy } from '@/config/copy'
 import { MAX_QUANTITY, PLATFORMS, type Platform } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
 import { PlatformIcon } from '../components/PlatformIcon'
-import { cardPrice } from '../landing.data'
 import styles from './CardPicker.module.css'
 import { chosenPlatforms, clampQuantity, toQuantity, type Quantities } from './quantities'
 
 type Props = {
+  /** One card in centavos. */
+  price: number
   quantities: Quantities
   onChange: (next: Quantities) => void
   error?: string | undefined
@@ -21,7 +22,7 @@ function selectAll({ currentTarget }: { currentTarget: HTMLInputElement }) {
 }
 
 /** Which cards the customer wants and how many of each. Every chosen platform gets its own quantity. */
-export function CardPicker({ quantities, onChange, error }: Props) {
+export function CardPicker({ price, quantities, onChange, error }: Props) {
   const text = copy.order.cards
   const chosen = chosenPlatforms(quantities)
 
@@ -91,7 +92,7 @@ export function CardPicker({ quantities, onChange, error }: Props) {
                     <PlatformIcon platform={platform} className={styles.icon} />
                     <span className={styles.lineText}>
                       {name}
-                      <small className={styles.subtotal}>{quantity > 0 ? formatPeso(quantity * cardPrice) : ''}</small>
+                      <small className={styles.subtotal}>{quantity > 0 ? formatPeso(quantity * price) : ''}</small>
                     </span>
                   </span>
                   <span className={styles.stepper}>

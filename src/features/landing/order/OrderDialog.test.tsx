@@ -11,7 +11,7 @@ function setup(repository?: OrderRepository, locations: LocationRepository = fak
     submit: vi.fn().mockResolvedValue({ reference: 'NM-TEST1', demo: false }),
   }
   const onClose = vi.fn()
-  render(<OrderDialog onClose={onClose} repository={repo} locations={locations} />)
+  render(<OrderDialog price={37900} onClose={onClose} repository={repo} locations={locations} />)
   return { repo, onClose, user: userEvent.setup() }
 }
 
@@ -48,7 +48,7 @@ describe('OrderDialog', () => {
   it('opens as a modal with the card name and price', () => {
     setup()
     expect(screen.getByRole('dialog', { name: /get your nfc card/i })).toBeInTheDocument()
-    expect(screen.getByText('NFC card · ₱499 each')).toBeInTheDocument()
+    expect(screen.getByText('NFC card · ₱379 each')).toBeInTheDocument()
   })
 
   it('shows what is missing and sends nothing for an empty form', async () => {
@@ -130,12 +130,12 @@ describe('OrderDialog', () => {
     await user.click(screen.getByRole('checkbox', { name: /instagram/i }))
     await user.click(screen.getByRole('checkbox', { name: /google review/i }))
     expect(screen.getAllByRole('textbox', { name: /quantity/i })).toHaveLength(3)
-    expect(total()).toHaveTextContent('Total · 3 cards₱1,497')
+    expect(total()).toHaveTextContent('Total · 3 cards₱1,137')
 
     await user.click(screen.getByRole('button', { name: /more facebook cards/i }))
     expect(screen.getByRole('textbox', { name: /facebook quantity/i })).toHaveValue('2')
-    expect(screen.getByText('₱998')).toBeInTheDocument()
-    expect(total()).toHaveTextContent('Total · 4 cards₱1,996')
+    expect(screen.getByText('₱758')).toBeInTheDocument()
+    expect(total()).toHaveTextContent('Total · 4 cards₱1,516')
 
     await user.click(screen.getByRole('checkbox', { name: /instagram/i }))
     expect(screen.getAllByRole('textbox', { name: /quantity/i })).toHaveLength(2)
@@ -148,7 +148,7 @@ describe('OrderDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Set all to 5' }))
     expect(screen.getByRole('textbox', { name: /facebook quantity/i })).toHaveValue('5')
     expect(screen.getByRole('textbox', { name: /google review quantity/i })).toHaveValue('5')
-    expect(total()).toHaveTextContent('Total · 10 cards₱4,990')
+    expect(total()).toHaveTextContent('Total · 10 cards₱3,790')
   })
 
   it('replaces the number when the customer types over it', async () => {
