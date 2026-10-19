@@ -1,7 +1,10 @@
 import { useState, type CSSProperties } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { copy } from '@/config/copy'
 import { PLATFORMS } from '@/entities/order/order'
 import { salePrice, type Offer } from '@/entities/pricing/pricing'
+import { authLink, CARD_ORDER, ORDER_PARAM } from '@/shared/session/authLink'
+import { useSession } from '@/shared/session/context'
 import { OrderDialog } from '../order/OrderDialog'
 import styles from './CardOffer.module.css'
 import { CheckList } from './CheckList'
@@ -14,10 +17,37 @@ type Props = {
   offer: Offer | null
 }
 
-/** The review card offer: one price per card, any mix of platforms, ordered through the "Get now" form. */
+/**
+ * The review card offer: one price per card, any mix of platforms, ordered through the "Get now" form.
+ * Orders need an account: "Get now" signs the visitor up first, then comes back with the form open.
+ */
 export function CardOffer({ offer }: Props) {
   const text = copy.landing.pricing.card
-  const [ordering, setOrdering] = useState(false)
+  const { session } = useSession()
+  const navigate = useNavigate()
+  const [params, setParams] = useSearchParams()
+  const [open, setOpen] = useState(false)
+  // Back from sign-up with ?order=cards: the form opens by itself.
+  const ordering = open || (session !== null && params.get(ORDER_PARAM) === 'cards')
+
+  function getNow() {
+    if (session) setOpen(true)
+    else navigate(`/${authLink('signup', CARD_ORDER)}`)
+  }
+
+  function close() {
+    setOpen(false)
+    if (params.has(ORDER_PARAM)) {
+      setParams(
+        (current) => {
+          const next = new URLSearchParams(current)
+          next.delete(ORDER_PARAM)
+          return next
+        },
+        { replace: true },
+      )
+    }
+  }
 
   return (
     <>
@@ -45,13 +75,13 @@ export function CardOffer({ offer }: Props) {
           className={plan.cta}
           aria-label={`${text.getNow}: ${text.name}`}
           disabled={offer === null}
-          onClick={() => setOrdering(true)}
+          onClick={getNow}
         >
           {text.getNow}
         </button>
       </article>
       {/* Outside the card, so the card's hover lift never moves the open dialog. */}
-      {ordering && offer !== null && <OrderDialog price={salePrice(offer)} onClose={() => setOrdering(false)} />}
+      {ordering && offer !== null && <OrderDialog price={salePrice(offer)} name={session?.account.name} onClose={close} />}
     </>
   )
 }

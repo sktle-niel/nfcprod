@@ -17,6 +17,8 @@ type Errors = Partial<Record<FieldName, FieldError>>
 type Props = {
   /** One card in centavos, for the running total. The server decides what is charged. */
   price: number
+  /** Fills the name field to start with. */
+  name?: string | undefined
   repository: OrderRepository
   /** Where the province, city and barangay lists come from. */
   locations?: LocationRepository | undefined
@@ -34,7 +36,7 @@ function errorText(field: FieldName, code: FieldError): string {
   return text[code]
 }
 
-export function OrderForm({ price, repository, locations = publicLocations, onDone }: Props) {
+export function OrderForm({ price, name, repository, locations = publicLocations, onDone }: Props) {
   const { fields } = copy.order
   const formRef = useRef<HTMLFormElement>(null)
   const [errors, setErrors] = useState<Errors>({})
@@ -106,7 +108,7 @@ export function OrderForm({ price, repository, locations = publicLocations, onDo
       <CardPicker price={price} quantities={quantities} onChange={setQuantities} error={message('platforms')} />
 
       <div className={styles.section}>
-        <Field name="fullName" label={fields.fullName.label} placeholder={fields.fullName.placeholder} autoComplete="name" maxLength={80} error={message('fullName')} />
+        <Field name="fullName" label={fields.fullName.label} placeholder={fields.fullName.placeholder} autoComplete="name" maxLength={80} defaultValue={name} error={message('fullName')} />
         <Field name="phone" type="tel" inputMode="tel" label={fields.phone.label} placeholder={fields.phone.placeholder} hint={fields.phone.hint} autoComplete="tel" maxLength={20} error={message('phone')} />
       </div>
 

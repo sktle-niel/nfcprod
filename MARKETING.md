@@ -1,7 +1,7 @@
 # MARKETING.md — Go-to-Market Strategy
 
 Goal: get business owners to **buy** the NFC cards and **keep using** the menu website.
-Scope: Philippines, peso pricing, menu and review cards only (no payments or ordering in the app).
+Scope: Philippines, peso pricing, menu and review cards. Owners pay for their plan through a hosted checkout; the menu takes no orders or payments. New accounts get a 7-day free trial and 2 free menu cards once a plan is paid.
 Numbers marked **(assumption)** are starting guesses to test, not facts.
 
 ## 1. Who we sell to

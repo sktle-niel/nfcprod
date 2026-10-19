@@ -6,6 +6,7 @@ describe('safeNext', () => {
     ['/dashboard', '/dashboard'],
     ['/dashboard/menu?tab=items', '/dashboard/menu?tab=items'],
     ['/dashboard#theme', '/dashboard#theme'],
+    ['/?order=cards', '/?order=cards'],
   ])('keeps %j', (value, expected) => {
     expect(safeNext(value)).toBe(expected)
   })
@@ -20,6 +21,8 @@ describe('safeNext', () => {
     '/admin',
     '/dashboardx',
     '/dashboard%2F..%2Fadmin',
+    '/?order=cards&x=1',
+    '/?order=other',
   ])('sends %j to the dashboard instead', (value) => {
     expect(safeNext(value)).toBe('/dashboard')
   })
