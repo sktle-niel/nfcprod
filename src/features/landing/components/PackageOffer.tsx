@@ -1,28 +1,29 @@
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { copy } from '@/config/copy'
-import { yearSaving, type Prices } from '@/entities/pricing/pricing'
-import { formatPeso, formatPrice } from '@/shared/lib/money'
+import { yearSaving, type Pricing } from '@/entities/pricing/pricing'
+import { formatPeso } from '@/shared/lib/money'
 import { useStartLink } from '@/shared/session/authLink'
 import { CheckList } from './CheckList'
-import styles from './PackageOffer.module.css'
 import plan from './Plan.module.css'
+import { DiscountChip, PriceTag } from './PriceTag'
 
 export type Billing = 'month' | 'year'
 
 type Props = {
   billing: Billing
-  /** Null while the prices load. */
-  prices: Prices | null
+  /** Null while the offers load. */
+  pricing: Pricing | null
   /** Position in the pricing row, for the staggered reveal. */
   index: number
 }
 
 /** The NFC + Website package for one billing period. Monthly and annual each get their own card. */
-export function PackageOffer({ billing, prices, index }: Props) {
+export function PackageOffer({ billing, pricing, index }: Props) {
   const text = copy.landing.pricing.package
   const start = useStartLink()
-  const year = prices ? yearSaving(prices) : null
+  const offer = pricing ? pricing[billing] : null
+  const year = pricing ? yearSaving(pricing) : null
   // Only a real saving is worth a mark and a note.
   const saves = year !== null && year.saving > 0
   const note =
@@ -37,20 +38,18 @@ export function PackageOffer({ billing, prices, index }: Props) {
       <span className={plan.badge}>
         {text.badges[billing]}
         {billing === 'year' && saves && year.percent > 0 && (
-          <span className={styles.save}>{text.save.replace('{percent}', String(year.percent))}</span>
+          <span className={plan.chip}>{text.save.replace('{percent}', String(year.percent))}</span>
         )}
+        <DiscountChip offer={offer} />
       </span>
       <h3 className={plan.name}>{text.name}</h3>
       <div className={plan.priceBox}>
-        <p className={plan.price}>
-          <strong>{formatPrice(prices ? prices[billing] : null)}</strong>
-          <small>{text.per[billing]}</small>
-        </p>
+        <PriceTag offer={offer} unit={text.per[billing]} />
         <p className={plan.note}>{note}</p>
       </div>
       <p className={plan.body}>{text.body}</p>
       <div className={plan.perks}>
-        <CheckList items={text.features} />
+        <CheckList items={offer?.perks ?? []} />
       </div>
       <Link className={plan.cta} to={start}>
         {text.cta}

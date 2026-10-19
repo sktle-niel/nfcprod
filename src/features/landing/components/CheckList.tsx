@@ -6,8 +6,9 @@ type Props = { items: readonly string[] }
 export function CheckList({ items }: Props) {
   return (
     <ul className={styles.list}>
-      {items.map((item) => (
-        <li key={item}>
+      {items.map((item, index) => (
+        // The admin may list the same text twice, so the position is part of the key.
+        <li key={`${index}-${item}`}>
           <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" className={styles.check}>
             <circle cx="10" cy="10" r="10" fill="currentColor" />
             <path

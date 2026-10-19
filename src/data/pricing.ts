@@ -1,37 +1,48 @@
-import { checkPrices, type Prices } from '@/entities/pricing/pricing'
+import { copy } from '@/config/copy'
+import { checkPricing, isClean, type Pricing } from '@/entities/pricing/pricing'
 
-/** The prices could not be loaded or saved. */
+/** The offers could not be loaded or saved. */
 export class PricingError extends Error {}
 
 /**
- * The seam between the pages that show or edit prices and wherever they are kept.
+ * The seam between the pages that show or edit the offers and wherever they are kept.
  * A real adapter needs admin sign-in for `save`, and the server must charge from its own copy:
  * ARCHITECTURE sections 7.7 and 7.8.
  */
 export interface PricingRepository {
-  get(): Promise<Prices>
-  /** Returns the prices as they are after the change. */
-  save(prices: Prices): Promise<Prices>
+  get(): Promise<Pricing>
+  /** Returns the offers as they are after the change. */
+  save(pricing: Pricing): Promise<Pricing>
 }
 
-/** The prices the platform starts with. */
-export const DEFAULT_PRICES: Prices = { card: 37900, month: 47900, year: 399900 }
+const { card, package: plan } = copy.landing.pricing
 
-/** Demo mode: the prices live in this tab's memory, so a change shows on the landing page until a reload. */
-export function createMockPricing(seed: Prices = DEFAULT_PRICES, { delay = 0 }: { delay?: number } = {}): PricingRepository {
-  let current = { ...seed }
+/** What the platform starts with: no discounts, and the perks from the copy. */
+export const DEFAULT_PRICING: Pricing = {
+  card: { price: 37900, discount: 0, perks: [...card.perks] },
+  month: { price: 47900, discount: 0, perks: [...plan.features] },
+  year: { price: 399900, discount: 0, perks: [...plan.features] },
+}
+
+function copyOf(pricing: Pricing): Pricing {
+  return structuredClone(pricing)
+}
+
+/** Demo mode: the offers live in this tab's memory, so a change shows on the landing page until a reload. */
+export function createMockPricing(seed: Pricing = DEFAULT_PRICING, { delay = 0 }: { delay?: number } = {}): PricingRepository {
+  let current = copyOf(seed)
   const wait = () => new Promise((resolve) => setTimeout(resolve, delay))
   return {
     async get() {
       await wait()
-      return { ...current }
+      return copyOf(current)
     },
-    async save(prices) {
+    async save(pricing) {
       await wait()
       // The server repeats the admin's checks, so this does too.
-      if (Object.keys(checkPrices(prices)).length > 0) throw new PricingError('invalid prices')
-      current = { ...prices }
-      return { ...current }
+      if (!isClean(checkPricing(pricing))) throw new PricingError('invalid offers')
+      current = copyOf(pricing)
+      return copyOf(current)
     },
   }
 }

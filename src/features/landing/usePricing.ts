@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react'
 import { pricing, type PricingRepository } from '@/data/pricing'
-import type { Prices } from '@/entities/pricing/pricing'
+import type { Pricing } from '@/entities/pricing/pricing'
 
 /**
- * The prices the admin set, or null until they arrive. If they cannot be loaded they stay null:
+ * The offers the admin set, or null until they arrive. If they cannot be loaded they stay null:
  * a dash is better than a price that may be wrong.
  */
-export function usePrices(repository: PricingRepository = pricing): Prices | null {
-  const [prices, setPrices] = useState<Prices | null>(null)
+export function usePricing(repository: PricingRepository = pricing): Pricing | null {
+  const [offers, setOffers] = useState<Pricing | null>(null)
 
   useEffect(() => {
     let live = true
     repository.get().then(
       (loaded) => {
-        if (live) setPrices(loaded)
+        if (live) setOffers(loaded)
       },
       () => {},
     )
@@ -22,5 +22,5 @@ export function usePrices(repository: PricingRepository = pricing): Prices | nul
     }
   }, [repository])
 
-  return prices
+  return offers
 }
