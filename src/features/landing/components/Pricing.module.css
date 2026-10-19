@@ -13,15 +13,15 @@
   text-align: center;
 }
 
-/* The two offers side by side when two 300px cards fit, stacked on phones. The max width keeps
-   each card at 420px or less on wide screens. */
+/* The three offers side by side when 280px cards fit, stacked on phones. The max width keeps
+   each card at 380px or less on wide screens. Each card spans the six rows of Plan.module.css. */
 .plans {
-  --plan-max: 420px;
+  --plan-max: 380px;
   --plan-gap: 24px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   align-items: stretch;
   gap: var(--plan-gap);
-  max-width: calc(2 * var(--plan-max) + var(--plan-gap));
+  max-width: calc(3 * var(--plan-max) + 2 * var(--plan-gap));
   margin-inline: auto;
 }

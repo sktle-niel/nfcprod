@@ -27,15 +27,3 @@ export const demoMenu = {
     { name: 'Chicken Rice Bowl', note: 'Best seller', price: 18500, tone: '#d98b5f' },
   ],
 } as const
-
-// NFC + Website package in integer centavos, by the month or by the year. The year sits under
-// ₱4,000 to win yearly sign-ups: about ₱333 a month, 30% less than 12 months.
-export const packagePlans = {
-  month: 47900,
-  year: 399900,
-} as const
-export type Billing = keyof typeof packagePlans
-export const BILLINGS: readonly Billing[] = ['month', 'year']
-
-// Price of one review card in integer centavos. The server decides what is charged.
-export const cardPrice = 49900

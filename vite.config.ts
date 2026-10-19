@@ -12,5 +12,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    // jsdom suites are CPU-heavy. One worker per core starves each of them on a busy machine and
+    // UI tests time out at random, which blocks the commit hook. Two workers run as fast and stay steady.
+    maxWorkers: 2,
+    testTimeout: 15_000,
   },
 })

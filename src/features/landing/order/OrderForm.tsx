@@ -7,7 +7,6 @@ import { validateOrder, type FieldError, type FieldName } from '@/entities/order
 import { formatPeso } from '@/shared/lib/money'
 import { plural } from '@/shared/lib/plural'
 import { Field } from '@/shared/ui/Field'
-import { cardPrice } from '../landing.data'
 import { CardPicker } from './CardPicker'
 import styles from './OrderForm.module.css'
 import { PlaceFields } from './PlaceFields'
@@ -16,6 +15,8 @@ import { cardTotal, type Quantities } from './quantities'
 type Errors = Partial<Record<FieldName, FieldError>>
 
 type Props = {
+  /** One card in centavos, for the running total. The server decides what is charged. */
+  price: number
   repository: OrderRepository
   /** Where the province, city and barangay lists come from. */
   locations?: LocationRepository | undefined
@@ -33,7 +34,7 @@ function errorText(field: FieldName, code: FieldError): string {
   return text[code]
 }
 
-export function OrderForm({ repository, locations = publicLocations, onDone }: Props) {
+export function OrderForm({ price, repository, locations = publicLocations, onDone }: Props) {
   const { fields } = copy.order
   const formRef = useRef<HTMLFormElement>(null)
   const [errors, setErrors] = useState<Errors>({})
@@ -102,7 +103,7 @@ export function OrderForm({ repository, locations = publicLocations, onDone }: P
 
   return (
     <form ref={formRef} className={styles.form} onSubmit={handleSubmit} noValidate>
-      <CardPicker quantities={quantities} onChange={setQuantities} error={message('platforms')} />
+      <CardPicker price={price} quantities={quantities} onChange={setQuantities} error={message('platforms')} />
 
       <div className={styles.section}>
         <Field name="fullName" label={fields.fullName.label} placeholder={fields.fullName.placeholder} autoComplete="name" maxLength={80} error={message('fullName')} />
@@ -142,7 +143,7 @@ export function OrderForm({ repository, locations = publicLocations, onDone }: P
           <span>
             {copy.order.total} · {plural(count, copy.order.cards.count)}
           </span>
-          <strong>{formatPeso(count * cardPrice)}</strong>
+          <strong>{formatPeso(count * price)}</strong>
         </p>
         <button type="submit" className={styles.submit} disabled={sending}>
           {sending ? copy.order.sending : copy.order.submit}

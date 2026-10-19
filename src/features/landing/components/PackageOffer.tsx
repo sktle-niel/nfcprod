@@ -1,58 +1,57 @@
-import { useState, type CSSProperties } from 'react'
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { copy } from '@/config/copy'
-import { formatPeso } from '@/shared/lib/money'
+import { yearSaving, type Prices } from '@/entities/pricing/pricing'
+import { formatPeso, formatPrice } from '@/shared/lib/money'
 import { useStartLink } from '@/shared/session/authLink'
-import { BILLINGS, packagePlans, type Billing } from '../landing.data'
 import { CheckList } from './CheckList'
 import styles from './PackageOffer.module.css'
 import plan from './Plan.module.css'
 
-// What a year saves against 12 single months.
-const fullYear = packagePlans.month * 12
-const saving = fullYear - packagePlans.year
-const percent = Math.floor((saving / fullYear) * 100)
-const perMonthOfYear = Math.round(packagePlans.year / 12 / 100) * 100
+export type Billing = 'month' | 'year'
 
-/** The NFC + Website package, paid by the month or by the year. It opens on the year, the plan we want owners to pick. */
-export function PackageOffer() {
+type Props = {
+  billing: Billing
+  /** Null while the prices load. */
+  prices: Prices | null
+  /** Position in the pricing row, for the staggered reveal. */
+  index: number
+}
+
+/** The NFC + Website package for one billing period. Monthly and annual each get their own card. */
+export function PackageOffer({ billing, prices, index }: Props) {
   const text = copy.landing.pricing.package
-  const [billing, setBilling] = useState<Billing>('year')
   const start = useStartLink()
+  const year = prices ? yearSaving(prices) : null
+  // Only a real saving is worth a mark and a note.
+  const saves = year !== null && year.saving > 0
   const note =
-    billing === 'year'
-      ? text.notes.year.replace('{month}', formatPeso(perMonthOfYear)).replace('{saving}', formatPeso(saving))
-      : text.notes.month
+    billing === 'month'
+      ? text.notes.month
+      : saves
+        ? text.notes.year.replace('{month}', formatPeso(year.perMonth)).replace('{saving}', formatPeso(year.saving))
+        : text.notes.yearOnly
 
   return (
-    <article className={`${plan.card} reveal`} style={{ '--i': 2 } as CSSProperties}>
-      <span className={plan.badge}>{text.badge}</span>
+    <article className={`${plan.card} reveal`} style={{ '--i': index } as CSSProperties}>
+      <span className={plan.badge}>
+        {text.badges[billing]}
+        {billing === 'year' && saves && year.percent > 0 && (
+          <span className={styles.save}>{text.save.replace('{percent}', String(year.percent))}</span>
+        )}
+      </span>
       <h3 className={plan.name}>{text.name}</h3>
-      <div className={styles.billing} role="radiogroup" aria-label={text.billing}>
-        {BILLINGS.map((option) => (
-          <label key={option} className={`${styles.option} ${option === billing ? styles.on : ''}`}>
-            <input
-              className={styles.radio}
-              type="radio"
-              name="billing"
-              value={option}
-              checked={option === billing}
-              onChange={() => setBilling(option)}
-            />
-            {text.plans[option]}
-            {option === 'year' && <span className={styles.save}>{text.save.replace('{percent}', String(percent))}</span>}
-          </label>
-        ))}
-      </div>
-      <div className={plan.priceBox} aria-live="polite">
+      <div className={plan.priceBox}>
         <p className={plan.price}>
-          <strong>{formatPeso(packagePlans[billing])}</strong>
+          <strong>{formatPrice(prices ? prices[billing] : null)}</strong>
           <small>{text.per[billing]}</small>
         </p>
         <p className={plan.note}>{note}</p>
       </div>
       <p className={plan.body}>{text.body}</p>
-      <CheckList items={text.features} />
+      <div className={plan.perks}>
+        <CheckList items={text.features} />
+      </div>
       <Link className={plan.cta} to={start}>
         {text.cta}
       </Link>
