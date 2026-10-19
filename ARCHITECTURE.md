@@ -49,12 +49,14 @@ Each surface is a separate lazy-loaded route group so the public bundle never ca
 src/
   app/            app shell, router, providers, error boundary
   features/
+    landing/      platform landing page (pricing, card bundles, "Get now" order form)
     landing/      platform landing page (pricing, "Get now" card order form)
     menu/         public menu (categories, product, variant and add-on picker)
     auth/         sign-up and log-in modal
     onboarding/   business type selection, preset apply
     dashboard/    editors (branding, theme, categories, products, modifiers)
     admin/        Overview, Orders, Customers (sample data until the backend exists)
+  entities/       domain types and pure logic (Business, Product, Variant, Modifier, Theme, Order)
   entities/       domain types and pure logic (Business, Product, Variant, Modifier, Theme, Order, Account)
   shared/
     ui/           design-system components (Button, Card, Sheet, Input, Tabs, Skeleton ...)
@@ -123,6 +125,7 @@ User 1--* Business 1--* Category 1--* Product 1--* Variant
                    Product *--* ModifierGroup
 Business: id, ownerId, slug, name, types[], theme, settings, plan, status, version
 Preset:   type, defaultCategories, defaultTheme, defaultFeatures
+Order:    reference, bundleId, platforms[], delivery details, status, total, createdAt
 Order:    reference, items[] (platform, quantity), delivery details, status, total, createdAt
 ```
 
