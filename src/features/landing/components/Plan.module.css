@@ -40,6 +40,17 @@
   text-transform: uppercase;
 }
 
+/* A chip inside the badge ("SAVE 30%", "20% OFF"). Takes the badge color, so it reads in both themes. */
+.chip {
+  margin-left: 8px;
+  padding: 1px 7px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
 .priceBox {
   display: grid;
   align-content: center;
@@ -64,6 +75,24 @@
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.03em;
+}
+
+/* The regular price before a discount. */
+.was {
+  align-self: center;
+  color: var(--color-ink-soft);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* Read out by screen readers only. */
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .price small {

@@ -61,6 +61,14 @@
   background: color-mix(in srgb, var(--color-btn-fg) 22%, transparent);
 }
 
+/* A red dot after the label. */
+.alert {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-danger);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .option[aria-pressed='false']:not(:disabled):hover {
     background: var(--color-pill-hover);
