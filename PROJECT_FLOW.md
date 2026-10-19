@@ -35,12 +35,13 @@ Any business with a menu listing:
 
 ### 3.2 Owner flow (dashboard)
 
-1. Sign up / log in.
-2. **Onboarding:** "What kind of business is this?" Pick one or more (see section 4).
-3. The system applies a **preset** (default categories, layout, theme, features).
-4. Owner customizes: branding, theme, categories, products, sizes, add-ons.
-5. Live preview, then publish.
-6. Get the menu link and QR code. Write the link to the NFC card (NDEF URL record).
+1. Sign up / log in ("Get your card", "Get started" and "Get now" all lead here). A 7-day free trial starts, with 2 free NFC website cards waiting for a plan.
+2. Account page: trial days left, choose Monthly or Annual, pay on the hosted checkout. The free cards ship once the plan is paid. When the trial or a plan ends, the menu is paused, not deleted.
+3. **Onboarding:** "What kind of business is this?" Pick one or more (see section 4).
+4. The system applies a **preset** (default categories, layout, theme, features).
+5. Owner customizes: branding, theme, categories, products, sizes, add-ons.
+6. Live preview, then publish.
+7. Get the menu link and QR code. Write the link to the NFC card (NDEF URL record).
 
 ### 3.2b Reseller flow (NFC card sellers)
 
@@ -52,7 +53,7 @@ Card sellers promote the platform and help set up their customers. The owner alw
 4. Reseller may assist during setup and sees only basic status of their referred clients (no passwords, no private data).
 5. Reseller writes or hands over the NFC card with the owner's menu link.
 
-Scope: **menu showing and landing page only.** No payments, no ordering, no customer accounts.
+Scope: **menu showing and landing page only.** No ordering in the menu, no customer accounts. Owners pay for their own plan through a hosted checkout.
 
 ### 3.3 Admin flow (us)
 
@@ -209,3 +210,6 @@ Each business only sees its own data (row-level security on `businessId`).
 | 2026-10-19 | Pricing shows three cards side by side: NFC card, NFC + Website monthly, NFC + Website annual (with the "Save 30%" mark). The monthly / yearly switch is gone. Every card keeps its badge, name, price, text, list and button on shared rows, so prices and buttons line up | Owner request: each plan easy to compare at a glance |
 | 2026-10-19 | NFC card price drops from ₱499 to ₱379 each. Old orders keep the total they were placed at | Owner decision |
 | 2026-10-19 | Prices are set by the admin at `/admin/pricing` (NFC card, NFC + Website monthly and annual), not in code. The landing page and the order form read them; the Save mark and "You save" note follow from the monthly and annual prices. Kept in memory until a backend and admin sign-in exist | Owner request: change prices without a code change |
+| 2026-10-19 | The admin can give each offer a percent discount (0 to 90%) and edit what it includes (up to 8 check-mark items). The landing page shows the regular price struck through, the price to pay and a "% off" mark; card orders total at the discounted price. No end date on discounts yet | Owner request: run promos and change the offer text without a code change |
+| 2026-10-19 | Every purchase needs an owner account: "Get your card" and "Get now" open sign-up or log-in first (supersedes the 2026-10-17 guest card orders). A new account gets a 7-day free trial and 2 free NFC cards for the menu website, sent once a plan is paid. The account page (`/dashboard`) shows the trial, lets the owner pick Monthly or Annual and pay. After the trial or a paid period the menu is paused, not deleted | Owner request. Free cards only after payment, so trials cost nothing to hand out |
+| 2026-10-19 | Plans are paid online through a hosted checkout (PayMongo planned); only the provider's signed webhook turns a plan on (supersedes "No payments" of 2026-10-09 for owner plans; the menu still takes no orders or payments) | Owner decision. Hosted checkout keeps card data off our servers (PCI SAQ A). Mock until the backend exists (ARCHITECTURE 7.9) |

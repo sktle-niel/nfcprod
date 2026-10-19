@@ -9,6 +9,10 @@ export type AuthMode = 'signup' | 'login'
 export const AUTH_PARAM = 'auth'
 export const NEXT_PARAM = 'next'
 
+// The landing page with the card order form open: where "Get now" comes back to after sign-in.
+export const ORDER_PARAM = 'order'
+export const CARD_ORDER = `/?${ORDER_PARAM}=cards`
+
 export function authLink(mode: AuthMode, next?: string): string {
   const params = new URLSearchParams({ [AUTH_PARAM]: mode })
   if (next) params.set(NEXT_PARAM, next)

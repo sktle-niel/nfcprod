@@ -36,7 +36,7 @@ Status: **frontend first**. Backend and infrastructure sections are the target d
 Four surfaces, one codebase:
 - **Platform landing** `/`: anonymous marketing page with pricing and the "Get now" card order form (section 7.8). The owner sign-up and log-in modal opens over any page from the address (`?auth=signup`, `?auth=login`).
 - **Public menu** `/m/:slug`: anonymous, read-only, cached, lightest bundle.
-- **Owner dashboard** `/dashboard/*`: authenticated, edits one business.
+- **Owner account** `/dashboard/*`: authenticated. Trial and plan, free cards, and (next) the editors for one business.
 - **Admin** `/admin/*`: platform staff only, strongest controls.
 
 Each surface is a separate lazy-loaded route group so the public bundle never carries dashboard or admin code.
@@ -101,8 +101,7 @@ interface OwnerRepository {
 }
 ```
 
-- Today: only the order repositories exist. `OrderRepository` (`src/data/orders.ts`) has a mock adapter, and an `http` adapter that is used when `VITE_ORDERS_ENDPOINT` is an `https:` URL (or localhost). `AdminOrderRepository` (`src/data/adminOrders.ts`) is mock only.
-- Today: no menu repository yet. `OrderRepository` (`src/data/orders.ts`) has a mock adapter, and an `http` adapter that is used when `VITE_ORDERS_ENDPOINT` is an `https:` URL (or localhost). `AdminOrderRepository` (`src/data/adminOrders.ts`) and `AuthRepository` (`src/data/auth.ts`) are mock only.
+- Today: no menu repository yet. `OrderRepository` (`src/data/orders.ts`) has a mock adapter, and an `http` adapter that is used when `VITE_ORDERS_ENDPOINT` is an `https:` URL (or localhost). `AdminOrderRepository` (`src/data/adminOrders.ts`), `AuthRepository` (`src/data/auth.ts`), `PricingRepository` (`src/data/pricing.ts`) and `BillingRepository` (`src/data/billing.ts`) are mock only.
 - Phase 1: a `mock` menu adapter returns sample businesses (coffee, fine dining, hybrid).
 - Later: `http` adapters call the real API. The UI does not change.
 - Components never call `fetch` directly.
@@ -280,7 +279,7 @@ The review card offer has a "Get now" form. It collects: the chosen cards and ho
 - **Purpose limit:** used only to confirm, deliver and set up the order. The form says so and needs an explicit consent checkbox.
 - **Client checks are for speed only.** The server repeats every check (`src/entities/order/validate.ts` is the reference): length limits, character allow-list, PH mobile format, the card lines (each platform once, a whole quantity from 1 to 20, `MAX_QUANTITY`).
 - **The server decides the price** from the items: number of cards times the card price it keeps itself (₱379 each to start). The form never sends a price.
-- **Prices are set by the admin** at `/admin/pricing` through `PricingRepository` (`src/data/pricing.ts`): the NFC card, the monthly and the annual package, in whole pesos (₱1 to ₱100,000; a year may not cost more than 12 months, rules in `src/entities/pricing/pricing.ts`). The landing page and the order form read them from the same repository. In demo mode they live in the tab's memory and reset on reload. A real adapter needs admin sign-in with MFA, the server repeats the checks, writes an audit entry for each change, and charges new orders from its own copy. Orders already placed keep their total.
+- **Offers are set by the admin** at `/admin/pricing` through `PricingRepository` (`src/data/pricing.ts`): for the NFC card, the monthly and the annual package, a regular price in whole pesos (₱1 to ₱100,000), a percent discount (0 to 90, rounded to the peso), and up to 8 included items (2 to 80 characters, plain text, shown with check marks). A year may not cost more than 12 months at regular prices. Rules in `src/entities/pricing/pricing.ts`. Customers pay the discounted price, and the order form totals with it. The landing page and the order form read them from the same repository. In demo mode they live in the tab's memory and reset on reload. A real adapter needs admin sign-in with MFA, the server repeats the checks, writes an audit entry for each change, and charges new orders from its own copy. Orders already placed keep their total.
 - **Place lists:** province, city and barangay are chosen from lists, not typed. `LocationRepository` (`src/data/locations.ts`) reads the free public PSGC API (`https://psgc.gitlab.io/api`: static JSON, CORS open, no key), or the origin in `VITE_LOCATIONS_API`. That origin must be in CSP `connect-src`. A request carries only a PSGC code: no cookies, no referrer, nothing the customer typed. The host still sees the visitor's IP and which place was opened. Every response is checked before use: codes must be digits (they end up in a URL path), names are cleaned until they pass the same place rule as the server (`PLACE_NAME` in `validate.ts`), lists have a size cap, and a request times out after 12 seconds.
 - **Limits of that data:** it dates from August 2022 (81 provinces, so Maguindanao is not split yet) and stops at the barangay, so sitio and purok go in the street field. Metro Manila has no provinces, so the adapter adds it as a province and reads its cities from the region. Two cities are listed under no province (City of Isabela, City of Cotabato); the adapter adds them to Basilan and Maguindanao. "City of Cebu" is written "Cebu City".
 - **Typing is the way out.** If a list cannot be loaded, or the place is missing, the three fields turn into text boxes (what was chosen stays), so an order is never blocked. The server cannot tell a chosen name from a typed one: it validates the text like any other input and must not assume it matches the PSGC. A real backend that wants clean places has to check them against its own copy of the PSGC.
@@ -291,6 +290,22 @@ The review card offer has a "Get now" form. It collects: the chosen cards and ho
 - **Admin path:** the admin reads every order and changes its status through `AdminOrderRepository` (`src/data/adminOrders.ts`). It shows sample data, kept in memory, until a backend exists. For now the repository returns every order and the lists are cut into pages in the browser; with real data the repository has to filter, count and page on the server. A real adapter needs admin sign-in with MFA, row-level security, and an audit entry for each read and each status change.
 - **Privacy notice:** a short notice and a link to the Privacy Policy must exist before launch (still to write).
 - **Today:** no backend is connected. Without an endpoint the form runs in demo mode and says nothing was sent.
+
+### 7.9 Owner accounts, trial and plan payments
+
+Owners need an account for everything they buy: "Get your card" and "Get now" open the sign-up modal first. "Get now" comes back to the home page with the order form open (`/?order=cards`, the only non-owner path `safeNext` allows).
+
+- **Trial:** the server starts a 7-day trial at sign-up (`TRIAL_DAYS`, `src/entities/account/subscription.ts`). The owner's menu website is live during the trial.
+- **Free cards:** every account carries 2 free NFC cards that open the owner's menu website (`FREE_WEBSITE_CARDS`). They are sent only once a plan is paid, so a trial costs nothing to hand out. One set per account; the server must also limit it per phone number and delivery address, because emails are cheap to make.
+- **Plans:** monthly or annual, at the prices the admin sets (section 7.8, discount included). The server reads the price from its own offers, never from the browser.
+- **Payments: hosted checkout only (PayMongo, planned).** The browser asks the server to start a checkout, gets back the provider's checkout address and goes there. Card details never touch our pages or servers (PCI SAQ A). Rules:
+  - The secret key lives only on the server. Nothing payment-related goes in a `VITE_` value.
+  - The browser goes only to an allow-listed checkout host over `https` (`isCheckoutUrl`, `src/data/billing.ts`). Anything else is refused, so a bad response cannot become an open redirect.
+  - **Only the provider's signed webhook turns a plan on.** Verify the signature, ignore repeats (idempotency by event id), and check the amount and currency against our own price. The return page after checkout only shows "processing"; it changes nothing.
+  - Every plan change gets an audit entry. No card data or full payment payloads in logs.
+- **After the trial or a paid period:** the menu is paused, never deleted (`isMenuLive`). The public menu shows a "not available" page and the NFC link keeps working, so it comes back as soon as a plan is paid.
+- **Today:** `BillingRepository` (`src/data/billing.ts`) is a mock. Each owner's standing lives in the tab's memory, the trial starts the first time the account page asks, and "checkout" turns the plan on at once without taking any payment. The account page says so.
+- **CSP:** going to the checkout is a navigation, not a fetch, so `connect-src` does not change. `form-action` stays `'self'`.
 
 ## 8. Scalability and Bottleneck Avoidance
 
@@ -403,4 +418,4 @@ Until there is a team: the project owner is the single owner of all of the above
 | Hosting / CDN | To pick with WAF and rate limits in mind | Before launch |
 | Brand name / domain | **Brand decided: NFC Menu** (`env.appName` reads `VITE_APP_NAME`, default NFC Menu). Domain still undecided | Domain: before the first card is printed |
 
-Decided: no payments, no ordering, no customer accounts (menu and landing page only). Owners sign up with email. Resellers set up clients through claim links.
+Decided: no ordering in the menu, no customer accounts. Owners sign up with email and pay for their plan through a hosted checkout (section 7.9). Resellers set up clients through claim links.

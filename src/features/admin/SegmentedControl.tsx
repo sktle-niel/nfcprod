@@ -4,6 +4,8 @@ type Option<T> = {
   value: T
   label: string
   count?: number
+  /** Something on that option needs attention: a dot, and this text for screen readers. */
+  alert?: string | undefined
 }
 
 type Props<T> = {
@@ -25,11 +27,14 @@ export function SegmentedControl<T extends string | number>({ label, value, opti
           type="button"
           className={styles.option}
           aria-pressed={option.value === value}
+          // Spelled out, so the alert is read after the label with a pause between them.
+          aria-label={option.alert ? [option.label, option.count, option.alert].filter((part) => part !== undefined).join(', ') : undefined}
           disabled={disabled}
           onClick={() => onChange(option.value)}
         >
           {option.label}
           {option.count !== undefined && <span className={styles.count}>{option.count}</span>}
+          {option.alert && <span className={styles.alert} />}
         </button>
       ))}
     </div>
