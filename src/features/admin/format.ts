@@ -1,3 +1,6 @@
+import { copy } from '@/config/copy'
+import type { OrderItem } from '@/entities/order/order'
+
 // The business runs on Philippine time, wherever the admin happens to be.
 const ZONE = 'Asia/Manila'
 const dateTime = new Intl.DateTimeFormat('en-PH', { dateStyle: 'medium', timeStyle: 'short', timeZone: ZONE })
@@ -13,6 +16,16 @@ export function formatDateTime(iso: string): string {
 export function formatDay(value: string | number): string {
   const date = new Date(value)
   return Number.isNaN(date.getTime()) ? String(value) : shortDay.format(date)
+}
+
+/** "Facebook × 2, Google review". A single card shows no count. */
+export function formatItems(items: readonly OrderItem[]): string {
+  return items
+    .map(({ platform, quantity }) => {
+      const name = copy.order.cardNames[platform]
+      return quantity > 1 ? `${name} × ${quantity}` : name
+    })
+    .join(', ')
 }
 
 /** +639171234567 becomes 0917 123 4567, the way people write and dial PH mobile numbers. */

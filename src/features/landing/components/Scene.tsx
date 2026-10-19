@@ -1,6 +1,5 @@
 import type { CSSProperties } from 'react'
 import { copy } from '@/config/copy'
-import { CTA_HREF } from '../landing.data'
 import { CardImage } from './CardImage'
 import { BrandMark } from './BrandMark'
 import { PhoneMenu } from './PhoneMenu'
@@ -61,7 +60,7 @@ export function Scene() {
           <div className={styles.side} style={index(3)}>
             <p>{hero.body}</p>
             <div className={styles.actions}>
-              <a className={styles.primary} href={CTA_HREF}>
+              <a className={styles.primary} href="#pricing">
                 {hero.cta}
               </a>
               <a className={styles.link} href="#how">

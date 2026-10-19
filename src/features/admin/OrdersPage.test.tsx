@@ -14,9 +14,11 @@ const records = [
     phone: '+639172222222',
     createdAt: '2026-10-05T05:00:00Z',
     status: 'confirmed',
-    bundleId: 'three',
     total: 139900,
-    platforms: ['facebook', 'instagram', 'google'],
+    items: [
+      { platform: 'facebook', quantity: 1 },
+      { platform: 'google', quantity: 2 },
+    ],
     city: 'Davao City',
     province: 'Davao del Sur',
   }),
@@ -53,7 +55,7 @@ describe('OrdersPage', () => {
     expect(within(screen.getByRole('article')).getByRole('heading', { name: 'NFC-BBBBBB' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Ben Reyes/ })).toHaveAttribute('aria-current', 'true')
     expect(screen.getByRole('link', { name: /Ana Cruz/ })).not.toHaveAttribute('aria-current')
-    expect(within(screen.getByRole('article')).getByText('Facebook, Instagram, Google review')).toBeInTheDocument()
+    expect(within(screen.getByRole('article')).getByText('Facebook, Google review × 2')).toBeInTheDocument()
   })
 
   it('says so when the order in the address does not exist', () => {
@@ -85,10 +87,10 @@ describe('OrdersPage', () => {
     const user = userEvent.setup()
     open()
     await user.click(screen.getByRole('button', { name: /^Confirmed/ }))
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Bundle' }), '3 cards')
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Size' }), '3+ cards')
     expect(screen.getByRole('link', { name: /Ben Reyes/ })).toHaveAttribute(
       'href',
-      '/admin/orders/NFC-BBBBBB?status=confirmed&bundle=three',
+      '/admin/orders/NFC-BBBBBB?status=confirmed&size=more',
     )
   })
 
@@ -112,13 +114,13 @@ describe('OrdersPage', () => {
     expect(screen.getByText('No matching orders')).toBeInTheDocument()
   })
 
-  it('filters by bundle and by period', async () => {
+  it('filters by size and by period', async () => {
     const user = userEvent.setup()
     open()
 
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Bundle' }), '3 cards')
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Size' }), '3+ cards')
     expect(listed()).toEqual(['/admin/orders/NFC-BBBBBB'])
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Bundle' }), 'All bundles')
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Size' }), 'All sizes')
 
     await user.selectOptions(screen.getByRole('combobox', { name: 'Period' }), 'Last 30 days')
     expect(listed()).toEqual(['/admin/orders/NFC-AAAAAA', '/admin/orders/NFC-BBBBBB'])
@@ -192,7 +194,7 @@ describe('OrdersPage', () => {
       expect(pager()).toHaveTextContent('1–10 of 25')
 
       await user.click(screen.getByRole('button', { name: 'Next page' }))
-      await user.selectOptions(screen.getByRole('combobox', { name: 'Bundle' }), '1 card')
+      await user.selectOptions(screen.getByRole('combobox', { name: 'Size' }), '1 card')
       expect(pager()).toHaveTextContent('1–10 of 25')
 
       await user.click(screen.getByRole('button', { name: 'Next page' }))
@@ -230,7 +232,7 @@ describe('OrdersPage', () => {
     expect(screen.queryByText('No matching orders')).not.toBeInTheDocument()
     expect(screen.queryByText('Order not found')).not.toBeInTheDocument()
     expect(screen.getByRole('searchbox')).toBeDisabled()
-    expect(screen.getByRole('combobox', { name: 'Bundle' })).toBeDisabled()
+    expect(screen.getByRole('combobox', { name: 'Size' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'All' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'All' })).not.toHaveTextContent(/\d/)
   })

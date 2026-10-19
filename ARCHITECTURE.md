@@ -34,7 +34,7 @@ Status: **frontend first**. Backend and infrastructure sections are the target d
 ```
 
 Four surfaces, one codebase:
-- **Platform landing** `/`: anonymous marketing page with pricing, card bundles and the "Get now" order form (section 7.8).
+- **Platform landing** `/`: anonymous marketing page with pricing and the "Get now" card order form (section 7.8). The owner sign-up and log-in modal opens over any page from the address (`?auth=signup`, `?auth=login`).
 - **Public menu** `/m/:slug`: anonymous, read-only, cached, lightest bundle.
 - **Owner dashboard** `/dashboard/*`: authenticated, edits one business.
 - **Admin** `/admin/*`: platform staff only, strongest controls.
@@ -50,17 +50,20 @@ src/
   app/            app shell, router, providers, error boundary
   features/
     landing/      platform landing page (pricing, card bundles, "Get now" order form)
+    landing/      platform landing page (pricing, "Get now" card order form)
     menu/         public menu (categories, product, variant and add-on picker)
-    auth/         login, signup, session
+    auth/         sign-up and log-in modal
     onboarding/   business type selection, preset apply
     dashboard/    editors (branding, theme, categories, products, modifiers)
     admin/        Overview, Orders, Customers (sample data until the backend exists)
   entities/       domain types and pure logic (Business, Product, Variant, Modifier, Theme, Order)
+  entities/       domain types and pure logic (Business, Product, Variant, Modifier, Theme, Order, Account)
   shared/
     ui/           design-system components (Button, Card, Sheet, Input, Tabs, Skeleton ...)
     theme/        tokens, theme provider, theme-to-CSS-variables
     lib/          pure utils (money, slug, a11y, validation schemas)
     hooks/        generic hooks
+    session/      the signed-in owner (provider, useSession, sign-in links)
   data/           data layer: interface + adapters (mock now, real API later)
   presets/        business type presets as plain data
   config/         env access, all user-facing copy, feature flags, constants
@@ -99,9 +102,11 @@ interface OwnerRepository {
 ```
 
 - Today: only the order repositories exist. `OrderRepository` (`src/data/orders.ts`) has a mock adapter, and an `http` adapter that is used when `VITE_ORDERS_ENDPOINT` is an `https:` URL (or localhost). `AdminOrderRepository` (`src/data/adminOrders.ts`) is mock only.
+- Today: no menu repository yet. `OrderRepository` (`src/data/orders.ts`) has a mock adapter, and an `http` adapter that is used when `VITE_ORDERS_ENDPOINT` is an `https:` URL (or localhost). `AdminOrderRepository` (`src/data/adminOrders.ts`) and `AuthRepository` (`src/data/auth.ts`) are mock only.
 - Phase 1: a `mock` menu adapter returns sample businesses (coffee, fine dining, hybrid).
 - Later: `http` adapters call the real API. The UI does not change.
 - Components never call `fetch` directly.
+- The "Get now" form gets its province, city and barangay lists from a second repository, `LocationRepository` (`src/data/locations.ts`). See section 7.8.
 
 ### 3.4 Theme engine
 
@@ -122,6 +127,7 @@ User 1--* Business 1--* Category 1--* Product 1--* Variant
 Business: id, ownerId, slug, name, types[], theme, settings, plan, status, version
 Preset:   type, defaultCategories, defaultTheme, defaultFeatures
 Order:    reference, bundleId, platforms[], delivery details, status, total, createdAt
+Order:    reference, items[] (platform, quantity), delivery details, status, total, createdAt
 ```
 
 Rules:
@@ -135,7 +141,7 @@ Rules:
 ## 5. Backend Architecture (target, not built yet)
 
 - **Style:** a simple stateless API (REST or RPC), validated at the boundary, thin handlers, logic in services, data access in repositories.
-- **Auth:** managed provider or hardened in-house. Passwords hashed with a modern slow hash (Argon2id or bcrypt). Short-lived access token plus rotating refresh token in an HttpOnly, Secure, SameSite cookie.
+- **Auth:** managed provider or hardened in-house. Passwords hashed with a modern slow hash (Argon2id or bcrypt). Short-lived access token plus rotating refresh token in an HttpOnly, Secure, SameSite cookie. Owners sign in with Google or with email and password (Supabase Auth); the email is the username. Supabase JS keeps the session in localStorage by default, which section 7.3 forbids, so the session must use cookies (Supabase's cookie-based server sessions or a small server in front). Until then `AuthRepository` (`src/data/auth.ts`) is a mock: accounts live in the tab's memory, passwords only as salted hashes, nothing in storage.
 - **Tenancy:** row-level security on `businessId`. The owner id comes from the session, never from the request body.
 - **Storage:** object storage for images. Uploads go through signed URLs with type and size limits. The server re-checks type by content (magic bytes), re-encodes images, and strips metadata.
 - **Publish pipeline:** on publish, build one denormalized, versioned JSON snapshot of the menu, store it, and push it to the CDN. The public page reads only this snapshot, never the live tables.
@@ -220,7 +226,7 @@ Layer: **F** frontend, **B** backend, **D** database, **I** infrastructure.
 ```
 Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
                          img-src 'self' https://<storage-origin> data:; font-src 'self';
-                         connect-src 'self' https://<api-origin>; frame-ancestors 'none';
+                         connect-src 'self' https://<api-origin> https://psgc.gitlab.io; frame-ancestors 'none';
                          base-uri 'self'; form-action 'self'; object-src 'none'
 Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 X-Content-Type-Options: nosniff
@@ -269,11 +275,14 @@ Token policy:
 
 ### 7.8 Orders and personal data ("Get now" form)
 
-The card bundles have a "Get now" form. It collects: chosen cards, full name, PH mobile number, province, city, barangay, street, and a landmark with the exact location. This is personal data (Data Privacy Act), so it follows these rules.
+The review card offer has a "Get now" form. It collects: the chosen cards and how many of each, full name, PH mobile number, province, city, barangay, street, and a landmark with the exact location. This is personal data (Data Privacy Act), so it follows these rules.
 
 - **Purpose limit:** used only to confirm, deliver and set up the order. The form says so and needs an explicit consent checkbox.
-- **Client checks are for speed only.** The server repeats every check (`src/entities/order/validate.ts` is the reference): length limits, character allow-list, PH mobile format, card count per bundle.
-- **The server decides the price** from the bundle id. The form never sends a price.
+- **Client checks are for speed only.** The server repeats every check (`src/entities/order/validate.ts` is the reference): length limits, character allow-list, PH mobile format, the card lines (each platform once, a whole quantity from 1 to 20, `MAX_QUANTITY`).
+- **The server decides the price** from the items: number of cards times the card price (today ₱499 each). The form never sends a price.
+- **Place lists:** province, city and barangay are chosen from lists, not typed. `LocationRepository` (`src/data/locations.ts`) reads the free public PSGC API (`https://psgc.gitlab.io/api`: static JSON, CORS open, no key), or the origin in `VITE_LOCATIONS_API`. That origin must be in CSP `connect-src`. A request carries only a PSGC code: no cookies, no referrer, nothing the customer typed. The host still sees the visitor's IP and which place was opened. Every response is checked before use: codes must be digits (they end up in a URL path), names are cleaned until they pass the same place rule as the server (`PLACE_NAME` in `validate.ts`), lists have a size cap, and a request times out after 12 seconds.
+- **Limits of that data:** it dates from August 2022 (81 provinces, so Maguindanao is not split yet) and stops at the barangay, so sitio and purok go in the street field. Metro Manila has no provinces, so the adapter adds it as a province and reads its cities from the region. Two cities are listed under no province (City of Isabela, City of Cotabato); the adapter adds them to Basilan and Maguindanao. "City of Cebu" is written "Cebu City".
+- **Typing is the way out.** If a list cannot be loaded, or the place is missing, the three fields turn into text boxes (what was chosen stays), so an order is never blocked. The server cannot tell a chosen name from a typed one: it validates the text like any other input and must not assume it matches the PSGC. A real backend that wants clean places has to check them against its own copy of the PSGC.
 - **Abuse controls:** hidden trap field (silent drop), rate limit per IP and per phone number (for example 3 orders per hour per IP), request size cap, bot challenge when abused, 429 with `Retry-After`.
 - **Transport:** HTTPS endpoint only (`VITE_ORDERS_ENDPOINT`), no cookies, no referrer, add the endpoint to CSP `connect-src`.
 - **Storage:** encrypted at rest, row-level security, readable only by the owner and assigned staff, not copied into logs, analytics or error reports. Keep the personal fields apart from the order row so they can be deleted on their own.
@@ -389,6 +398,7 @@ Until there is a team: the project owner is the single owner of all of the above
 | Server state library | TanStack Query vs a small custom hook | Step 5 |
 | Validation library | Zod vs Valibot (smaller) | Step 5 |
 | Styling approach | **Decided: CSS Modules + CSS variable tokens** (`src/shared/theme/tokens.css`) | Done |
+| Place lists (province, city, barangay) | **Decided: the free public PSGC API** (`psgc.gitlab.io`) behind `LocationRepository`, with typing as the fallback. It is a free community service with 2022 data. Before launch, either keep it or host our own copy of the latest PSA PSGC data and point `VITE_LOCATIONS_API` at it | Done |
 | Hosting / CDN | To pick with WAF and rate limits in mind | Before launch |
 | Brand name / domain | **Brand decided: NFC Menu** (`env.appName` reads `VITE_APP_NAME`, default NFC Menu). Domain still undecided | Domain: before the first card is printed |
 

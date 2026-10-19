@@ -18,19 +18,16 @@ Segment 4 is the fastest door-opener: the review cards work for any business, so
 ## 2. Offer ladder (land and expand)
 
 ```
-₱580   1 NFC card          entry, impulse buy
-₱780   Any 2 cards         "just add one more"
-₱1,399 All 3 cards         best value, the anchor
-₱1,799 NFC + Website       flagship, recurring need (menu changes)
+₱499      NFC card (each)     entry, impulse buy; mix platforms and quantities
+₱479/mo   NFC + Website       flagship, recurring need (menu changes); ₱3,999 a year (₱333/mo) saves 30%
 ```
 
 Included in every offer: **free setup and guide** (sales point #1: "no work for you").
 
+Since 2026-10-16 every card costs ₱499, and since 2026-10-17 one order can mix platforms and quantities. The "Any 2 cards" and "All 3 cards" bundles were dropped (see the decision log in `PROJECT_FLOW.md`). The NFC + Website package became a subscription on 2026-10-17: ₱479 a month, or ₱3,999 a year (about ₱333 a month, 30% less than 12 months).
+
 Recommendations:
-1. **Fix the saving claim.** "Save ₱779" on All 3 cards does not match the price list (3 × ₱580 = ₱1,740, so the real saving is ₱341). Use the real number or explain what the ₱779 compares to. A wrong claim hurts trust and can be treated as misleading.
-2. **Add one combo** for owners who have a menu: website package + all 3 cards. Suggested starting point: about ₱2,799 **(assumption, test it)** versus ₱3,198 bought separately. Having one clear "get everything" option raises the average order.
-3. Keep **All 3 cards** as the visual "best value" so the ₱1,799 package feels reasonable beside it.
-4. Check margins before any promo: card cost, domain cost, setup time, reseller commission. "Free hosting + domain" must still leave profit after year 1. Decide the renewal price now (domain renews yearly) so there are no surprises later.
+1. Check margins before any promo: card cost, domain cost, setup time, reseller commission. "Free hosting + domain" must still leave profit after year 1. Decide the renewal price now (domain renews yearly) so there are no surprises later.
 
 ## 3. Message
 
@@ -95,14 +92,14 @@ Coffee and equipment suppliers, POS and printer vendors, signage shops, packagin
 | "Hindi techy ang customers." | "No app, no sign-up. Just tap, or scan the QR on the card." |
 | "Paano kung walang NFC phone?" | "QR code is printed on the card for that." |
 | "Sino mag-e-edit ng menu?" | "You, in a simple dashboard. And we guide you for free." |
-| "May monthly fee ba?" | Have a clear, honest answer ready (decide renewal terms first). |
+| "May monthly fee ba?" | "Cards: one-time ₱499 each. Website: ₱479 a month, or ₱3,999 a year (save 30%)." |
 | "Paano kung mawala ang card?" | "The link stays the same, so a replacement card works the same." |
 
 ## 6. Launch plan
 
 **Days 1 to 30 (prove it)**
 - Finish the landing page and a **demo menu** (`/m/demo`).
-- Replace the placeholder "Get started" link with a real contact path (Messenger or Viber link or an inquiry form).
+- ~~Replace the placeholder "Get started" link~~ Done: "Get started" opens the owner sign-up, and "Get your card" leads to the "Get now" order form (decision log, 2026-10-17). Decide if a Messenger or Viber link for questions is still needed.
 - Recruit 3 resellers. Sign up 10 pilot businesses **(assumption)**. Build their menus free.
 - Collect photos, short quotes and tap videos from the pilots (with permission).
 
@@ -131,7 +128,6 @@ Coffee and equipment suppliers, POS and printer vendors, signage shops, packagin
 |---|---|
 | Contacts → demos → paid | Funnel health |
 | Time from payment to live menu | Setup promise |
-| Share buying 2 cards or 3 cards | Bundle pricing works |
 | Review-card buyers who add a website | Upsell success |
 | Taps per business per week | Real usage |
 | Menu edits per business per month | Stickiness |
@@ -150,20 +146,16 @@ Needs product support: tap counts, referral code tracking, and an "activity" vie
 
 ## 10. Decisions needed from you
 
-1. The real "Save" figure for All 3 cards.
-2. Renewal price and terms after year 1 (domain and hosting).
-3. Reseller rule and rate, and the payout day.
-4. Whether to add the website + all 3 cards combo, and at what price.
-5. The "Get started" destination (Messenger, Viber, form, or phone).
-6. Domain (the brand name is NFC Menu; the domain is still needed before printing cards).
-7. Who builds the pilot menus (you or the reseller).
+1. Renewal price and terms after year 1 (domain and hosting).
+2. Reseller rule and rate, and the payout day.
+3. ~~The "Get started" destination~~ Decided 2026-10-17: it opens the owner sign-up. Card orders go through "Get now".
+4. Domain (the brand name is NFC Menu; the domain is still needed before printing cards).
+5. Who builds the pilot menus (you or the reseller).
 
 ## 11. Build tasks that support this plan (frontend)
 
-- [ ] Real "Get started" and "Get your card" destination (replace the placeholder link)
+- [x] Real "Get started" and "Get your card" destination: "Get started" opens the owner sign-up, "Get your card" goes to pricing and the "Get now" order form
 - [ ] `/m/demo` public demo menu to show on the tap
 - [ ] `?ref=` code kept through the page and added to the contact link
 - [ ] Short FAQ section (objections above)
-- [ ] A "Menu + all 3 cards" combo card, if approved
-- [ ] Correct the "Save" amounts
 - [ ] Tap and view analytics in the owner dashboard (later phase)

@@ -1,11 +1,12 @@
 import { useId, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { copy } from '@/config/copy'
-import { ORDER_STATUSES } from '@/entities/order/order'
+import { countCards, ORDER_STATUSES } from '@/entities/order/order'
 import type { OrderRecord, OrderStatus } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
+import { plural } from '@/shared/lib/plural'
 import { useAdminData } from './adminData'
-import { formatDateTime, formatMobile } from './format'
+import { formatDateTime, formatItems, formatMobile } from './format'
 import { IconBack, IconPhone } from './icons'
 import styles from './OrderDetail.module.css'
 import { Block, Pulse } from './Skeleton'
@@ -110,10 +111,8 @@ export function OrderDetail({ order, search }: Props) {
         <div className={styles.item}>
           <dt>{text.order}</dt>
           <dd>
-            {copy.admin.bundles[order.bundleId]}
-            <span className={styles.soft}>
-              {order.platforms.map((platform) => copy.order.cardNames[platform]).join(', ')}
-            </span>
+            {plural(countCards(order.items), copy.admin.cards)}
+            <span className={styles.soft}>{formatItems(order.items)}</span>
           </dd>
         </div>
         <div className={styles.item}>

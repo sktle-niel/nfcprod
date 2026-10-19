@@ -30,15 +30,25 @@
 .brand {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
   text-decoration: none;
 }
 
 .logo {
   --logo-height: 30px;
+  min-width: 0;
+}
+
+/* On narrow phones the logo shrinks first, so the toggle and the call to action stay on one line. */
+.logo img {
+  max-width: 100%;
+  height: auto;
+  max-height: var(--logo-height);
 }
 
 .actions {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 10px;
 }
@@ -77,11 +87,37 @@
   font-size: 0.92rem;
   font-weight: 600;
   text-decoration: none;
+  white-space: nowrap;
   transition: transform 160ms var(--ease-out);
 }
 
 .cta:active {
   transform: scale(0.97);
+}
+
+/* Phones skip it: the sign-up page links to log-in, and the bar has no room for a third button. */
+.login {
+  display: none;
+  padding: 11px 14px;
+  border-radius: var(--radius-pill);
+  color: var(--color-ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 150ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .login:hover {
+    background: var(--color-pill-hover);
+  }
+}
+
+@media (min-width: 560px) {
+  .login {
+    display: inline-flex;
+  }
 }
 
 @media (min-width: 760px) {

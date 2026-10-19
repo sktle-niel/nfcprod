@@ -1,0 +1,17 @@
+.logOut {
+  justify-self: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logOut:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

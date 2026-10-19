@@ -54,16 +54,29 @@ describe('counted', () => {
 describe('totals', () => {
   it('adds up revenue, average and cards, and ignores cancelled orders', () => {
     const result = totals([
-      makeOrder({ total: 58000, platforms: ['google'] }),
-      makeOrder({ total: 139900, bundleId: 'three', platforms: ['facebook', 'instagram', 'google'] }),
-      makeOrder({ total: 78000, status: 'cancelled', platforms: ['facebook', 'instagram'] }),
+      makeOrder({ total: 58000, items: [{ platform: 'google', quantity: 1 }] }),
+      makeOrder({
+        total: 249500,
+        items: [
+          { platform: 'facebook', quantity: 2 },
+          { platform: 'google', quantity: 3 },
+        ],
+      }),
+      makeOrder({
+        total: 78000,
+        status: 'cancelled',
+        items: [
+          { platform: 'facebook', quantity: 1 },
+          { platform: 'instagram', quantity: 1 },
+        ],
+      }),
     ])
     expect(result).toEqual({
       orders: 2,
-      revenue: 197900,
-      average: 98950,
-      cards: { facebook: 1, instagram: 1, google: 2 },
-      bundles: { one: 1, two: 0, three: 1 },
+      revenue: 307500,
+      average: 153750,
+      cards: { facebook: 2, instagram: 0, google: 4 },
+      sizes: { one: 1, two: 0, more: 1 },
     })
   })
 
@@ -74,7 +87,7 @@ describe('totals', () => {
       revenue: 0,
       average: 0,
       cards: { facebook: 0, instagram: 0, google: 0 },
-      bundles: { one: 0, two: 0, three: 0 },
+      sizes: { one: 0, two: 0, more: 0 },
     })
   })
 })

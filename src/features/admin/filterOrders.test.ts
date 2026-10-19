@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { makeOrder } from '@/test/orders'
 import { filterOrders, matchesQuery, type OrderFilter } from './filterOrders'
 
-const all: OrderFilter = { query: '', status: 'all', bundle: 'all', from: null }
+const all: OrderFilter = { query: '', status: 'all', size: 'all', from: null }
 
 const maria = makeOrder({ reference: 'NFC-7K2M9Q', fullName: 'Maria Santos', phone: '+639171234501' })
 const juan = makeOrder({
@@ -12,8 +12,7 @@ const juan = makeOrder({
   province: 'Davao del Sur',
   city: 'Davao City',
   status: 'confirmed',
-  bundleId: 'two',
-  platforms: ['facebook', 'instagram'],
+  items: [{ platform: 'facebook', quantity: 2 }],
   createdAt: '2026-10-01T04:12:00Z',
 })
 const orders = [maria, juan]
@@ -51,10 +50,11 @@ describe('filterOrders', () => {
     expect(filterOrders(orders, { ...all, query })).toEqual(expected)
   })
 
-  it('filters by status, bundle and start date together', () => {
+  it('filters by status, size and start date together', () => {
     expect(filterOrders(orders, { ...all, status: 'confirmed' })).toEqual([juan])
-    expect(filterOrders(orders, { ...all, bundle: 'one' })).toEqual([maria])
+    expect(filterOrders(orders, { ...all, size: 'one' })).toEqual([maria])
+    expect(filterOrders(orders, { ...all, size: 'two' })).toEqual([juan])
     expect(filterOrders(orders, { ...all, from: Date.parse('2026-10-10T00:00:00Z') })).toEqual([maria])
-    expect(filterOrders(orders, { ...all, status: 'new', bundle: 'two' })).toEqual([])
+    expect(filterOrders(orders, { ...all, status: 'new', size: 'two' })).toEqual([])
   })
 })

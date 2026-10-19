@@ -1,0 +1,48 @@
+/* Two columns from 560px, like the rest of the delivery fields. The note and the switch take the full row. */
+.grid {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 560px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.note,
+.switch {
+  grid-column: 1 / -1;
+}
+
+.note {
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.note:empty {
+  display: none;
+}
+
+/* A text button with a tap target of 44px. */
+.switch {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.switch:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
