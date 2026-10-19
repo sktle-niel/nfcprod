@@ -11,3 +11,8 @@ export function formatPeso(centavos: number): string {
   const formatter = centavos % 100 === 0 ? pesoWhole : peso
   return formatter.format(centavos / 100)
 }
+
+/** A price that may still be loading: a dash until it is known. */
+export function formatPrice(centavos: number | null): string {
+  return centavos === null ? '₱—' : formatPeso(centavos)
+}

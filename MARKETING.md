@@ -18,13 +18,13 @@ Segment 4 is the fastest door-opener: the review cards work for any business, so
 ## 2. Offer ladder (land and expand)
 
 ```
-₱499      NFC card (each)     entry, impulse buy; mix platforms and quantities
+₱379      NFC card (each)     entry, impulse buy; mix platforms and quantities
 ₱479/mo   NFC + Website       flagship, recurring need (menu changes); ₱3,999 a year (₱333/mo) saves 30%
 ```
 
 Included in every offer: **free setup and guide** (sales point #1: "no work for you").
 
-Since 2026-10-16 every card costs ₱499, and since 2026-10-17 one order can mix platforms and quantities. The "Any 2 cards" and "All 3 cards" bundles were dropped (see the decision log in `PROJECT_FLOW.md`). The NFC + Website package became a subscription on 2026-10-17: ₱479 a month, or ₱3,999 a year (about ₱333 a month, 30% less than 12 months).
+Since 2026-10-19 every card costs ₱379 (₱499 before), and since 2026-10-17 one order can mix platforms and quantities. The "Any 2 cards" and "All 3 cards" bundles were dropped (see the decision log in `PROJECT_FLOW.md`). The NFC + Website package became a subscription on 2026-10-17: ₱479 a month, or ₱3,999 a year (about ₱333 a month, 30% less than 12 months).
 
 Recommendations:
 1. Check margins before any promo: card cost, domain cost, setup time, reseller commission. "Free hosting + domain" must still leave profit after year 1. Decide the renewal price now (domain renews yearly) so there are no surprises later.
@@ -92,7 +92,7 @@ Coffee and equipment suppliers, POS and printer vendors, signage shops, packagin
 | "Hindi techy ang customers." | "No app, no sign-up. Just tap, or scan the QR on the card." |
 | "Paano kung walang NFC phone?" | "QR code is printed on the card for that." |
 | "Sino mag-e-edit ng menu?" | "You, in a simple dashboard. And we guide you for free." |
-| "May monthly fee ba?" | "Cards: one-time ₱499 each. Website: ₱479 a month, or ₱3,999 a year (save 30%)." |
+| "May monthly fee ba?" | "Cards: one-time ₱379 each. Website: ₱479 a month, or ₱3,999 a year (save 30%)." |
 | "Paano kung mawala ang card?" | "The link stays the same, so a replacement card works the same." |
 
 ## 6. Launch plan

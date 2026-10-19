@@ -5,11 +5,12 @@ import { orders, type OrderRepository } from '@/data/orders'
 import type { OrderReceipt } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
 import { Modal } from '@/shared/ui/Modal'
-import { cardPrice } from '../landing.data'
 import styles from './OrderDialog.module.css'
 import { OrderForm } from './OrderForm'
 
 type Props = {
+  /** One card in centavos, as the landing page shows it. The server decides what is charged. */
+  price: number
   onClose: () => void
   repository?: OrderRepository
   /** Where the province, city and barangay lists come from. */
@@ -17,7 +18,7 @@ type Props = {
 }
 
 /** Modal "Get now" form on the shared modal sheet. After a sent order it shows the reference. */
-export function OrderDialog({ onClose, repository = orders, locations }: Props) {
+export function OrderDialog({ price, onClose, repository = orders, locations }: Props) {
   const text = copy.order
   const [done, setDone] = useState<{ receipt: OrderReceipt; phone: string } | null>(null)
 
@@ -28,7 +29,7 @@ export function OrderDialog({ onClose, repository = orders, locations }: Props) 
       subtitle={
         done ? undefined : (
           <span className={styles.price}>
-            {copy.landing.pricing.card.name} · {text.each.replace('{price}', formatPeso(cardPrice))}
+            {copy.landing.pricing.card.name} · {text.each.replace('{price}', formatPeso(price))}
           </span>
         )
       }
@@ -48,7 +49,7 @@ export function OrderDialog({ onClose, repository = orders, locations }: Props) 
             </button>
           </div>
         ) : (
-          <OrderForm repository={repository} locations={locations} onDone={(receipt, phone) => setDone({ receipt, phone })} />
+          <OrderForm price={price} repository={repository} locations={locations} onDone={(receipt, phone) => setDone({ receipt, phone })} />
         )
       }
     </Modal>

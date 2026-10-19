@@ -23,6 +23,7 @@ describe('routes', () => {
     ['/admin/orders', 'Orders'],
     ['/admin/orders/NFC-7K2M9Q', 'Orders'],
     ['/admin/customers', 'Customers'],
+    ['/admin/pricing', 'Pricing'],
   ])('renders the admin page at %s', async (path, title) => {
     renderAt(path)
     expect(await screen.findByRole('heading', { name: title, level: 1 })).toBeInTheDocument()
