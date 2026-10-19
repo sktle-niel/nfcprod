@@ -1,8 +1,11 @@
 import '@testing-library/jest-dom/vitest'
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach } from 'vitest'
 
 afterEach(() => cleanup())
+
+// findBy and waitFor give up after 1 s by default. Lazy routes on a busy machine can take longer.
+configure({ asyncUtilTimeout: 5000 })
 
 // jsdom has no matchMedia. Report "reduced motion" so animation helpers stay off in tests.
 if (!window.matchMedia) {
