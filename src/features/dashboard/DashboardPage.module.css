@@ -1,17 +1,239 @@
-.logOut {
-  justify-self: center;
+.page {
+  min-height: 100dvh;
+  padding: 0 var(--gutter) calc(40px + env(safe-area-inset-bottom));
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 16px 0;
+}
+
+.logo {
+  --logo-height: 30px;
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.main {
+  display: grid;
+  gap: 16px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.title {
+  margin: 8px 0 0;
+  font-size: clamp(1.7rem, 5vw, 2.3rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.small,
+.error {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.small {
+  color: var(--color-ink-soft);
+}
+
+.error {
+  color: var(--color-danger-ink);
+  font-weight: 600;
+}
+
+/* Where the owner stands: a tinted strip, red-tinted when the menu is paused. */
+.status {
+  display: grid;
+  gap: 4px;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-tint);
+}
+
+.status[data-tone='warn'] {
+  background: var(--color-danger-bg);
+}
+
+.statusTitle {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.statusBody {
+  margin: 0;
+  color: var(--color-ink-soft);
+}
+
+/* Plan on the left, cards and menu on the right; stacked on phones. */
+.grid {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  }
+}
+
+.side {
+  display: grid;
+  gap: 16px;
+}
+
+.panel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.panelTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.chip {
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.chip[data-tone='warn'] {
+  color: var(--color-danger-ink);
+}
+
+/* The two plans as big tappable choices. */
+.plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 12px;
+}
+
+.plan {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 2px solid var(--color-line);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color 150ms ease;
+}
+
+.plan[data-on='true'] {
+  border-color: var(--color-ink);
+}
+
+.plan:has(.radio:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.plan:has(.radio:disabled) {
+  cursor: default;
+}
+
+/* The real radio stays for keyboards and screen readers; the card is what people see. */
+.radio {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.planName {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.planPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.planPrice strong {
+  font-size: 1.8rem;
+  letter-spacing: -0.02em;
+}
+
+.planPrice small {
+  color: var(--color-ink-soft);
+  font-weight: 600;
+}
+
+.primary,
+.secondary {
   min-height: 44px;
   padding: 0 20px;
-  border: 1.5px solid var(--color-line);
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  color: var(--color-ink);
+  border-radius: var(--radius-sm);
   font: inherit;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 }
 
-.logOut:focus-visible {
+.primary {
+  border: 0;
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+}
+
+.secondary {
+  border: 1.5px solid var(--color-line);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.link {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.primary:focus-visible,
+.secondary:focus-visible,
+.link:focus-visible,
+.top a:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }

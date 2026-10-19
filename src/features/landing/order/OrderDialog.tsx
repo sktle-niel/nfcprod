@@ -11,6 +11,8 @@ import { OrderForm } from './OrderForm'
 type Props = {
   /** One card in centavos, as the landing page shows it. The server decides what is charged. */
   price: number
+  /** The signed-in owner's name, to fill in for them. */
+  name?: string | undefined
   onClose: () => void
   repository?: OrderRepository
   /** Where the province, city and barangay lists come from. */
@@ -18,7 +20,7 @@ type Props = {
 }
 
 /** Modal "Get now" form on the shared modal sheet. After a sent order it shows the reference. */
-export function OrderDialog({ price, onClose, repository = orders, locations }: Props) {
+export function OrderDialog({ price, name, onClose, repository = orders, locations }: Props) {
   const text = copy.order
   const [done, setDone] = useState<{ receipt: OrderReceipt; phone: string } | null>(null)
 
@@ -49,7 +51,7 @@ export function OrderDialog({ price, onClose, repository = orders, locations }: 
             </button>
           </div>
         ) : (
-          <OrderForm price={price} repository={repository} locations={locations} onDone={(receipt, phone) => setDone({ receipt, phone })} />
+          <OrderForm price={price} name={name} repository={repository} locations={locations} onDone={(receipt, phone) => setDone({ receipt, phone })} />
         )
       }
     </Modal>

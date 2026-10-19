@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react'
+import { Link } from 'react-router-dom'
 import { copy } from '@/config/copy'
+import { useStartLink } from '@/shared/session/authLink'
 import { CardImage } from './CardImage'
 import { BrandMark } from './BrandMark'
 import { PhoneMenu } from './PhoneMenu'
@@ -14,6 +16,7 @@ const index = (i: number) => ({ '--i': i }) as CSSProperties
  */
 export function Scene() {
   const { hero, how } = copy.landing
+  const start = useStartLink()
   return (
     <section className={styles.track}>
       <div className={styles.stage}>
@@ -60,9 +63,10 @@ export function Scene() {
           <div className={styles.side} style={index(3)}>
             <p>{hero.body}</p>
             <div className={styles.actions}>
-              <a className={styles.primary} href="#pricing">
+              {/* Cards come with an account: sign-up first, then the account page. */}
+              <Link className={styles.primary} to={start}>
                 {hero.cta}
-              </a>
+              </Link>
               <a className={styles.link} href="#how">
                 {hero.secondary}
               </a>
