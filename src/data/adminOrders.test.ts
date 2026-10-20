@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { isInPhilippines, roundPin } from '@/entities/location/pin'
 import { MAX_QUANTITY, PLATFORMS } from '@/entities/order/order'
 import { normalizePhone } from '@/entities/order/validate'
 import { createMockAdminOrders } from './adminOrders'
@@ -14,6 +15,20 @@ describe('sample orders', () => {
 
   it('are all older than the demo day', () => {
     expect(sampleOrders.every((order) => Date.parse(order.createdAt) <= Date.parse(SAMPLE_AS_OF))).toBe(true)
+  })
+
+  it('show both kinds of order, with a pin and without one', () => {
+    expect(sampleOrders.some((order) => order.pin)).toBe(true)
+    expect(sampleOrders.some((order) => !order.pin)).toBe(true)
+  })
+
+  it('keep every pin inside the Philippines, at the five decimals a real order carries', () => {
+    const pins = sampleOrders.flatMap((order) => (order.pin ? [order.pin] : []))
+    expect(pins.length).toBeGreaterThan(0)
+    for (const pin of pins) {
+      expect(isInPhilippines(pin)).toBe(true)
+      expect(roundPin(pin)).toEqual(pin)
+    }
   })
 
   it.each(sampleOrders.map((order) => [order.reference, order] as const))('%s follows the order rules', (_, order) => {

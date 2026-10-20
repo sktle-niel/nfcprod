@@ -321,6 +321,9 @@ export const copy = {
       call: 'Call',
       statusLabel: 'Status',
       updateError: 'Could not update the status.',
+      pin: 'Pin',
+      openPin: 'Open pin in Google Maps',
+      noPin: 'No pin',
     },
     pricing: {
       title: 'Pricing',

@@ -2,12 +2,19 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { renderAdminPage } from '@/test/admin'
-import { makeOrder, manyOrders } from '@/test/orders'
+import { LAHUG_PIN, makeOrder, manyOrders } from '@/test/orders'
 import { OrdersPage } from './OrdersPage'
 
-// Newest first, like the repository returns them.
+// Newest first, like the repository returns them. Only the first one has a pin.
 const records = [
-  makeOrder({ reference: 'NFC-AAAAAA', fullName: 'Ana Cruz', phone: '+639171111111', createdAt: '2026-10-12T05:00:00Z', status: 'new' }),
+  makeOrder({
+    reference: 'NFC-AAAAAA',
+    fullName: 'Ana Cruz',
+    phone: '+639171111111',
+    createdAt: '2026-10-12T05:00:00Z',
+    status: 'new',
+    pin: LAHUG_PIN,
+  }),
   makeOrder({
     reference: 'NFC-BBBBBB',
     fullName: 'Ben Reyes',
@@ -48,6 +55,27 @@ describe('OrdersPage', () => {
     expect(within(detail).getByText('1 Test Street, Lahug')).toBeInTheDocument()
     expect(within(detail).getByText('Near the test landmark')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Ana Cruz/ })).toHaveAttribute('aria-current', 'true')
+  })
+
+  it('gives the rider the pin as numbers and as a Google Maps link', () => {
+    open()
+    const detail = within(screen.getByRole('article'))
+    expect(detail.getByText('Pin')).toBeInTheDocument()
+    expect(detail.getByText('10.32800, 123.90600')).toBeInTheDocument()
+
+    const link = detail.getByRole('link', { name: 'Open pin in Google Maps' })
+    expect(link).toHaveAttribute('href', 'https://www.google.com/maps?q=10.328,123.906')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+    expect(detail.queryByText('No pin')).not.toBeInTheDocument()
+  })
+
+  it('says so when the order has no pin, and offers no link', () => {
+    open('/admin/orders/NFC-BBBBBB')
+    const detail = within(screen.getByRole('article'))
+    expect(detail.getByText('No pin')).toBeInTheDocument()
+    expect(detail.queryByRole('link', { name: 'Open pin in Google Maps' })).not.toBeInTheDocument()
+    expect(detail.queryByText(/\d+\.\d{5}, \d+\.\d{5}/)).not.toBeInTheDocument()
   })
 
   it('shows the order named in the address, even when it is not the first', () => {
