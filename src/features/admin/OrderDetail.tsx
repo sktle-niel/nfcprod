@@ -1,12 +1,13 @@
 import { useId, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { copy } from '@/config/copy'
+import { googleMapsUrl } from '@/entities/location/pin'
 import { countCards, ORDER_STATUSES } from '@/entities/order/order'
 import type { OrderRecord, OrderStatus } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
 import { plural } from '@/shared/lib/plural'
 import { useAdminData } from './adminData'
-import { formatDateTime, formatItems, formatMobile } from './format'
+import { formatDateTime, formatItems, formatMobile, formatPin } from './format'
 import { IconBack, IconPhone } from './icons'
 import styles from './OrderDetail.module.css'
 import { Block, Pulse } from './Skeleton'
@@ -118,6 +119,21 @@ export function OrderDetail({ order, search }: Props) {
         <div className={styles.item}>
           <dt>{text.total}</dt>
           <dd className={styles.total}>{formatPeso(order.total)}</dd>
+        </div>
+        <div className={`${styles.item} ${styles.wide}`}>
+          <dt>{text.pin}</dt>
+          <dd>
+            {order.pin ? (
+              <>
+                <span className={styles.coords}>{formatPin(order.pin)}</span>
+                <a className={`${styles.link} ${styles.pinLink}`} href={googleMapsUrl(order.pin)} target="_blank" rel="noopener noreferrer">
+                  {text.openPin}
+                </a>
+              </>
+            ) : (
+              <span className={styles.soft}>{text.noPin}</span>
+            )}
+          </dd>
         </div>
       </dl>
 

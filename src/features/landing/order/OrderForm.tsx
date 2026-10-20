@@ -1,15 +1,17 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { copy } from '@/config/copy'
+import type { ReverseGeocoder } from '@/data/geocoder'
 import { locations as publicLocations, type LocationRepository } from '@/data/locations'
 import { OrderError, type OrderFailure, type OrderRepository } from '@/data/orders'
+import { readPin } from '@/entities/location/pin'
 import { MAX_QUANTITY, type OrderReceipt } from '@/entities/order/order'
 import { validateOrder, type FieldError, type FieldName } from '@/entities/order/validate'
 import { formatPeso } from '@/shared/lib/money'
 import { plural } from '@/shared/lib/plural'
 import { Field } from '@/shared/ui/Field'
 import { CardPicker } from './CardPicker'
+import { DeliveryFields } from './DeliveryFields'
 import styles from './OrderForm.module.css'
-import { PlaceFields } from './PlaceFields'
 import { cardTotal, type Quantities } from './quantities'
 
 type Errors = Partial<Record<FieldName, FieldError>>
@@ -22,21 +24,24 @@ type Props = {
   repository: OrderRepository
   /** Where the province, city and barangay lists come from. */
   locations?: LocationRepository | undefined
+  /** Where the map panel looks up addresses. Left out, the public one is used. */
+  geocoder?: ReverseGeocoder | undefined
   onDone: (receipt: OrderReceipt, phone: string) => void
 }
 
-// Focus goes to the first problem, in the order the customer sees the fields.
-const FIELD_ORDER: FieldName[] = ['platforms', 'fullName', 'phone', 'province', 'city', 'barangay', 'street', 'landmark', 'consent']
+// Focus goes to the first problem, in the order the customer sees the fields. The pin opens the delivery details.
+const FIELD_ORDER: FieldName[] = ['platforms', 'fullName', 'phone', 'pin', 'province', 'city', 'barangay', 'street', 'landmark', 'consent']
 
 function errorText(field: FieldName, code: FieldError): string {
   const text = copy.order.errors
   if (field === 'consent') return text.consent
   if (field === 'platforms') return code === 'quantity' ? text.quantity.replace('{max}', String(MAX_QUANTITY)) : text.choose
+  if (field === 'pin') return code === 'invalid' ? text.pin.invalid : text.pin.required
   if (code === 'invalid') return field === 'phone' ? text.phone : field === 'fullName' ? text.fullName : text.invalid
   return text[code]
 }
 
-export function OrderForm({ price, name, repository, locations = publicLocations, onDone }: Props) {
+export function OrderForm({ price, name, repository, locations = publicLocations, geocoder, onDone }: Props) {
   const { fields } = copy.order
   const formRef = useRef<HTMLFormElement>(null)
   const [errors, setErrors] = useState<Errors>({})
@@ -79,6 +84,9 @@ export function OrderForm({ price, name, repository, locations = publicLocations
       street: text('street'),
       landmark: text('landmark'),
       consent: data.get('consent') === 'on',
+      // The map panel keeps these as hidden inputs. Blank means no pin; anything else is checked by validateOrder.
+      pin: readPin(text('lat'), text('lng')),
+      mapUnavailable: text('mapUnavailable') === '1',
     })
 
     if (!result.ok) {
@@ -112,13 +120,7 @@ export function OrderForm({ price, name, repository, locations = publicLocations
         <Field name="phone" type="tel" inputMode="tel" label={fields.phone.label} placeholder={fields.phone.placeholder} hint={fields.phone.hint} autoComplete="tel" maxLength={20} error={message('phone')} />
       </div>
 
-      <div className={styles.section}>
-        <h3 className={styles.heading}>{copy.order.deliveryTitle}</h3>
-        <PlaceFields repository={locations} errors={{ province: message('province'), city: message('city'), barangay: message('barangay') }}>
-          <Field name="street" label={fields.street.label} placeholder={fields.street.placeholder} autoComplete="address-line1" maxLength={120} error={message('street')} />
-        </PlaceFields>
-        <Field name="landmark" multiline label={fields.landmark.label} placeholder={fields.landmark.placeholder} hint={fields.landmark.hint} autoComplete="off" maxLength={200} error={message('landmark')} />
-      </div>
+      <DeliveryFields locations={locations} geocoder={geocoder} message={message} />
 
       <div className={styles.trap} aria-hidden="true">
         <label>

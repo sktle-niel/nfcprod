@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { copy } from '@/config/copy'
+import type { ReverseGeocoder } from '@/data/geocoder'
 import type { LocationRepository } from '@/data/locations'
 import { orders, type OrderRepository } from '@/data/orders'
 import type { OrderReceipt } from '@/entities/order/order'
@@ -17,10 +18,12 @@ type Props = {
   repository?: OrderRepository
   /** Where the province, city and barangay lists come from. */
   locations?: LocationRepository | undefined
+  /** Where the delivery map looks up addresses. */
+  geocoder?: ReverseGeocoder | undefined
 }
 
 /** Modal "Get now" form on the shared modal sheet. After a sent order it shows the reference. */
-export function OrderDialog({ price, name, onClose, repository = orders, locations }: Props) {
+export function OrderDialog({ price, name, onClose, repository = orders, locations, geocoder }: Props) {
   const text = copy.order
   const [done, setDone] = useState<{ receipt: OrderReceipt; phone: string } | null>(null)
 
@@ -51,7 +54,14 @@ export function OrderDialog({ price, name, onClose, repository = orders, locatio
             </button>
           </div>
         ) : (
-          <OrderForm price={price} name={name} repository={repository} locations={locations} onDone={(receipt, phone) => setDone({ receipt, phone })} />
+          <OrderForm
+            price={price}
+            name={name}
+            repository={repository}
+            locations={locations}
+            geocoder={geocoder}
+            onDone={(receipt, phone) => setDone({ receipt, phone })}
+          />
         )
       }
     </Modal>

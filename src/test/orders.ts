@@ -1,9 +1,13 @@
+import type { Pin } from '@/entities/location/pin'
 import type { OrderRecord } from '@/entities/order/order'
 
 /** 13 Oct 2026, 20:00 in the Philippines. */
 export const AS_OF = Date.parse('2026-10-13T12:00:00Z')
 
-/** A valid order record for tests. Override only what the test cares about. */
+/** Lahug IT Park, Cebu City: a pin well inside the country, already at five decimals. */
+export const LAHUG_PIN: Pin = { lat: 10.328, lng: 123.906 }
+
+/** A valid order record for tests. It has no pin; pass `pin: LAHUG_PIN` for one. Override only what the test cares about. */
 export function makeOrder(overrides: Partial<OrderRecord> = {}): OrderRecord {
   return {
     reference: 'NFC-AAAAAA',

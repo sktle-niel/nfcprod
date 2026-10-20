@@ -1,0 +1,255 @@
+/* The pin panel of the delivery form. The map itself is styled in LeafletMap.module.css. */
+.panel {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+
+/* The form found no usable pin. */
+.panel[data-invalid] {
+  border-color: var(--color-danger);
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.intro,
+.privacy {
+  margin: 0;
+  color: var(--color-ink-soft);
+  line-height: 1.4;
+}
+
+.intro {
+  font-size: 0.92rem;
+}
+
+.privacy {
+  font-size: 0.82rem;
+}
+
+.opened {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Every button here is a 44px-plus tap target. The same look serves "Open the map", "Use my current location",
+   "Search" and "Pin the center of the map". */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 8px 16px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out), border-color 150ms ease, opacity 150ms ease;
+}
+
+.primary {
+  border-color: transparent;
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font-weight: 700;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button:focus-visible,
+.hit:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button:hover:not(:disabled),
+  .hit:hover {
+    border-color: var(--color-accent);
+  }
+}
+
+/* The search box: the same look as the form's other fields. */
+.search {
+  display: grid;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.searchRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+/* 16px text keeps phones from zooming in when the box gets focus. */
+.input {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 1rem;
+  text-overflow: ellipsis;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+}
+
+.input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.note,
+.status,
+.credit {
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* The search note is a live region. Empty, it stays in the page and is only clipped: with display:none it is not in the
+   accessibility tree, so a screen reader would not know it yet when its first words arrive, and could miss them. The
+   clip also takes it out of the grid flow, so it asks for no row and no gap. (The notice further down is not like this on
+   purpose: it also takes the keyboard, and a permanent region there would be read out twice.) */
+.note:empty {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.credit {
+  font-size: 0.78rem;
+}
+
+.hits {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A found place. The text comes from the map service, so it may be long: let it wrap anywhere. */
+.hit {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 0.92rem;
+  line-height: 1.3;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+/* The room the map takes, kept while its code loads so nothing jumps. Tall enough to aim, short enough that the
+   sheet still has page left above and below it to scroll with: the second term keeps about 210px of the screen
+   for the order bar and the content around the map, so a short or landscape screen is not covered by the map alone. */
+.frame {
+  height: clamp(150px, min(52dvh, calc(100dvh - 210px)), 420px);
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  margin: 0;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-line);
+  color: var(--color-ink-soft);
+  font-size: 0.9rem;
+}
+
+/* Three lines of room, because the message changes as the lookup goes and the map below it should not bounce. */
+.status {
+  min-height: 4.2em;
+}
+
+.status[data-tone='warn'] {
+  color: var(--color-danger-ink);
+  font-weight: 600;
+}
+
+.notice {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-tint);
+  color: var(--color-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.notice:empty {
+  display: none;
+}
+
+.notice:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .input {
+    transition: none;
+  }
+
+  .button:active:not(:disabled) {
+    transform: none;
+  }
+}

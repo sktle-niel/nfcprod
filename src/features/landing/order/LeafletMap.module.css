@@ -1,0 +1,125 @@
+/* The map fills the frame the panel gives it. It is its own stacking context: Leaflet uses z-index values up to
+   1000, and without this they would sit above the sheet's sticky close button and order bar while the sheet scrolls. */
+.wrap {
+  position: relative;
+  isolation: isolate;
+  height: 100%;
+  overflow: hidden;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-sm);
+}
+
+/* The ring goes on the wrapper: the map clips its own content, so a ring on the map itself would be cut. */
+.wrap:has(.map:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.map {
+  height: 100%;
+}
+
+.map:global(.leaflet-container) {
+  background: var(--color-line);
+  font-family: var(--font-sans);
+}
+
+.map:focus-visible {
+  outline: none;
+}
+
+/* Zoom buttons at the 44px tap size the rest of the form uses. */
+.map:global(.leaflet-container) :global(.leaflet-bar) a {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+}
+
+/* The pin: a drop with a dot, drawn in CSS colors so it follows the theme. The icon box is larger than the
+   drop so a thumb can grab it; the tip of the drop sits on the spot (see the icon anchor in LeafletMap.tsx). */
+.pin,
+.pin:global(.leaflet-marker-draggable) {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  color: var(--color-accent);
+  cursor: grab;
+}
+
+/* The picture lets every press through to the icon box: Leaflet marks the element that was pressed as the one being
+   dragged, and the lift below only works when that is the box and not the drawing inside it. */
+.pin svg {
+  width: 28px;
+  height: 38px;
+  max-width: none;
+  filter: drop-shadow(0 2px 2px var(--drop-color));
+  pointer-events: none;
+  transition: transform 120ms var(--ease-out);
+}
+
+.pin path {
+  fill: currentColor;
+  stroke: var(--color-surface);
+  stroke-width: 2px;
+}
+
+.pin circle {
+  fill: var(--color-surface);
+}
+
+/* While it is held, the drop lifts so the finger does not hide it. */
+.pin:global(.leaflet-drag-target) {
+  cursor: grabbing;
+}
+
+.pin:global(.leaflet-drag-target) svg {
+  transform: translateY(-8px);
+}
+
+/* A small plus in the middle of the map, shown only while the map has keyboard focus: it marks where
+   "Pin the center of the map" will put the pin. */
+.crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 500;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.crosshair::before,
+.crosshair::after {
+  content: '';
+  position: absolute;
+  background: var(--color-ink);
+  box-shadow: 0 0 0 1px var(--color-surface);
+}
+
+.crosshair::before {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+}
+
+.crosshair::after {
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 2px;
+  margin-top: -1px;
+}
+
+.wrap:has(.map:focus-visible) .crosshair {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin svg {
+    transition: none;
+  }
+}

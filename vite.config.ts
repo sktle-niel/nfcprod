@@ -16,5 +16,8 @@ export default defineConfig({
     // UI tests time out at random, which blocks the commit hook. Two workers run as fast and stay steady.
     maxWorkers: 2,
     testTimeout: 15_000,
+    // The tests assume the public map services, the public place lists and no order endpoint, whatever a developer's
+    // .env.local or shell says. An empty value reads as "not set" (src/config/env.ts), so the defaults apply.
+    env: { VITE_MAP_TILES: '', VITE_GEOCODER_API: '', VITE_LOCATIONS_API: '', VITE_ORDERS_ENDPOINT: '' },
   },
 })

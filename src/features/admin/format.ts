@@ -1,4 +1,5 @@
 import { copy } from '@/config/copy'
+import { roundCoordinate, type Pin } from '@/entities/location/pin'
 import type { OrderItem } from '@/entities/order/order'
 
 // The business runs on Philippine time, wherever the admin happens to be.
@@ -31,6 +32,11 @@ export function formatItems(items: readonly OrderItem[]): string {
 /** +639171234567 becomes 0917 123 4567, the way people write and dial PH mobile numbers. */
 export function formatMobile(phone: string): string {
   return phone.replace(/^\+63(9\d{2})(\d{3})(\d{4})$/, '0$1 $2 $3')
+}
+
+/** "10.32800, 123.90600": latitude, then longitude, always five decimals, the way a maps search box takes them. */
+export function formatPin(pin: Pin): string {
+  return `${roundCoordinate(pin.lat).toFixed(5)}, ${roundCoordinate(pin.lng).toFixed(5)}`
 }
 
 /** 12.5 becomes "12.5%", 12 becomes "12%". The sign is left to the caller. */

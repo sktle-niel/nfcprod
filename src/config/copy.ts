@@ -94,6 +94,52 @@ export const copy = {
       failed: 'We could not load the list of places. Type them in, or try the list again.',
       tryAgain: 'Try the list again',
     },
+    map: {
+      title: 'Pin your delivery spot',
+      intro: 'Place a pin on the map so our rider finds your door. We fill in your address from it.',
+      privacy:
+        'The part of the map you view, your pin, your searches and your IP address go to OpenStreetMap to show the map and find your address. Nothing is sent to OpenStreetMap until you open the map.',
+      open: 'Open the map',
+      loading: 'Loading the map',
+      // The pointer and the keyboard both have a way in, so the texts below name both. The button is "pinHere".
+      region: 'Map. Tap to place your pin, or drag the pin to your door. Or move the map with the arrow keys and press Pin the center of the map.',
+      hint: 'Tap the map to place your pin, or drag the pin to your door. Or move the map and press Pin the center of the map.',
+      pinHere: 'Pin the center of the map',
+      useMyLocation: 'Use my current location',
+      locating: 'Finding your location',
+      searchLabel: 'Find a place',
+      searchPlaceholder: 'Street, barangay or landmark',
+      searchSubmit: 'Search',
+      searching: 'Searching',
+      noResults: 'No places found. Try another name, or place your pin on the map.',
+      // Added for the map panel: the search service could not be reached (not the same as no results).
+      searchFailed: 'The search is not available right now. Try again later, or place your pin on the map.',
+      results: 'Places found',
+      zoomIn: 'Zoom in closer to place your pin.',
+      // Added for the map panel: the names of the map's own + and - buttons, for screen readers and tooltips.
+      zoomInButton: 'Zoom in',
+      zoomOutButton: 'Zoom out',
+      attributionNote: 'Map data from OpenStreetMap contributors.',
+      // The place fields below the map are lists, or text boxes when the lists cannot load: the words fit both.
+      status: {
+        looking: 'Looking up your address',
+        found: 'Found {place}. Check your details below.',
+        partial: 'We filled in {place}. Please fill in the rest of your address below.',
+        none: 'We could not match this spot to an address. Please fill in your address below. Your pin is saved.',
+        busy: 'Address lookup is busy. Please fill in your address below. Your pin is saved.',
+        offline: 'We could not look up your address. Please fill in your address below. Your pin is saved.',
+        outside: 'That spot is not in the Philippines. Place your pin at your address.',
+        // Said after a search result is chosen: the map moved but no pin was placed. A message of its own, so it is announced.
+        moved: 'The map moved to that place. Place your pin on the map, or press Pin the center of the map.',
+      },
+      location: {
+        denied: 'We could not use your location. Place your pin on the map instead.',
+        unavailable: 'Your location is not available right now. Place your pin on the map instead.',
+        timeout: 'Finding your location took too long. Place your pin on the map instead.',
+        coarse: 'Your location is only roughly known. Drag the pin to your door, or move the map and press Pin the center of the map.',
+      },
+      unavailable: 'The map could not load. You can still place your order without a pin.',
+    },
     consent: 'I agree that NFC Menu uses these details only to deliver and set up my order.',
     submit: 'Place order',
     sending: 'Sending',
@@ -107,6 +153,10 @@ export const copy = {
       choose: 'Choose at least one card.',
       quantity: 'Enter a number from 1 to {max} for each card.',
       consent: 'Please agree to continue.',
+      pin: {
+        required: 'Pin your delivery spot on the map.',
+        invalid: 'This pin is not in the Philippines. Move it to your address.',
+      },
       summary: 'Please fix the highlighted fields.',
       submit: {
         network: 'Could not reach the server. Check your connection and try again.',
@@ -271,6 +321,9 @@ export const copy = {
       call: 'Call',
       statusLabel: 'Status',
       updateError: 'Could not update the status.',
+      pin: 'Pin',
+      openPin: 'Open pin in Google Maps',
+      noPin: 'No pin',
     },
     pricing: {
       title: 'Pricing',

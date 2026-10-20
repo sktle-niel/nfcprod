@@ -1,0 +1,16 @@
+/* The delivery section: its heading, the map, the place fields and the landmark, evenly spaced.
+   The single column may shrink below its content, so a wide map can never push the sheet sideways at 360px. */
+.section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.heading {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}

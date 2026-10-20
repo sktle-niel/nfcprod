@@ -182,3 +182,146 @@ describe('caching', () => {
     await expect(repository.barangays('072217000')).resolves.toEqual(list)
   })
 })
+
+describe('allCities', () => {
+  const path = '/cities-municipalities/'
+  // The API writes the whole country as one list, with the fields we do not use.
+  const item = (code: string, name: string, extra: Record<string, unknown> = {}) => ({
+    code,
+    name,
+    oldName: '',
+    isCity: true,
+    isMunicipality: false,
+    provinceCode: '072200000',
+    regionCode: '070000000',
+    ...extra,
+  })
+  const everyone = [
+    item('072217000', 'City of Cebu'),
+    item('072201000', 'Alcantara', { isCity: false, isMunicipality: true }),
+    item('137602000', 'City of Makati', { provinceCode: false, regionCode: '130000000' }),
+    item('099701000', 'City of Isabela', { provinceCode: false, regionCode: '090000000' }),
+    item('129804000', 'City of Cotabato', { provinceCode: false, regionCode: '120000000' }),
+  ]
+
+  it('lists every city and municipality with its province, its region and whether it is a city', async () => {
+    serve({ [path]: everyone })
+    const cities = await psgcLocations(BASE).allCities()
+    expect(cities).toEqual([
+      { code: '072201000', name: 'Alcantara', provinceCode: '072200000', regionCode: '070000000', isCity: false },
+      { code: '072217000', name: 'Cebu City', provinceCode: '072200000', regionCode: '070000000', isCity: true },
+      { code: '129804000', name: 'Cotabato City', provinceCode: MAGUINDANAO, regionCode: '120000000', isCity: true },
+      { code: '099701000', name: 'Isabela City', provinceCode: BASILAN, regionCode: '090000000', isCity: true },
+      { code: '137602000', name: 'Makati City', provinceCode: '130000000', regionCode: '130000000', isCity: true },
+    ])
+  })
+
+  it('gives Metro Manila cities the code of Metro Manila, the same as provinces() lists it with', async () => {
+    serve({ [path]: everyone, '/provinces/': [CEBU] })
+    const repository = psgcLocations(BASE)
+    const [metro] = (await repository.provinces()).filter((province) => province.name === 'Metro Manila')
+    const makati = (await repository.allCities()).find((city) => city.name === 'Makati City')
+    expect(makati?.provinceCode).toBe(metro?.code)
+  })
+
+  it('puts the two left-out cities in the provinces that cities() already lists them under', async () => {
+    serve({
+      [path]: everyone,
+      [`/provinces/${BASILAN}/cities-municipalities/`]: [],
+      [`/provinces/${MAGUINDANAO}/cities-municipalities/`]: [],
+      [`/cities-municipalities/${ISABELA_CITY.code}/`]: ISABELA_CITY,
+      [`/cities-municipalities/${COTABATO_CITY.code}/`]: COTABATO_CITY,
+    })
+    const repository = psgcLocations(BASE)
+    const all = await repository.allCities()
+    for (const province of [BASILAN, MAGUINDANAO]) {
+      const listed = await repository.cities(province)
+      const owned = all.filter((city) => city.provinceCode === province)
+      expect(owned.map((city) => city.code)).toEqual(listed.map((place) => place.code))
+      expect(owned).toHaveLength(1)
+    }
+  })
+
+  it('asks once for the whole list, without cookies and without telling the host which page it came from', async () => {
+    serve({ [path]: everyone })
+    await psgcLocations(BASE).allCities()
+    expect(requested()).toEqual([path])
+    expect(fetchMock).toHaveBeenCalledWith(
+      `${BASE}${path}`,
+      expect.objectContaining({ credentials: 'omit', referrerPolicy: 'no-referrer' }),
+    )
+  })
+
+  it('asks for nothing until it is called', () => {
+    serve({ [path]: everyone })
+    psgcLocations(BASE)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('remembers the list, and shares one request between callers that ask at the same time', async () => {
+    serve({ [path]: everyone })
+    const repository = psgcLocations(BASE)
+    const [first, second] = await Promise.all([repository.allCities(), repository.allCities()])
+    await repository.allCities()
+    expect(second).toBe(first)
+    expect(requested()).toEqual([path])
+  })
+
+  it('does not drag the other lists along', async () => {
+    serve({ [path]: everyone, '/provinces/': [CEBU] })
+    const repository = psgcLocations(BASE)
+    await repository.allCities()
+    await repository.provinces()
+    expect(requested()).toEqual([path, '/provinces/'])
+  })
+
+  it('drops an item that is not usable and keeps the rest', async () => {
+    serve({ [path]: [item('../etc', 'Hacker'), item('072217000', 'City of Cebu'), item('072201001', 'Nowhere', { provinceCode: false })] })
+    const cities = await psgcLocations(BASE).allCities()
+    expect(cities.map((city) => city.code)).toEqual(['072217000'])
+  })
+
+  it.each([
+    ['answers with an error', new Response('oops', { status: 500 })],
+    ['answers with something that is not JSON', new Response('<html>Not a list</html>', { status: 200 })],
+    ['answers with an object instead of a list', new Response('{"data":[]}', { status: 200 })],
+    ['answers with a list of something else', new Response('[{"nombre":"Cebu"}]', { status: 200 })],
+    ['answers with far too much', new Response(' '.repeat(1_000_001), { status: 200 })],
+  ])('rejects when it %s', async (_, response) => {
+    serve({ [path]: response })
+    await expect(psgcLocations(BASE).allCities()).rejects.toBeInstanceOf(LocationError)
+  })
+
+  it('rejects when the network is down', async () => {
+    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'))
+    await expect(psgcLocations(BASE).allCities()).rejects.toBeInstanceOf(LocationError)
+  })
+
+  it('gives up on a request that never ends', async () => {
+    vi.useFakeTimers()
+    fetchMock.mockImplementation(
+      (_, init) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')))
+        }),
+    )
+    const result = expect(psgcLocations(BASE).allCities()).rejects.toBeInstanceOf(LocationError)
+    await vi.advanceTimersByTimeAsync(12_000)
+    await result
+  })
+
+  it('does not remember a failure, so asking again tries again', async () => {
+    const repository = psgcLocations(BASE)
+    serve({})
+    await expect(repository.allCities()).rejects.toBeInstanceOf(LocationError)
+    serve({ [path]: everyone })
+    await expect(repository.allCities()).resolves.toHaveLength(5)
+  })
+
+  it('keeps the list of one repository apart from another', async () => {
+    serve({ [path]: everyone })
+    await psgcLocations(BASE).allCities()
+    await psgcLocations(BASE).allCities()
+    expect(requested()).toEqual([path, path])
+  })
+})

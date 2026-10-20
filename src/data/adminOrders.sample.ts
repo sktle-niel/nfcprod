@@ -13,19 +13,20 @@ const PRICE = { 1: 58000, 2: 78000, 3: 139900 } as const
 /** One card of each platform, the way orders looked before quantities. */
 const each = (...platforms: Platform[]): OrderItem[] => platforms.map((platform) => ({ platform, quantity: 1 }))
 
-// The last three weeks, written by hand.
+// The last three weeks, written by hand. Some orders have a pin and some do not, so the admin shows both
+// states: a customer whose map could not load orders without one.
 const recent: OrderRecord[] = [
   {
     reference: 'NFC-7K2M9Q', createdAt: '2026-10-13T04:12:00Z', status: 'new', total: PRICE[3],
     items: each('facebook', 'instagram', 'google'), fullName: 'Maria Angelica Santos', phone: '+639171234501',
     province: 'Cebu', city: 'Cebu City', barangay: 'Lahug', street: '12 Salinas Drive',
-    landmark: 'Blue gate beside the 7-Eleven, 2nd house',
+    landmark: 'Blue gate beside the 7-Eleven, 2nd house', pin: { lat: 10.328, lng: 123.906 },
   },
   {
     reference: 'NFC-4P8R1T', createdAt: '2026-10-12T09:40:00Z', status: 'new', total: PRICE[1],
     items: each('google'), fullName: 'Juan Dela Cruz', phone: '+639171234502',
     province: 'Davao del Sur', city: 'Davao City', barangay: 'Buhangin', street: '45 Rizal Street',
-    landmark: 'Second floor above the pharmacy, green door',
+    landmark: 'Second floor above the pharmacy, green door', pin: { lat: 7.1067, lng: 125.6118 },
   },
   {
     reference: 'NFC-9D3X6B', createdAt: '2026-10-12T02:05:00Z', status: 'new', total: PRICE[2],
@@ -37,19 +38,19 @@ const recent: OrderRecord[] = [
     reference: 'NFC-2W6H5N', createdAt: '2026-10-11T11:30:00Z', status: 'new', total: PRICE[1],
     items: each('facebook'), fullName: 'Cheryl Anne Mercado', phone: '+639171234504',
     province: 'Pampanga', city: 'Angeles City', barangay: 'Balibago', street: '7 Fields Avenue',
-    landmark: 'Beside the milk tea shop, white building',
+    landmark: 'Beside the milk tea shop, white building', pin: { lat: 15.1578, lng: 120.5893 },
   },
   {
     reference: 'NFC-8T1Y4C', createdAt: '2026-10-10T07:55:00Z', status: 'confirmed', total: PRICE[3],
     items: each('facebook', 'instagram', 'google'), fullName: 'Joshua Bautista', phone: '+639171234505',
     province: 'Cavite', city: 'Bacoor', barangay: 'Molino IV', street: '23 Tirona Highway',
-    landmark: 'Yellow house after the basketball court',
+    landmark: 'Yellow house after the basketball court', pin: { lat: 14.4122, lng: 120.9769 },
   },
   {
     reference: 'NFC-5G7J2K', createdAt: '2026-10-09T14:20:00Z', status: 'confirmed', total: PRICE[2],
     items: each('instagram', 'google'), fullName: 'Patricia Lim', phone: '+639171234506',
     province: 'Iloilo', city: 'Iloilo City', barangay: 'Mandurriao', street: '101 Diversion Road',
-    landmark: 'Unit 3B, glass door facing the parking lot',
+    landmark: 'Unit 3B, glass door facing the parking lot', pin: { lat: 10.7167, lng: 122.5444 },
   },
   {
     reference: 'NFC-3M9Q8V', createdAt: '2026-10-08T03:10:00Z', status: 'delivered', total: PRICE[1],
@@ -61,7 +62,7 @@ const recent: OrderRecord[] = [
     reference: 'NFC-6B4Z1R', createdAt: '2026-10-07T10:45:00Z', status: 'delivered', total: PRICE[3],
     items: each('facebook', 'instagram', 'google'), fullName: 'Liza Marie Navarro', phone: '+639171234508',
     province: 'Bohol', city: 'Tagbilaran City', barangay: 'Poblacion II', street: '9 CPG Avenue',
-    landmark: 'Corner lot with a red roof, near the church',
+    landmark: 'Corner lot with a red roof, near the church', pin: { lat: 9.6486, lng: 123.8544 },
   },
   {
     reference: 'NFC-1C8L3F', createdAt: '2026-10-05T08:25:00Z', status: 'delivered', total: PRICE[2],
