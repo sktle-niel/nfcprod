@@ -1,19 +1,18 @@
 import type { ReactNode } from 'react'
 import { copy } from '@/config/copy'
-import type { LocationRepository } from '@/data/locations'
 import { Field } from '@/shared/ui/Field'
 import { SelectField, type SelectOption } from '@/shared/ui/SelectField'
 import styles from './PlaceFields.module.css'
-import { usePlacePicker, type Level, type PlacesState } from './usePlacePicker'
+import { LEVELS, type Level, type PlacePicker, type PlacesState } from './usePlacePicker'
 
 type Props = {
-  repository: LocationRepository
+  /** Built by the form (`usePlacePicker`), so that the map beside these fields can fill them too. */
+  picker: PlacePicker
   errors: Partial<Record<Level, string | undefined>>
   /** The field that sits beside the barangay, so the form keeps its two columns. */
   children?: ReactNode
 }
 
-const LEVELS: readonly Level[] = ['province', 'city', 'barangay']
 const AUTOCOMPLETE: Record<Level, string> = { province: 'address-level1', city: 'address-level2', barangay: 'address-level3' }
 
 const toOptions = (state: PlacesState): SelectOption[] =>
@@ -24,9 +23,9 @@ const toOptions = (state: PlacesState): SelectOption[] =>
  * If a list cannot be loaded, or the place is not on it, the same three fields turn into text boxes.
  * Either way the form gets plain names under `province`, `city` and `barangay`.
  */
-export function PlaceFields({ repository, errors, children }: Props) {
+export function PlaceFields({ picker, errors, children }: Props) {
   const { fields, places: text } = copy.order
-  const { picked, lists, manual, failed, choose, toggle } = usePlacePicker(repository)
+  const { picked, lists, manual, failed, grid, choose, toggle } = picker
 
   const placeholder = (level: Level): string => {
     if (level !== 'province' && !(level === 'city' ? picked.province : picked.city)) return text.chooseFirst[level]
@@ -47,6 +46,8 @@ export function PlaceFields({ repository, errors, children }: Props) {
     />
   )
 
+  // No key: a box keeps its node, its text and its focus when the map sets its level. The picker writes the new name into
+  // the box. `defaultValue` only shows what was picked when the boxes first appear.
   const typed = (level: Level) => (
     <Field
       name={level}
@@ -60,7 +61,7 @@ export function PlaceFields({ repository, errors, children }: Props) {
   )
 
   return (
-    <div className={styles.grid}>
+    <div ref={grid} className={styles.grid}>
       {manual ? (
         <>
           {typed('province')}

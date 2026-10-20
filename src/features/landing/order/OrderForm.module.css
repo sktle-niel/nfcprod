@@ -9,15 +9,6 @@
   gap: 14px;
 }
 
-.heading {
-  margin: 4px 0 0;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-ink-soft);
-}
-
 /* Bot trap: off-screen rather than display:none, which some bots skip. */
 .trap {
   position: absolute;

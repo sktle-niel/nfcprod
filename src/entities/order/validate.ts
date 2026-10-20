@@ -1,3 +1,4 @@
+import { isInPhilippines, roundPin } from '@/entities/location/pin'
 import { cleanText, PERSON_NAME } from '@/shared/lib/text'
 import { MAX_QUANTITY, PLATFORMS, type Order, type Platform, type RawOrder } from './order'
 
@@ -12,6 +13,7 @@ export type FieldName =
   | 'barangay'
   | 'street'
   | 'landmark'
+  | 'pin'
   | 'consent'
 
 export type FieldError = 'required' | 'tooShort' | 'tooLong' | 'invalid' | 'quantity'
@@ -70,6 +72,16 @@ function checkItems(items: RawOrder['items']): FieldError | null {
   return null
 }
 
+/**
+ * The rider finds the door by the pin, so an order needs one. The only way out is a map that could not
+ * load for this customer: a free third-party service must never block an order. A pin that is there is
+ * always checked, also when the map was unavailable.
+ */
+function checkPin({ pin, mapUnavailable }: Pick<RawOrder, 'pin' | 'mapUnavailable'>): FieldError | null {
+  if (!pin) return mapUnavailable ? null : 'required'
+  return isInPhilippines(pin) ? null : 'invalid'
+}
+
 /** The server must repeat these checks. This only gives the customer fast feedback. */
 export function validateOrder(raw: RawOrder): ValidationResult {
   const errors: Partial<Record<FieldName, FieldError>> = {}
@@ -94,6 +106,9 @@ export function validateOrder(raw: RawOrder): ValidationResult {
   const itemsError = checkItems(raw.items)
   if (itemsError) errors.platforms = itemsError
 
+  const pinError = checkPin(raw)
+  if (pinError) errors.pin = pinError
+
   if (!raw.consent) errors.consent = 'required'
 
   if (Object.keys(errors).length > 0 || phone === null) {
@@ -106,6 +121,8 @@ export function validateOrder(raw: RawOrder): ValidationResult {
       items: raw.items.flatMap((item) => (isPlatform(item.platform) ? [{ platform: item.platform, quantity: item.quantity }] : [])),
       ...text,
       phone,
+      // Rebuilt from the two numbers, so nothing else a caller attached to the pin travels on.
+      ...(raw.pin ? { pin: roundPin(raw.pin) } : {}),
       consent: true,
     },
   }

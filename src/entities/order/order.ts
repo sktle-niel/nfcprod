@@ -1,3 +1,5 @@
+import type { Pin } from '@/entities/location/pin'
+
 export const PLATFORMS = ['facebook', 'instagram', 'google'] as const
 export type Platform = (typeof PLATFORMS)[number]
 
@@ -23,6 +25,10 @@ export type RawOrder = {
   street: string
   landmark: string
   consent: boolean
+  /** The pin as read from the form. Null when none was placed. Numbers are not checked yet. */
+  pin: Pin | null
+  /** True when the map could not load for this customer. Only then may an order go without a pin. */
+  mapUnavailable: boolean
 }
 
 /** A checked and cleaned order, safe to send. The server must derive the price from the items, never from the client. */
@@ -37,6 +43,8 @@ export type Order = {
   barangay: string
   street: string
   landmark: string
+  /** The exact delivery spot, rounded to 5 decimals, inside the Philippines. Missing only when the map could not load. */
+  pin?: Pin
   consent: true
 }
 
