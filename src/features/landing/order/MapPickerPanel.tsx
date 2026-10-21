@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { copy } from '@/config/copy'
 import type { ReverseGeocoder } from '@/data/geocoder'
-import type { LeafletMapHandle } from './LeafletMap'
-import { loadLeafletMap } from './loadLeafletMap'
+import type { PinMapHandle } from './PinMap'
+import { loadPinMap } from './loadPinMap'
 import styles from './MapPicker.module.css'
 import { MapPickerSearch } from './MapPickerSearch'
 import { statusText, statusTone } from './MapPickerStatus'
@@ -16,14 +16,14 @@ type Props = {
   onUnavailable: () => void
 }
 
-// Leaflet is a chunk of its own. Nothing of it is fetched until a panel renders it, which is when the map is opened.
-const LazyMap = lazy(loadLeafletMap)
+// The map library is a chunk of its own. Nothing of it is fetched until a panel renders it, which is when the map is opened.
+const LazyMap = lazy(loadPinMap)
 
 /** The opened map and everything that places a pin: your location, a search, the status line, the map itself. */
 export function MapPickerPanel({ geocoder, map, anchor, onUnavailable }: Props) {
   const text = copy.order.map
   const [ready, setReady] = useState(false)
-  const handle = useRef<LeafletMapHandle>(null)
+  const handle = useRef<PinMapHandle>(null)
   const firstButton = useRef<HTMLButtonElement>(null)
 
   // The button that opened the map has just gone, and with it the keyboard's place: start the panel at its first control.

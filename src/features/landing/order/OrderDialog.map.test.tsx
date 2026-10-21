@@ -8,9 +8,9 @@ import { fakeGeocoder, LAHUG_HINT } from '@/test/geocoder'
 import { CEBU, CEBU_CITY, deferred, fakeLocations, LAHUG } from '@/test/locations'
 import { OrderDialog } from './OrderDialog'
 
-// The order form with the real map panel. Only Leaflet itself is replaced, because jsdom cannot run it:
+// The order form with the real map panel. Only the map itself is replaced, because jsdom cannot run MapLibre (no WebGL):
 // the shared stand-in has buttons that report a tap, or a failure, the way the real map does.
-vi.mock('./LeafletMap', async () => ({ LeafletMap: (await import('./MapPicker.fakeMap')).FakeLeafletMap }))
+vi.mock('./PinMap', async () => ({ PinMap: (await import('./MapPicker.fakeMap')).FakePinMap }))
 
 function setup(geocoder: ReverseGeocoder = fakeGeocoder()) {
   const repo: OrderRepository = { submit: vi.fn().mockResolvedValue({ reference: 'NM-TEST1', demo: false }) }

@@ -1,31 +1,47 @@
 import { env } from '@/config/env'
 
-/** The public OpenStreetMap tiles and Nominatim. Free, no key, no SLA, light use only. Swap them before real traffic. */
-export const OSM_TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+/**
+ * The public OpenFreeMap "positron" style: the light, grey Positron look, built on OpenMapTiles and OpenStreetMap data.
+ * Free for commercial use, no key, no sign-up, no cookies, no SLA. Swap it for our own style host before real traffic.
+ */
+export const OPENFREEMAP_STYLE = 'https://tiles.openfreemap.org/styles/positron'
+/** The public Nominatim service. Free, no key, no SLA, light use only (one request a second). Swap it before real traffic. */
 export const OSM_GEOCODER = 'https://nominatim.openstreetmap.org'
 
-/** Shown on the map, bottom right, always. The tile policy requires it. The text is fixed here, never from outside. */
-export const TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
+/**
+ * Shown on the map, bottom right, always. OpenFreeMap requires "© OpenMapTiles Data from OpenStreetMap" and likes to see
+ * its own name in front. Plain data, never HTML: the text and the links are fixed here, and nothing from outside is
+ * ever rendered as markup. The map draws this list in React, and the attribution that the style itself carries
+ * (HTML from a remote file) is switched off. If the style provider changes, change this list and the privacy sentence
+ * in copy.ts with it.
+ */
+export const MAP_CREDITS: readonly (string | { text: string; href: string })[] = [
+  { text: 'OpenFreeMap', href: 'https://openfreemap.org' },
+  { text: '© OpenMapTiles', href: 'https://www.openmaptiles.org/' },
+  'Data from',
+  { text: 'OpenStreetMap', href: 'https://www.openstreetmap.org/copyright' },
+]
 
-/** Where the map starts: the whole country. */
+/**
+ * Where the map starts: the whole country. Zoom 5 is on the 256-px scale that the whole app speaks (OpenStreetMap's),
+ * which is one more than the 512-px zoom that MapLibre counts. Only the map renderer converts between the two.
+ */
 export const MAP_START = { lat: 12.8797, lng: 121.774, zoom: 5 } as const
 
 /**
- * A tile template is used only if it has {z}, {x} and {y} once each and no other braces, and with those filled in it
- * is a plain https URL: no spaces, and no user name or password in front of the host. A path may hold an "@" ("{y}@2x.png").
+ * A style address is used only if it is a plain https URL: written out as "https://" and a host, no spaces, no braces
+ * (a tile template pasted into the wrong setting has them), and no user name or password in front of the host.
+ * It may carry a query string, since some providers take a key there. Anything else is the public OpenFreeMap style.
  */
-export function usableTileUrl(value: string): string {
-  const braces = value.match(/[{}]/g)?.length ?? 0
-  if (braces !== 6 || !['{z}', '{x}', '{y}'].every((part) => value.split(part).length === 2)) return OSM_TILES
-  if (/\s/.test(value)) return OSM_TILES
-  // The placeholders belong in the path or query. One in the host name would make a different, meaningless host.
-  const hostEnd = value.indexOf('/', value.indexOf('//') + 2)
-  if (hostEnd === -1 || value.indexOf('{') < hostEnd) return OSM_TILES
+export function usableStyleUrl(value: string): string {
+  // "https://" and then a host name, with no space or brace anywhere. "https:host" and "https:///host" would parse, but
+  // to a different host than they look like, so the scheme must be followed by exactly two slashes.
+  if (!/^https:\/\/[^\s/\\{}][^\s{}]*$/i.test(value)) return OPENFREEMAP_STYLE
   try {
-    const url = new URL(value.replace('{z}', '1').replace('{x}', '1').replace('{y}', '1'))
-    return url.protocol === 'https:' && url.username === '' && url.password === '' ? value : OSM_TILES
+    const { username, password } = new URL(value)
+    return username === '' && password === '' ? value : OPENFREEMAP_STYLE
   } catch {
-    return OSM_TILES
+    return OPENFREEMAP_STYLE
   }
 }
 
@@ -39,10 +55,10 @@ export function usableGeocoderUrl(value: string): string {
  * One line for each setting that was filled in and then refused, so that a typo does not silently keep every visitor on
  * the public servers. The lines name the variable and never repeat its value, which may hold a key.
  */
-export function configWarnings(set: { mapTiles: string; geocoderApi: string }): string[] {
+export function configWarnings(set: { mapStyle: string; geocoderApi: string }): string[] {
   const warnings: string[] = []
-  if (set.mapTiles !== '' && set.mapTiles !== OSM_TILES && usableTileUrl(set.mapTiles) === OSM_TILES) {
-    warnings.push('VITE_MAP_TILES is ignored: it needs https and {z}, {x}, {y} once each, no other braces. The public OpenStreetMap tiles are used.')
+  if (set.mapStyle !== '' && set.mapStyle !== OPENFREEMAP_STYLE && usableStyleUrl(set.mapStyle) === OPENFREEMAP_STYLE) {
+    warnings.push('VITE_MAP_STYLE is ignored: it needs an https address with no spaces, no braces and no user name or password. The public OpenFreeMap style is used.')
   }
   if (set.geocoderApi !== '' && set.geocoderApi.replace(/\/+$/, '') !== OSM_GEOCODER && usableGeocoderUrl(set.geocoderApi) === OSM_GEOCODER) {
     warnings.push('VITE_GEOCODER_API is ignored: it needs https. The public Nominatim service is used.')
@@ -50,7 +66,8 @@ export function configWarnings(set: { mapTiles: string; geocoderApi: string }): 
   return warnings
 }
 
-export const tileUrl = usableTileUrl(env.mapTiles)
+/** The MapLibre style JSON that the map loads: the setting if it is usable, else the public OpenFreeMap style. */
+export const styleUrl = usableStyleUrl(env.mapStyle)
 export const geocoderUrl = usableGeocoderUrl(env.geocoderApi)
 
 // Once, when the page loads. In every build, because the owner sets these in the deploy settings and not only on a

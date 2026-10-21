@@ -4,7 +4,7 @@ import { FOUND_TEXT, onMap, openMap, resetKit, setup, text } from './MapPicker.t
 
 // What a screen reader is given. A live region is read when something in it changes, and not when it appears with its
 // words already in it, so the status line and the search note have to be there first and to change inside.
-vi.mock('./LeafletMap', async () => ({ LeafletMap: (await import('./MapPicker.fakeMap')).FakeLeafletMap }))
+vi.mock('./PinMap', async () => ({ PinMap: (await import('./MapPicker.fakeMap')).FakePinMap }))
 vi.mock('@/data/resolveAddress', () => ({ resolveAddress: vi.fn() }))
 beforeEach(resetKit)
 

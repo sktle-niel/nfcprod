@@ -120,12 +120,14 @@ describe('the words of the panel', () => {
     expect(words).toMatch(/fill in/i)
   })
 
-  it('name everything the map service gets, and when, in the one sentence next to the map', () => {
+  it('name everything the map services get, and when, in the one sentence next to the map', () => {
     expect(text.privacy).toMatch(/part of the map you view/)
     expect(text.privacy).toMatch(/\byour pin\b/)
     expect(text.privacy).toMatch(/\byour searches\b/)
     expect(text.privacy).toMatch(/\bIP address\b/)
+    // Two services: the map itself (OpenFreeMap) and the address lookup and search (OpenStreetMap's Nominatim).
+    expect(text.privacy).toContain('OpenFreeMap')
     expect(text.privacy).toContain('OpenStreetMap')
-    expect(text.privacy).toContain('Nothing is sent to OpenStreetMap until you open the map.')
+    expect(text.privacy).toMatch(/^Nothing is sent to .+ until you open the map/)
   })
 })

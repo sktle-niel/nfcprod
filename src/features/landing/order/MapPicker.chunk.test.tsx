@@ -3,20 +3,20 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { copy } from '@/config/copy'
 import { fakeGeocoder } from '@/test/geocoder'
 import { fakeLocations } from '@/test/locations'
-import { FakeLeafletMap } from './MapPicker.fakeMap'
+import { FakePinMap } from './MapPicker.fakeMap'
 
-// The map's code never becomes a map, in four ways. Each test gives './LeafletMap' its own mock and loads the picker
+// The map's code never becomes a map, in four ways. Each test gives './PinMap' its own mock and loads the picker
 // fresh, because the lazy map is loaded once per page load and a failure stays: that is what a customer gets too.
 const text = copy.order.map
 
 afterEach(() => {
   vi.useRealTimers()
-  vi.doUnmock('./LeafletMap')
+  vi.doUnmock('./PinMap')
 })
 
 async function openPicker(mock: () => object | Promise<object>) {
   vi.resetModules()
-  vi.doMock('./LeafletMap', mock)
+  vi.doMock('./PinMap', mock)
   const { MapPicker } = await import('./MapPicker')
   const reverse = vi.fn(fakeGeocoder().reverse)
   render(
@@ -61,7 +61,7 @@ describe('MapPicker when the map code cannot be fetched', () => {
   // the import itself answers, and what comes after it fails.
   it('lets the order go on when the code arrives but cannot be handed over', async () => {
     await openPicker(() => ({
-      get LeafletMap(): never {
+      get PinMap(): never {
         throw new Error('The stylesheet of the map could not be loaded')
       },
     }))
@@ -92,7 +92,7 @@ describe('MapPicker when the map code is slow', () => {
     await openPicker(async () => {
       // Late, but not too late: five seconds of the fifteen.
       await new Promise((resolve) => setTimeout(resolve, 5_000))
-      return { LeafletMap: FakeLeafletMap }
+      return { PinMap: FakePinMap }
     })
 
     await wait(4_900)

@@ -14,7 +14,7 @@ async function readStylesheet(name: string): Promise<string> {
 /**
  * Puts the stylesheet in the page, so `getComputedStyle` and the accessibility queries answer as they would in a browser.
  * `classes` is the CSS Module object of the same file: the stylesheet is rewritten to the names it gives. A class
- * written `:global(...)` is Leaflet's, and stays as it is. Returns the function that takes the stylesheet out again.
+ * written `:global(...)` is the map library's, and stays as it is. Returns the function that takes the stylesheet out again.
  */
 export async function installStylesheet(name: string, classes: Readonly<Record<string, string>>): Promise<() => void> {
   const css = (await readStylesheet(name)).replace(

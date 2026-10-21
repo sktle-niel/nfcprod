@@ -8,7 +8,7 @@ import { FOUND, FOUND_TEXT, onMap, openMap, resetKit, seen, sent, setup, stubGeo
 
 // What happens to an answer that is still on its way when something newer happens. jsdom cannot draw a map: the panel gets
 // a fake one. The matcher has its own tests: here the lookup is told what it found (the kit resets it before each test).
-vi.mock('./LeafletMap', async () => ({ LeafletMap: (await import('./MapPicker.fakeMap')).FakeLeafletMap }))
+vi.mock('./PinMap', async () => ({ PinMap: (await import('./MapPicker.fakeMap')).FakePinMap }))
 vi.mock('@/data/resolveAddress', () => ({ resolveAddress: vi.fn() }))
 beforeEach(resetKit)
 

@@ -1,4 +1,4 @@
-/* The pin panel of the delivery form. The map itself is styled in LeafletMap.module.css. */
+/* The pin panel of the delivery form. The map itself is styled in PinMap.module.css. */
 .panel {
   display: grid;
   gap: 10px;
