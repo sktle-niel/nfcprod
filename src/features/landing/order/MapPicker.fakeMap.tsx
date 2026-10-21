@@ -1,12 +1,12 @@
 import { useEffect, useImperativeHandle, useRef } from 'react'
-import type { LeafletMapProps } from './LeafletMap'
+import type { PinMapProps } from './PinMap'
 
 /**
- * A stand-in for `LeafletMap` in tests (jsdom cannot draw a map). It shows what it was given, and its buttons
+ * A stand-in for `PinMap` in tests (jsdom cannot draw a map). It shows what it was given, and its buttons
  * do what a tap, a drag and a failure would do. Spots: "Lahug" (with more than five decimals, to see rounding),
  * "Makati", and the middle of the sea off the coast of Africa.
  */
-export function FakeLeafletMap({ ref, pin, view, onPlace, onTooFar, onZoomedIn, onReady, onUnavailable }: LeafletMapProps) {
+export function FakePinMap({ ref, pin, view, onPlace, onTooFar, onZoomedIn, onReady, onUnavailable }: PinMapProps) {
   const region = useRef<HTMLDivElement>(null)
   const zoomedOut = useRef(false)
 

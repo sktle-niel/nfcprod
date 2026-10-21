@@ -9,7 +9,7 @@ import { LAHUG_HINT } from '@/test/geocoder'
 import { CEBU, CEBU_CITY, fakeLocations, LAHUG } from '@/test/locations'
 import { MapPicker } from './MapPicker'
 
-// Shared by the MapPicker test files. Each of them mocks './LeafletMap' (jsdom cannot draw a map) with the fake map from
+// Shared by the MapPicker test files. Each of them mocks './PinMap' (jsdom cannot draw a map) with the fake map from
 // MapPicker.fakeMap.tsx, and '@/data/resolveAddress' (the matcher has its own tests), because vi.mock only works in the file that calls it.
 
 export const text = copy.order.map

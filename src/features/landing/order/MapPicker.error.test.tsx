@@ -4,7 +4,7 @@ import { copy } from '@/config/copy'
 import { onMap, openMap, resetKit, setup, text } from './MapPicker.testkit'
 
 // The form's message about the pin ("Pin your delivery spot on the map."): where it sits, and when it goes.
-vi.mock('./LeafletMap', async () => ({ LeafletMap: (await import('./MapPicker.fakeMap')).FakeLeafletMap }))
+vi.mock('./PinMap', async () => ({ PinMap: (await import('./MapPicker.fakeMap')).FakePinMap }))
 vi.mock('@/data/resolveAddress', () => ({ resolveAddress: vi.fn() }))
 beforeEach(resetKit)
 

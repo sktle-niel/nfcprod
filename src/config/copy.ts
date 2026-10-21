@@ -98,7 +98,7 @@ export const copy = {
       title: 'Pin your delivery spot',
       intro: 'Place a pin on the map so our rider finds your door. We fill in your address from it.',
       privacy:
-        'The part of the map you view, your pin, your searches and your IP address go to OpenStreetMap to show the map and find your address. Nothing is sent to OpenStreetMap until you open the map.',
+        'Nothing is sent to OpenFreeMap or OpenStreetMap until you open the map; then your IP address goes to OpenFreeMap with the part of the map you view, and to OpenStreetMap with your pin and your searches, to show the map and find your address.',
       open: 'Open the map',
       loading: 'Loading the map',
       // The pointer and the keyboard both have a way in, so the texts below name both. The button is "pinHere".

@@ -5,13 +5,13 @@ import { fakeGeocoder } from '@/test/geocoder'
 import { fakeLocations } from '@/test/locations'
 import { MapPicker } from './MapPicker'
 
-// Whether Leaflet's code was asked for at all. The factory runs the first time './LeafletMap' is imported, by whatever
-// way: a prefetch, a static import, an effect, a timer. Keep this file to the one story below, or an earlier test that
-// opens the map would set the flag before the first assertion runs.
-const leaflet = vi.hoisted(() => ({ asked: false }))
-vi.mock('./LeafletMap', async () => {
-  leaflet.asked = true
-  return { LeafletMap: (await import('./MapPicker.fakeMap')).FakeLeafletMap }
+// Whether the map's code (the renderer, and MapLibre with it) was asked for at all. The factory runs the first time
+// './PinMap' is imported, by whatever way: a prefetch, a static import, an effect, a timer. Keep this file to the one
+// story below, or an earlier test that opens the map would set the flag before the first assertion runs.
+const mapCode = vi.hoisted(() => ({ asked: false }))
+vi.mock('./PinMap', async () => {
+  mapCode.asked = true
+  return { PinMap: (await import('./MapPicker.fakeMap')).FakePinMap }
 })
 
 const text = copy.order.map
@@ -28,11 +28,11 @@ describe('MapPicker and the code of the map', () => {
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 50))
     })
-    expect(leaflet.asked).toBe(false)
+    expect(mapCode.asked).toBe(false)
     expect(screen.queryByRole('region', { name: 'Fake map' })).not.toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: text.open }))
     expect(await screen.findByRole('region', { name: 'Fake map' })).toBeInTheDocument()
-    expect(leaflet.asked).toBe(true)
+    expect(mapCode.asked).toBe(true)
   })
 })

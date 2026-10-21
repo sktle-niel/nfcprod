@@ -3,7 +3,7 @@ import { GeocoderError, type ReverseGeocoder } from '@/data/geocoder'
 import type { LocationRepository } from '@/data/locations'
 import { resolveAddress, type ResolvedPlaces } from '@/data/resolveAddress'
 import { isInPhilippines, roundPin, type Pin } from '@/entities/location/pin'
-import type { MapView } from './LeafletMap'
+import type { MapView } from './PinMap'
 import { describePlaces, HINT, type Status, type StatusKey } from './MapPickerStatus'
 import { useNewestRun } from './useMapPinRun'
 

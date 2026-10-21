@@ -5,7 +5,7 @@ import { declaredValue, installStylesheet } from './MapPicker.stylekit'
 import { openMap, resetKit, setup } from './MapPicker.testkit'
 
 // What the stylesheet of the panel does, with the stylesheet itself in the page (see MapPicker.stylekit.ts).
-vi.mock('./LeafletMap', async () => ({ LeafletMap: (await import('./MapPicker.fakeMap')).FakeLeafletMap }))
+vi.mock('./PinMap', async () => ({ PinMap: (await import('./MapPicker.fakeMap')).FakePinMap }))
 vi.mock('@/data/resolveAddress', () => ({ resolveAddress: vi.fn() }))
 beforeEach(resetKit)
 

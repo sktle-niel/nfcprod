@@ -24,9 +24,9 @@ import {
 } from './MapPicker.testkit'
 
 // jsdom cannot draw a map: the panel gets a fake one with buttons for a tap, a failure and so on.
-vi.mock('./LeafletMap', async () => {
-  const { FakeLeafletMap } = await import('./MapPicker.fakeMap')
-  return { LeafletMap: FakeLeafletMap }
+vi.mock('./PinMap', async () => {
+  const { FakePinMap } = await import('./MapPicker.fakeMap')
+  return { PinMap: FakePinMap }
 })
 
 // The matcher has its own tests. Here the lookup is told what it found.

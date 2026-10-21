@@ -9,7 +9,7 @@ import { fakeGeocoder } from '@/test/geocoder'
 import { ALCANTARA, CEBU, CEBU_CITY, fakeLocations, ILOCOS_NORTE, LAHUG } from '@/test/locations'
 import { OrderDialog } from './OrderDialog'
 
-// The real map panel needs Leaflet, which jsdom cannot run. This stand-in takes the same props and keeps the same
+// The real map panel needs MapLibre, which jsdom cannot run (no WebGL). This stand-in takes the same props and keeps the same
 // hidden inputs (lat, lng, mapUnavailable). Its buttons play what the customer and the map do:
 // "Look up" hands `map.lookup` to the form, the way a finished address lookup does.
 const map = vi.hoisted(() => ({

@@ -7,9 +7,9 @@ export const env = {
   ordersEndpoint: import.meta.env['VITE_ORDERS_ENDPOINT']?.trim() ?? '',
   // Where the province, city and barangay lists come from (https only). Empty means the public PSGC API.
   locationsApi: import.meta.env['VITE_LOCATIONS_API']?.trim() ?? '',
-  // Map tiles URL template with {z}, {x} and {y} once each and no other braces (https only). Empty means the public
-  // OpenStreetMap tiles. A value that does not fit is ignored, with a warning in the console (src/config/map.ts).
-  mapTiles: import.meta.env['VITE_MAP_TILES']?.trim() ?? '',
+  // MapLibre style JSON URL for the delivery pin map (https only, no braces). Empty means the public OpenFreeMap
+  // Positron (light) style. A value that does not fit is ignored, with a warning in the console (src/config/map.ts).
+  mapStyle: import.meta.env['VITE_MAP_STYLE']?.trim() ?? '',
   // Reverse geocoder and place search base URL (https only). Empty means the public Nominatim service. A value that
   // does not fit is ignored, with a warning in the console (src/config/map.ts).
   geocoderApi: import.meta.env['VITE_GEOCODER_API']?.trim() ?? '',
