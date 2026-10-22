@@ -1,22 +1,29 @@
 import { useMemo } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 import { copy } from '@/config/copy'
 import { env } from '@/config/env'
 import { adminOrders, type AdminOrderRepository } from '@/data/adminOrders'
-import { Logo } from '@/shared/ui/Logo'
-import { ThemeToggle } from '@/shared/ui/ThemeToggle'
+import { DemoTag } from '@/shared/ui/DemoTag'
+import { IconCustomers, IconOrders, IconOverview, IconPricing } from '@/shared/ui/icons'
+import { LoadError } from '@/shared/ui/LoadError'
+import { AppShell } from '@/shared/ui/shell/AppShell'
+import ui from '@/shared/ui/ui.module.css'
 import { AdminDataContext, type AdminData } from './adminData'
-import styles from './AdminLayout.module.css'
-import { AdminNav } from './AdminNav'
-import ui from './ui.module.css'
 import { useOrders } from './useOrders'
 
 type Props = {
   repository?: AdminOrderRepository
 }
 
+const items = [
+  { to: '/admin', end: true, label: copy.admin.nav.overview, Icon: IconOverview },
+  { to: '/admin/orders', end: false, label: copy.admin.nav.orders, Icon: IconOrders },
+  { to: '/admin/customers', end: false, label: copy.admin.nav.customers, Icon: IconCustomers },
+  { to: '/admin/pricing', end: false, label: copy.admin.nav.pricing, Icon: IconPricing },
+]
+
 /**
- * The admin shell: sidebar (a tab bar on phones), a top strip, and the page. Loads the orders once for every page.
+ * The admin shell around the page. Loads the orders once for every page.
  * The page is there from the first moment and shows skeletons until the orders arrive.
  */
 export function AdminLayout({ repository = adminOrders }: Props) {
@@ -31,50 +38,27 @@ export function AdminLayout({ repository = adminOrders }: Props) {
   )
 
   return (
-    <div className={styles.shell}>
-      <meta name="robots" content="noindex" />
-      <a className={styles.skip} href="#admin-main">
-        {copy.admin.skip}
-      </a>
-
-      <aside className={styles.sidebar}>
-        <Link className={styles.brand} to="/admin" aria-label={env.appName}>
-          <Logo className={styles.logo} />
-        </Link>
-        <AdminNav />
-      </aside>
-
-      <div className={styles.content}>
-        <header className={styles.topbar}>
-          <Link className={styles.mobileBrand} to="/admin" aria-label={env.appName}>
-            <Logo className={styles.logo} />
-          </Link>
-          <div className={styles.actions}>
-            {data.demo && <span className={styles.demo}>{copy.admin.demo}</span>}
-            <ThemeToggle />
-          </div>
-        </header>
-
-        <main id="admin-main" className={styles.main}>
-          {state.status === 'loading' && (
-            <p role="status" className={ui.visuallyHidden}>
-              {copy.admin.loading}
-            </p>
-          )}
-          {state.status === 'error' ? (
-            <p role="alert" className={styles.note}>
-              {copy.admin.error}
-              <button type="button" className={styles.retry} onClick={retry}>
-                {copy.admin.retry}
-              </button>
-            </p>
-          ) : (
-            <AdminDataContext.Provider value={data}>
-              <Outlet />
-            </AdminDataContext.Provider>
-          )}
-        </main>
-      </div>
-    </div>
+    <AppShell
+      label={copy.admin.menu}
+      home="/admin"
+      brandLabel={env.appName}
+      items={items}
+      skipLabel={copy.admin.skip}
+      mainId="admin-main"
+      topbarExtra={data.demo && <DemoTag>{copy.admin.demo}</DemoTag>}
+    >
+      {state.status === 'loading' && (
+        <p role="status" className={ui.visuallyHidden}>
+          {copy.admin.loading}
+        </p>
+      )}
+      {state.status === 'error' ? (
+        <LoadError message={copy.admin.error} retryLabel={copy.admin.retry} onRetry={retry} />
+      ) : (
+        <AdminDataContext.Provider value={data}>
+          <Outlet />
+        </AdminDataContext.Provider>
+      )}
+    </AppShell>
   )
 }

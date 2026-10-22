@@ -3,10 +3,10 @@ import { copy } from '@/config/copy'
 import { countCards, type OrderRecord } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
 import { plural } from '@/shared/lib/plural'
-import { Avatar } from './Avatar'
+import { Avatar } from '@/shared/ui/Avatar'
 import { formatDay } from './format'
 import styles from './OrderRow.module.css'
-import { Block, Pulse } from './Skeleton'
+import { Block, Pulse } from '@/shared/ui/Skeleton'
 import { StatusPill } from './StatusPill'
 
 type Props = {

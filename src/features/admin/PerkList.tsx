@@ -1,7 +1,7 @@
 import { copy } from '@/config/copy'
 import { PERK_MAX, PERKS_MAX, type FieldError, type OfferKey } from '@/entities/pricing/pricing'
 import styles from './PricingPage.module.css'
-import ui from './ui.module.css'
+import ui from '@/shared/ui/ui.module.css'
 import type { PerkValue } from './usePricingEditor'
 
 const text = copy.admin.pricing

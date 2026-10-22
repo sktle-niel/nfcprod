@@ -1,5 +1,6 @@
 import { PLATFORMS, countCards } from '@/entities/order/order'
 import type { OrderRecord, Platform } from '@/entities/order/order'
+import type { Count } from '@/shared/ui/chart'
 
 export const DAY = 86_400_000
 
@@ -97,8 +98,6 @@ export function buckets(records: readonly OrderRecord[], span: Span, size: numbe
 export function bucketSize(days: number): number {
   return days <= 31 ? 1 : 7
 }
-
-export type Count = { label: string; value: number }
 
 /** The provinces with the most orders, biggest first. */
 export function topProvinces(records: readonly OrderRecord[], limit = 5): Count[] {

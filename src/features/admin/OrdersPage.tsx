@@ -8,14 +8,14 @@ import { filterOrders } from './filterOrders'
 import { OrderDetail, OrderDetailSkeleton } from './OrderDetail'
 import { OrderRow, OrderRowsSkeleton } from './OrderRow'
 import styles from './OrdersPage.module.css'
-import { PageHeader } from './PageHeader'
+import { PageHeader } from '@/shared/ui/PageHeader'
 import { Pagination } from './Pagination'
 import { paginate, showTop } from './paging'
-import { Panel } from './Panel'
-import { SegmentedControl } from './SegmentedControl'
+import { Panel } from '@/shared/ui/Panel'
+import { SegmentedControl } from '@/shared/ui/SegmentedControl'
 import { toStatus } from './status'
 import { lastDays, SIZES } from './stats'
-import ui from './ui.module.css'
+import ui from '@/shared/ui/ui.module.css'
 
 const text = copy.admin.orders
 const periods = [{ days: 0, label: text.allTime }, ...copy.admin.overview.ranges]

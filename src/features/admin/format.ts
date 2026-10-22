@@ -38,16 +38,3 @@ export function formatMobile(phone: string): string {
 export function formatPin(pin: Pin): string {
   return `${roundCoordinate(pin.lat).toFixed(5)}, ${roundCoordinate(pin.lng).toFixed(5)}`
 }
-
-/** 12.5 becomes "12.5%", 12 becomes "12%". The sign is left to the caller. */
-export function formatPercent(value: number): string {
-  return `${Math.abs(value).toFixed(1).replace(/\.0$/, '')}%`
-}
-
-/** "Maria Angelica Santos" becomes "MS". */
-export function initials(name: string): string {
-  const words = name.trim().split(/\s+/).filter(Boolean)
-  const first = words[0]?.[0] ?? ''
-  const last = words.length > 1 ? (words[words.length - 1]?.[0] ?? '') : ''
-  return (first + last).toUpperCase()
-}
