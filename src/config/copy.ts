@@ -1,4 +1,7 @@
-// All user-facing text lives here (English only for now), so translations can be added later.
+import { menuViewCopy } from './copyParts/menuView'
+
+// All user-facing text lives here (English only for now), so translations can be added later. The owner dashboard's words
+// are in ./dashboardCopy, apart from this file, so the public pages that load it do not download them.
 export const copy = {
   landing: {
     nav: { how: 'How it works', cards: 'Cards', pricing: 'Pricing', login: 'Log in', dashboard: 'Dashboard', cta: 'Get started' },
@@ -173,52 +176,21 @@ export const copy = {
     },
   },
   menu: {
-    comingSoon: 'Menu coming soon.',
-  },
-  dashboard: {
-    title: 'Your account',
-    signedInAs: 'Signed in as {name} ({email})',
-    logOut: 'Log out',
-    home: 'Home',
-    loading: 'Loading your account',
-    loadError: 'Could not load your account.',
-    retry: 'Retry',
-    status: {
-      trial: { one: 'Free trial: 1 day left', many: 'Free trial: {n} days left' },
-      trialBody: 'Your menu website is live until {date}. Start a plan to keep it on.',
-      trialEnded: 'Your free trial has ended',
-      trialEndedBody: 'Your menu is paused, not deleted. Start a plan to turn it back on.',
-      active: '{plan} plan is active',
-      activeBody: 'Renews on {date}.',
-      lapsed: 'Your {plan} plan has ended',
-      lapsedBody: 'Your menu is paused, not deleted. Start the plan again to turn it back on.',
+    /** The public page at /m/:slug, as a customer meets it. */
+    page: {
+      loading: 'Loading the menu',
+      notAvailable: {
+        title: 'This menu is not available',
+        body: 'The link may be wrong, or the menu is not open to customers right now.',
+        home: 'Go to the home page',
+      },
+      error: {
+        title: 'The menu did not load',
+        message: 'We could not load this menu. Check your connection and try again.',
+        retry: 'Try again',
+      },
     },
-    plans: {
-      title: 'Choose your plan',
-      names: { month: 'Monthly', year: 'Annual' },
-      per: { month: '/month', year: '/year' },
-      save: 'Save {percent}%',
-      start: 'Start {plan} plan',
-      restart: 'Restart {plan} plan',
-      starting: 'Opening checkout…',
-      current: 'Your plan',
-      error: 'Could not open the checkout. Try again.',
-      secure: 'You pay on a secure checkout page. We never see your card details.',
-      demo: 'Demo mode: no payment is taken, the plan turns on right away.',
-    },
-    freeCards: {
-      title: '{n} free NFC cards',
-      waiting: 'Cards that open your menu website. We send them for free when your plan starts.',
-      ready: 'Your plan is on, so your free cards are next. We will call you to confirm where to send them.',
-      sent: 'Your free cards are on their way.',
-    },
-    menu: {
-      title: 'Your menu website',
-      live: 'Live',
-      paused: 'Paused',
-      body: 'Set up your menu: branding, colors, products and prices.',
-      soon: 'The menu editor is coming next.',
-    },
+    view: menuViewCopy,
   },
   auth: {
     close: 'Close',

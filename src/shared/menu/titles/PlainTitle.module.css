@@ -1,0 +1,10 @@
+/* A bar in the accent beside the title: a text-free shape on the page color, so it needs no on-accent text color. */
+.title {
+  margin: 0 0 12px;
+  padding-left: 10px;
+  border-left: 4px solid var(--menu-accent);
+  font-family: var(--menu-display);
+  font-size: 1.125rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}

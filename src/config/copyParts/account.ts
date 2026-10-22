@@ -1,0 +1,68 @@
+/** Words of the Account page: the profile, the plan and billing, and Log out. */
+export const accountCopy = {
+  title: 'Account',
+  loading: 'Loading your account',
+  loadError: 'Could not load your account.',
+  retry: 'Retry',
+  profile: {
+    title: 'Profile',
+    name: 'Name',
+    email: 'Email',
+    method: 'Signed in with',
+    methods: { google: 'Google', password: 'Email and password' },
+    logOut: 'Log out',
+  },
+  status: {
+    trial: { one: 'Free trial: 1 day left', many: 'Free trial: {n} days left' },
+    // The menu is on only when it is published; a draft or a missing menu gets the second line.
+    trialBody: 'Your menu is live until {date}. Choose a plan to keep it on.',
+    trialBodyHidden: 'Your free trial ends on {date}. Choose a plan to keep your menu live.',
+    trialEnded: 'Your free trial has ended',
+    trialEndedBody: 'Your menu is paused, not deleted. Choose a plan to turn it back on.',
+    active: '{plan} plan is active',
+    activeBody: 'Renews on {date}.',
+    lapsed: 'Your {plan} plan has ended',
+    lapsedBody: 'Your menu is paused, not deleted. Choose a plan to turn it back on.',
+    // The two lines above are for a published menu. A draft was never on, and without a menu there is nothing to pause.
+    endedDraft: 'Your menu is not published yet. Choose a plan first, then publish it.',
+    endedOther: 'Choose a plan to put your menu online.',
+  },
+  plans: {
+    title: 'Choose your plan',
+    names: { month: 'Monthly', year: 'Annual' },
+    per: { month: '/month', year: '/year' },
+    save: 'Save {percent}%',
+    start: 'Start {plan} plan',
+    restart: 'Restart {plan} plan',
+    starting: 'Opening checkout…',
+    current: 'Your plan',
+    // Said in the status line after a plan starts, because the Start button goes away.
+    started: 'Your {plan} plan is on.',
+    error: 'Could not open the checkout. Try again.',
+    secure: 'You pay on a secure checkout page. We never see your card details.',
+    demo: 'Demo mode: no payment is taken, the plan turns on right away.',
+  },
+  freeCards: {
+    title: '{n} free NFC cards',
+    titleOne: '1 free NFC card',
+    waiting: 'We send them for free when your plan starts.',
+    ready: 'Your free cards are next. We will call you to confirm where to send them.',
+    sent: 'Your free cards are on their way.',
+  },
+  menu: {
+    title: 'Your menu page',
+    live: 'Live',
+    paused: 'Paused',
+    draft: 'Draft',
+    none: 'Not set up',
+    body: {
+      live: 'Customers can open it while your trial or plan runs. Edit it and share it from the other pages.',
+      paused: 'Customers cannot open it until a plan is running.',
+      pausedDraft: 'Nobody can see it yet. Choose a plan first, then publish it.',
+      draft: 'Nobody can see it yet. Publish it when you are ready for customers.',
+      none: 'Set up your menu to get a link you can share.',
+    },
+    publish: 'Publish your menu',
+    setup: 'Set up your menu',
+  },
+} as const

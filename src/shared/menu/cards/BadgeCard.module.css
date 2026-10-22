@@ -1,0 +1,189 @@
+/* The "badge" card: a centered column drawn on the page itself (no card color), so its text is the page pair
+   (--menu-text, --menu-muted on --menu-bg). The picture stands on a pedestal of the accent; the price is a round badge in
+   the fill pair. Painted from the --menu-* variables only. */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding-bottom: 8px;
+  list-style: none;
+  color: var(--menu-text);
+  text-align: center;
+}
+
+/* The picture, its pedestal and its badge. It is drawn first though it comes last in the document. In one column (the list
+   layout) it does not grow past a comfortable size. */
+.stage {
+  position: relative;
+  order: -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 220px;
+  padding-top: 8px;
+}
+
+/* The pedestal: a flat ellipse in a tint of the accent (mixed into the page color, so a patterned backdrop does not show
+   through), under the foot of the picture. A shape with no text. */
+.stage::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 84%;
+  aspect-ratio: 6 / 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--menu-accent) 65%, var(--menu-bg));
+  transform: translateX(-50%);
+}
+
+/* The picture stands with its foot on the middle of the pedestal: half the pedestal's height, which is 84% / 6 of the
+   stage width (a margin in % reads the width). */
+.photo {
+  position: relative;
+  z-index: 1;
+  width: 74%;
+  margin-bottom: 7%;
+  --photo-ratio: 1 / 1;
+}
+
+/* A placeholder drawing without a frame stands on the pedestal too, rather than floating in the middle of its box. */
+span.photo[data-shape='cutout'] {
+  place-items: end center;
+}
+
+/* The price: a round sticker on the top right of the picture, inside the column so that it never clips or touches the
+   next card. A long amount stretches it into a pill rather than spilling out. The ring in the page color lifts it off
+   the picture. */
+.badge {
+  position: absolute;
+  z-index: 2;
+  top: 12%;
+  right: 0;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 3.25rem;
+  height: 3.25rem;
+  padding: 0 7px;
+  color: var(--menu-on-fill);
+  background: var(--menu-fill);
+  border-radius: 999px;
+  box-shadow: 0 0 0 3px var(--menu-bg);
+  font-family: var(--menu-display);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-synthesis-weight: none;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 2px 0;
+}
+
+/* The display font, bold where the face has a bold (a face with one weight, such as Anton, keeps its own heavy cut rather
+   than a smeared fake bold). */
+.name {
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: 1rem;
+  font-weight: 700;
+  font-synthesis-weight: none;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.variants,
+.description,
+.addOns {
+  margin: 0;
+  color: var(--menu-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.variants {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Two lines at most: the column is narrow. */
+.description {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.addOns {
+  font-style: italic;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin: 2px 0 0;
+  padding: 0;
+}
+
+/* Page text on the page color; the accent only draws the outline. */
+.tag {
+  list-style: none;
+  padding: 1px 8px;
+  color: var(--menu-text);
+  background: var(--menu-bg);
+  border: 1px solid var(--menu-accent);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* "Sold out" sits above the name. The page colors swapped: the words stay at full contrast. */
+.soldOut {
+  order: -1;
+  padding: 1px 8px;
+  color: var(--menu-bg);
+  background: var(--menu-text);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* Sold out: the words stay readable, the price is struck through, only the picture is quieter. */
+.card[data-sold-out] .badge {
+  text-decoration: line-through;
+}
+
+.card[data-sold-out] .photo {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+@container (min-width: 640px) {
+  .name {
+    font-size: 1.0625rem;
+  }
+
+  .badge {
+    min-width: 3.5rem;
+    height: 3.5rem;
+    font-size: 0.875rem;
+  }
+}

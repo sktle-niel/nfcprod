@@ -1,0 +1,58 @@
+/* The shape of a product picture. The card sets the width and, for the framed shapes, --photo-ratio; the menu's look picks the
+   shape. Colors come from the --menu-* variables only. */
+.photo {
+  display: block;
+  flex: none;
+  max-width: 100%;
+}
+
+.rounded {
+  aspect-ratio: var(--photo-ratio, 4 / 3);
+  object-fit: cover;
+  border-radius: min(var(--menu-radius), 14px);
+}
+
+.circle {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* An arch window: round on top, a little rounded at the foot. */
+.arch {
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 999px 999px min(var(--menu-radius), 12px) min(var(--menu-radius), 12px);
+}
+
+/* No frame: made for pictures with a transparent background. The shadow follows the shape of what is drawn. */
+.cutout {
+  aspect-ratio: var(--photo-ratio, 1 / 1);
+  object-fit: contain;
+  filter: drop-shadow(0 6px 8px rgb(0 0 0 / 0.28));
+}
+
+/* The placeholder: a quiet tint in the shape, and the drawing in the muted color. A cut-out has no tint, only the drawing. */
+.empty {
+  display: grid;
+  place-items: center;
+  color: var(--menu-muted);
+  background: color-mix(in srgb, var(--menu-accent) 12%, transparent);
+}
+
+.empty.cutout {
+  background: none;
+  filter: none;
+}
+
+.drawing {
+  display: block;
+  width: 62%;
+  height: 62%;
+  opacity: 0.85;
+}
+
+.empty.cutout .drawing {
+  width: 82%;
+  height: 82%;
+}

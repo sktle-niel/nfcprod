@@ -1,0 +1,146 @@
+/* The poster-board card: no card color, a picture standing on the page and the words beside it. Drawn on the page, so its
+   text is the page pair (--menu-text, --menu-muted). */
+.card {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 6px 0;
+  list-style: none;
+  color: var(--menu-text);
+}
+
+/* The picture leans a little over the margin, like a cut-out pasted on a board. It stays inside the menu (the section has
+   16px of padding), so it never makes the page scroll sideways. A tall box suits a cup; a circle keeps its own 1:1. */
+.photo {
+  width: 112px;
+  margin-left: -8px;
+  --photo-ratio: 4 / 5;
+}
+
+/* A framed picture has an edge of its own, so it keeps to the margin: only a cut-out leans out. */
+.photo:not([data-shape="cutout"]) {
+  margin-left: 0;
+}
+
+/* The words start a little below the top of the picture, beside the cup rather than above it. */
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 10px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--menu-display);
+  font-synthesis: none;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.description,
+.addOns {
+  margin: 0;
+  color: var(--menu-muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.addOns {
+  font-style: italic;
+}
+
+/* The sizes as a small table: each size a row, its label then its price, the prices lined up in one column. Rows share the
+   columns of the list (subgrid); a browser without subgrid gets fixed columns that still line up. */
+.sizes {
+  display: grid;
+  grid-template-columns: minmax(0, max-content) max-content;
+  column-gap: 14px;
+  row-gap: 1px;
+  margin: 2px 0 0;
+  padding: 0;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.size {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(2.5em, max-content) max-content;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+  list-style: none;
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.sizeLabel {
+  color: var(--menu-muted);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.sizePrice,
+.price {
+  font-family: var(--menu-display);
+  font-synthesis: none;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
+}
+
+.price {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 2px 0 0;
+  padding: 0;
+}
+
+/* Words in the page text color; the accent draws only the outline. */
+.tag {
+  list-style: none;
+  padding: 1px 8px;
+  color: var(--menu-text);
+  border: 1px solid var(--menu-accent);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* The inverse label of the page: the page color on the page text color. */
+.soldOut {
+  padding: 2px 8px;
+  color: var(--menu-bg);
+  background: var(--menu-text);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* Sold out: the words stay as they are, every price is struck, only the picture is quieter. */
+.card[data-sold-out] .price,
+.card[data-sold-out] .sizePrice {
+  text-decoration: line-through;
+}
+
+.card[data-sold-out] .photo {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+

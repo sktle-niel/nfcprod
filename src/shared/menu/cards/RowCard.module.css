@@ -1,0 +1,151 @@
+/* The Classic card. Painted from the --menu-* variables only. It sits on its own card color, so its text is
+   --menu-on-surface (and --menu-card-muted for second-rank lines), whatever the page text color is. */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  list-style: none;
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+  border: 1px solid var(--menu-card-line);
+  /* A pill radius would round a whole card into a capsule, so it stops at 16px. */
+  border-radius: min(var(--menu-radius), 16px);
+}
+
+/* Vertical card: the picture on top. The shape class of ProductPhoto draws the shape; the rules here only place and size
+   it, and every rule that touches a corner names the shape it is for (a bare .photo rule would square a circle). */
+.photo {
+  order: -1;
+  width: 100%;
+  --photo-ratio: 4 / 3;
+  /* A placeholder drawing sits on the card, so it takes the card's muted ink: the page's muted token may not read on an owner-picked card color. */
+  color: var(--menu-card-muted);
+}
+
+/* The rectangle runs across the top of the card: the card's own rounded corners clip it. */
+.photo[data-shape='rounded'] {
+  border-radius: 0;
+}
+
+/* A shape that is not a rectangle does not run across the card: it sits centered above the text. */
+.photo[data-shape='circle'],
+.photo[data-shape='arch'],
+.photo[data-shape='cutout'] {
+  width: min(112px, 72%);
+  align-self: center;
+  margin-top: 14px;
+}
+
+/* A cut-out has no frame: a little larger, so the product itself is the size of the framed shapes. */
+.photo[data-shape='cutout'] {
+  width: min(128px, 80%);
+  --photo-ratio: 1 / 1;
+  margin-top: 8px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+}
+
+.name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.description,
+.variants,
+.addOns {
+  margin: 0;
+  color: var(--menu-card-muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.price {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.addOns {
+  font-style: italic;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 0;
+  padding: 0;
+}
+
+/* Text in the card's own text color on its card color, so it reads like the body text (4.5:1) whatever the accent is.
+   The accent only draws the outline: a chip filled with the raw accent cannot promise that for its label. */
+.tag {
+  list-style: none;
+  padding: 1px 8px;
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+  border: 1px solid var(--menu-accent);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* Sold out: the card stays in its place. The words are never faded (that would drop them under 4.5:1): the badge and a
+   struck price say it, and only the photo is quieter. */
+.card[data-sold-out] .price {
+  text-decoration: line-through;
+}
+
+.card[data-sold-out] .photo {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+.soldOut {
+  align-self: flex-start;
+  padding: 2px 8px;
+  color: var(--menu-surface);
+  background: var(--menu-on-surface);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* List layout: one column, the picture small on the right. The root carries the layout. */
+:global([data-menu-layout='list']) .card {
+  flex-direction: row;
+  align-items: stretch;
+}
+
+:global([data-menu-layout='list']) .photo {
+  order: 1;
+  align-self: center;
+  width: 88px;
+  margin: 12px 12px 12px 0;
+  --photo-ratio: 1 / 1;
+}
+
+:global([data-menu-layout='list']) .photo[data-shape='rounded'] {
+  border-radius: min(var(--menu-radius), 12px);
+}
+
+/* No frame, so no need for the margin a frame needs to breathe: the product may come closer to the edge. */
+:global([data-menu-layout='list']) .photo[data-shape='cutout'] {
+  width: 96px;
+  margin: 8px 8px 8px 0;
+}

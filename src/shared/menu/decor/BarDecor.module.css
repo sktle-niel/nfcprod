@@ -1,0 +1,30 @@
+/* Where the bar set sits: stars in the top left, a coupe glass tilted in the top right, a bottle and a short glass standing
+   together at the bottom right beside the footer. */
+.stars {
+  top: 0.75em;
+  left: 4%;
+  width: 16%;
+  max-width: 6em;
+}
+
+.coupe {
+  top: -0.25em;
+  right: 1.5%;
+  width: 14%;
+  max-width: 5.5em;
+  transform: rotate(10deg);
+}
+
+.bottle {
+  bottom: 0.5em;
+  right: 4%;
+  width: 10%;
+  max-width: 4em;
+}
+
+.rocks {
+  bottom: 0.5em;
+  right: 15%;
+  width: 11%;
+  max-width: 4.25em;
+}

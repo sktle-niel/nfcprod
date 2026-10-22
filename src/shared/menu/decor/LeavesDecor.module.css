@@ -1,0 +1,40 @@
+/* Where the leaves set sits: a branch from each top corner (the right one mirrored and a little smaller), two sprigs at the
+   bottom right beside the footer, one peeking in at the bottom left corner. */
+.topLeft {
+  top: 0;
+  left: 0;
+  width: 27%;
+  max-width: 10em;
+}
+
+.topRight {
+  top: 0;
+  right: 0;
+  width: 22%;
+  max-width: 8em;
+  transform: scaleX(-1);
+}
+
+.footRight {
+  bottom: 0;
+  right: 4%;
+  width: 13%;
+  max-width: 5em;
+  transform: rotate(8deg);
+}
+
+.footRightSmall {
+  bottom: 0;
+  right: 14%;
+  width: 9%;
+  max-width: 3.5em;
+  transform: rotate(-14deg);
+}
+
+.footLeft {
+  bottom: -1.5em;
+  left: -1%;
+  width: 10%;
+  max-width: 4em;
+  transform: rotate(-24deg);
+}

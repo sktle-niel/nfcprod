@@ -1,0 +1,8 @@
+.logo {
+  flex: none;
+  width: var(--logo-size, 72px);
+  height: var(--logo-size, 72px);
+  object-fit: cover;
+  border: 1px solid var(--menu-line);
+  border-radius: var(--logo-radius, min(var(--menu-radius), 20px));
+}

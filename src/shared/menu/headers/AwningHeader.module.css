@@ -1,0 +1,69 @@
+.header {
+  /* One stripe of the awning, and the scallop under it (a half circle as wide as the stripe). */
+  --awning-stripe: 30px;
+  --awning-scallop: 15px;
+  --awning-a: var(--menu-accent);
+  /* The card color nudged toward the text, so the light stripes show on a page close to the card color (a dark page). */
+  --awning-b: color-mix(in srgb, var(--menu-surface) 86%, var(--menu-text));
+  --logo-size: 64px;
+}
+
+/* Stripes on top, a row of half circles under them, both tiled from the center so the awning is symmetrical. Text-free. */
+.awning {
+  height: 48px;
+  background-image:
+    linear-gradient(90deg, var(--awning-a) 50%, var(--awning-b) 50%),
+    radial-gradient(circle var(--awning-scallop) at 25% 0, var(--awning-a) calc(100% - 0.75px), transparent 100%),
+    radial-gradient(circle var(--awning-scallop) at 75% 0, var(--awning-b) calc(100% - 0.75px), transparent 100%);
+  background-position:
+    50% 0,
+    50% 100%,
+    50% 100%;
+  background-size:
+    calc(2 * var(--awning-stripe)) calc(100% - var(--awning-scallop) + 1px),
+    calc(2 * var(--awning-stripe)) var(--awning-scallop),
+    calc(2 * var(--awning-stripe)) var(--awning-scallop);
+  background-repeat: repeat-x;
+  filter: drop-shadow(0 3px 2px rgb(0 0 0 / 0.14));
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 16px 16px;
+  text-align: center;
+}
+
+.name {
+  max-width: 100%;
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: clamp(2rem, 10.5cqi, 3rem);
+  font-weight: 800;
+  font-synthesis-weight: none;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.tagline {
+  max-width: 34ch;
+  margin: 0;
+  color: var(--menu-muted);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* Under the glow backdrop the page is lighter or darker than its own color: the tagline takes the full text color, which keeps
+   4.5:1 there. */
+[data-menu-backdrop='glow'] .tagline {
+  color: var(--menu-text);
+}

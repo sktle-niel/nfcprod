@@ -1,0 +1,166 @@
+/* The fine-dining card: a numbered dish on the page (no card color), so its text is the page pair: --menu-text and
+   --menu-muted. The accent only draws shapes: the ring around the plate and the thin rule. */
+.card {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 10px 0;
+  list-style: none;
+  color: var(--menu-text);
+}
+
+/* The plate: a soft ring around a round picture. Its size is fixed, so nothing moves when the picture arrives. */
+.plate {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  padding: 5px;
+  border: 1px solid color-mix(in srgb, var(--menu-accent) 70%, transparent);
+  border-radius: 50%;
+  box-shadow: 0 6px 14px rgb(0 0 0 / 0.22);
+}
+
+/* Always a circle here, whatever the picture shape of the look: a plate is round. The selector outweighs the shapes of
+   ProductPhoto (a cut-out has no frame and no tint there), so a cut-out or an arch is drawn on the plate too. */
+.card .plate .photo {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 50%;
+  filter: none;
+  background: color-mix(in srgb, var(--menu-accent) 12%, var(--menu-bg));
+}
+
+/* The placeholder drawing sits inside the round plate with room to spare, for every shape. */
+.card .plate .photo > span {
+  width: 60%;
+  height: 60%;
+}
+
+/* The small round number, on the fill pair so it reads whatever the accent is. */
+.number {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 4px;
+  color: var(--menu-on-fill);
+  background: var(--menu-fill);
+  border: 2px solid var(--menu-bg);
+  border-radius: 999px;
+  font-family: var(--menu-display);
+  font-synthesis: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 1;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* The name and, at the right, the price, over a thin rule. */
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--menu-accent) 45%, transparent);
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--menu-display);
+  font-synthesis: none;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.price {
+  flex: none;
+  max-width: 50%;
+  margin: 0;
+  font-family: var(--menu-display);
+  font-synthesis: none;
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums lining-nums;
+  text-align: right;
+}
+
+.description,
+.variants,
+.addOns {
+  margin: 0;
+  color: var(--menu-muted);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  font-style: italic;
+}
+
+.variants {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 2px 0 0;
+  padding: 0;
+}
+
+/* Words in the page text color; the accent draws only the outline. */
+.tag {
+  list-style: none;
+  padding: 1px 8px;
+  color: var(--menu-text);
+  border: 1px solid var(--menu-accent);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/* The inverse label of the page: the page color on the page text color. */
+.soldOut {
+  align-self: flex-start;
+  padding: 2px 8px;
+  color: var(--menu-bg);
+  background: var(--menu-text);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* Sold out: the words stay as they are, the price is struck, only the picture is quieter. */
+.card[data-sold-out] .price {
+  text-decoration: line-through;
+}
+
+.card[data-sold-out] .plate .photo {
+  opacity: 0.5;
+  filter: grayscale(1);
+}

@@ -1,0 +1,198 @@
+/* The tile: picture on top, then the words, the price in a filled chip at the foot. It sits on its own card color, so its
+   text is --menu-on-surface and --menu-card-muted; the chip is the fill pair. Painted from the --menu-* variables only. */
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  list-style: none;
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+  border: 1px solid var(--menu-card-line);
+  /* A pill radius would round a tile into a capsule, so it stops at 18px. */
+  border-radius: min(var(--menu-radius), 18px);
+}
+
+/* Where the picture stands. The shape class of ProductPhoto draws the shape; these rules only size it, per shape. */
+.stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 8px 8px 0;
+}
+
+.photo {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  --photo-ratio: 4 / 3;
+  /* A placeholder drawing sits on the card, so it takes the card's muted ink: the page's muted token may not read on an owner-picked card color. */
+  color: var(--menu-card-muted);
+}
+
+.photo[data-shape='circle'] {
+  width: min(128px, 76%);
+  margin-top: 8px;
+}
+
+.photo[data-shape='arch'] {
+  width: min(116px, 68%);
+  margin-top: 8px;
+}
+
+.photo[data-shape='cutout'] {
+  width: min(144px, 88%);
+  --photo-ratio: 1 / 1;
+}
+
+/* A cut-out stands on the card: a soft oval floor under it, a shape without text. */
+:global([data-menu-photo='cutout']) .stage::after {
+  content: '';
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: 0;
+  height: 14px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--menu-accent) 22%, transparent);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px 12px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.22;
+  overflow-wrap: anywhere;
+}
+
+.variants {
+  margin: 0;
+  color: var(--menu-card-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Two lines drawn; the whole text stays in the page for a screen reader and for search. */
+.description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
+  color: var(--menu-card-muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.addOns {
+  margin: 0;
+  color: var(--menu-card-muted);
+  font-size: 0.75rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 2px 0 0;
+  padding: 0;
+}
+
+/* The card's text on the card color; the accent only draws the outline. */
+.tag {
+  list-style: none;
+  padding: 0 7px;
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+  border: 1px solid var(--menu-accent);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+/* The price chip, pushed to the foot so the chips of a row line up. */
+.price {
+  align-self: flex-start;
+  max-width: 100%;
+  margin: auto 0 0;
+  padding: 3px 10px;
+  color: var(--menu-on-fill);
+  background: var(--menu-fill);
+  border-radius: var(--menu-radius);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A little more room above the chip than between the lines, also when no taller neighbour stretches the tile (the chip is
+   always the last child, so this is whatever line comes before it). */
+.body > :nth-last-child(2) {
+  margin-bottom: 4px;
+}
+
+/* Sold out: the label sits on the picture's corner; the words stay at full strength, the price is struck, only the picture
+   is quieter. */
+.soldOut {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  padding: 1px 8px;
+  color: var(--menu-surface);
+  background: var(--menu-on-surface);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.tile[data-sold-out] .price {
+  text-decoration: line-through;
+}
+
+.tile[data-sold-out] .photo {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+/* List layout: one tile per line, the picture on the left. */
+:global([data-menu-layout='list']) .tile {
+  flex-direction: row;
+}
+
+:global([data-menu-layout='list']) .stage {
+  flex: none;
+  align-items: center;
+  width: 112px;
+  padding: 10px 0 10px 10px;
+}
+
+:global([data-menu-layout='list']) .photo[data-shape] {
+  width: 100%;
+  margin-top: 0;
+  --photo-ratio: 1 / 1;
+}
+
+:global([data-menu-layout='list']) .stage::after {
+  bottom: 12px;
+}

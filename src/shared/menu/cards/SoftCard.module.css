@@ -1,0 +1,175 @@
+/* The "soft" card: a lifted card in the card color with large round corners. Its text is the card pair
+   (--menu-on-surface, --menu-card-muted on --menu-surface); the price tag is the fill pair. The picture reaches over the
+   top and right edges on purpose, so the card never clips (no overflow hidden) and keeps room above for it. Painted from
+   the --menu-* variables only. */
+.card {
+  --card-pad: 18px;
+  --card-rise: 12px;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 6px;
+  min-width: 0;
+  /* Room for the picture that rises over the top edge, so it never touches the card above. */
+  margin-top: var(--card-rise);
+  padding: var(--card-pad) 0 var(--card-pad) 20px;
+  list-style: none;
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+  /* Two and a half times the button roundness, kept between a soft corner and a wide round one. */
+  border-radius: clamp(10px, calc(var(--menu-radius) * 2.5), 28px);
+  box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.45);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  /* The price tag hangs 12px past the picture's left edge, 6px of it over the gap: this keeps a long name out from under it. */
+  padding-right: 8px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: 1.375rem;
+  font-weight: 800;
+  font-synthesis-weight: none;
+  line-height: 1.02;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.description,
+.variants,
+.addOns {
+  margin: 0;
+  color: var(--menu-card-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  margin-top: 2px;
+}
+
+.variants {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.addOns {
+  font-style: italic;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 2px 0 0;
+  padding: 0;
+}
+
+/* Card text on the card color; the accent only draws the outline. */
+.tag {
+  list-style: none;
+  padding: 1px 8px;
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+  border: 1px solid var(--menu-accent);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* The picture and its tag: on the right, rising over the top edge and reaching a little past the right edge (less than
+   the section's side padding, so the page never scrolls sideways). */
+.visual {
+  position: relative;
+  margin: calc(-1 * (var(--card-pad) + var(--card-rise))) -10px -6px 0;
+}
+
+.photo {
+  width: 124px;
+  --photo-ratio: 1 / 1;
+}
+
+/* A placeholder is drawn in the card's muted color: it sits on the card, not on the page. */
+.card .photo {
+  color: var(--menu-card-muted);
+}
+
+/* A placeholder drawing without a frame stands at the foot of its box, like a cut-out picture. */
+span.photo[data-shape='cutout'] {
+  place-items: end center;
+}
+
+/* The drawing fills its box, so that it reaches the card's edge like a cut-out picture does. */
+.card span.photo[data-shape='cutout'] > span {
+  width: 100%;
+  height: 100%;
+}
+
+/* The price: a small tag, tilted, pinned to the lower left of the picture. */
+.price {
+  position: absolute;
+  z-index: 1;
+  bottom: 14px;
+  left: -12px;
+  margin: 0;
+  padding: 3px 9px;
+  color: var(--menu-on-fill);
+  background: var(--menu-fill);
+  border-radius: min(var(--menu-radius), 8px);
+  box-shadow: 0 4px 10px -4px rgb(0 0 0 / 0.4);
+  font-size: 0.875rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  white-space: nowrap;
+  transform: rotate(-4deg);
+}
+
+/* "Sold out" under the name: the card colors swapped, so the words keep full contrast. */
+.soldOut {
+  padding: 1px 8px;
+  color: var(--menu-surface);
+  background: var(--menu-on-surface);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* Sold out: the words stay readable, the price is struck through, only the picture is quieter. */
+.card[data-sold-out] .price {
+  text-decoration: line-through;
+}
+
+.card[data-sold-out] .photo {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+@container (min-width: 640px) {
+  .card {
+    padding-left: 28px;
+  }
+
+  .name {
+    font-size: 1.75rem;
+  }
+
+  .description {
+    font-size: 0.8125rem;
+  }
+
+  .photo {
+    width: 156px;
+  }
+}
