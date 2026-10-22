@@ -1,6 +1,7 @@
 import { copy } from '@/config/copy'
 import { MAX_QUANTITY, PLATFORMS, type Platform } from '@/entities/order/order'
 import { formatPeso } from '@/shared/lib/money'
+import { fill } from '@/shared/lib/fill'
 import { PlatformIcon } from '../components/PlatformIcon'
 import styles from './CardPicker.module.css'
 import { chosenPlatforms, clampQuantity, toQuantity, type Quantities } from './quantities'
@@ -99,7 +100,7 @@ export function CardPicker({ price, quantities, onChange, error }: Props) {
                     <button
                       type="button"
                       className={styles.step}
-                      aria-label={text.fewer.replace('{name}', name)}
+                      aria-label={fill(text.fewer, { name })}
                       disabled={quantity <= 1}
                       onClick={() => step(platform, -1)}
                     >
@@ -112,7 +113,7 @@ export function CardPicker({ price, quantities, onChange, error }: Props) {
                       inputMode="numeric"
                       autoComplete="off"
                       maxLength={2}
-                      aria-label={text.quantity.replace('{name}', name)}
+                      aria-label={fill(text.quantity, { name })}
                       value={value}
                       onFocus={selectAll}
                       onClick={selectAll}
@@ -121,7 +122,7 @@ export function CardPicker({ price, quantities, onChange, error }: Props) {
                     <button
                       type="button"
                       className={styles.step}
-                      aria-label={text.more.replace('{name}', name)}
+                      aria-label={fill(text.more, { name })}
                       disabled={quantity >= MAX_QUANTITY}
                       onClick={() => step(platform, 1)}
                     >

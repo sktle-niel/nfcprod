@@ -1,0 +1,17 @@
+/* The wait for a menu. It uses the browser's own colors and font, not the app's, so there is no flash of the app's look
+   before the menu's own colors arrive. */
+.loading {
+  display: grid;
+  min-height: 100dvh;
+  padding: 16px;
+  place-content: center;
+  background: Canvas;
+  color: CanvasText;
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  text-align: center;
+}
+
+.loading p {
+  margin: 0;
+}

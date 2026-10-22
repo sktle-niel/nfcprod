@@ -5,6 +5,7 @@ import { SessionProvider } from '@/shared/session/SessionProvider'
 import { NotFound } from '@/shared/ui/NotFound'
 import { RouteError } from '@/shared/ui/RouteError'
 import { AuthHost } from './AuthHost'
+import { dashboardRoutes } from './dashboardRoutes'
 import { RequireSession } from './RequireSession'
 
 // Each surface is lazy-loaded so the public menu bundle never carries dashboard or admin code.
@@ -30,17 +31,19 @@ export const routes: RouteObject[] = [
       { path: '/signup', element: <Navigate to={`/${authLink('signup', OWNER_HOME)}`} replace /> },
       { path: '/login', element: <Navigate to={`/${authLink('login', OWNER_HOME)}`} replace /> },
       {
-        path: '/dashboard/*',
+        // The owner's area: one provider loads the business, menu and plan for the setup wizard and for the shell.
+        path: '/dashboard',
         lazy: async () => {
-          const { DashboardPage } = await import('@/features/dashboard/DashboardPage')
+          const { DashboardProvider } = await import('@/features/dashboard/DashboardProvider')
           return {
             element: (
               <RequireSession>
-                <DashboardPage />
+                <DashboardProvider />
               </RequireSession>
             ),
           }
         },
+        children: dashboardRoutes,
       },
       {
         path: '/admin',
@@ -62,9 +65,17 @@ export const routes: RouteObject[] = [
             path: 'pricing',
             lazy: async () => ({ Component: (await import('@/features/admin/PricingPage')).PricingPage }),
           },
-          { path: '*', element: <NotFound /> },
+          { path: '*', element: <NotFound inline /> },
         ],
       },
+      // For developers: every menu style on a sample menu, and the Design page's Look tab with no sign-in. They exist in
+      // development builds only.
+      ...(import.meta.env.DEV
+        ? [
+            { path: '/__styles', lazy: async () => ({ Component: (await import('@/features/dev/StylesPage')).StylesPage }) },
+            { path: '/__look', lazy: async () => ({ Component: (await import('@/features/dev/LookTabPage')).LookTabPage }) },
+          ]
+        : []),
       { path: '*', element: <NotFound /> },
     ],
   },

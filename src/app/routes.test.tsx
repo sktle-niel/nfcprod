@@ -13,9 +13,29 @@ describe('routes', () => {
     expect(await screen.findByRole('heading', { name: /one tap away/i }, { timeout: 5000 })).toBeInTheDocument()
   })
 
-  it('renders a menu for a valid slug', async () => {
+  it('renders the public menu of a business at its link', async () => {
     renderAt('/m/cafe-luna')
-    expect(await screen.findByRole('heading', { name: 'cafe-luna' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Cafe Luna' }, { timeout: 5000 })).toBeInTheDocument()
+    expect(screen.getByRole('main')).toBeInTheDocument()
+  })
+
+  it('says a link with no menu is not available, in the page of the menu and not the 404', async () => {
+    renderAt('/m/nobody-here')
+    expect(await screen.findByRole('heading', { level: 1, name: 'This menu is not available' }, { timeout: 5000 })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /page not found/i })).not.toBeInTheDocument()
+  })
+
+  it('keeps the owner preview behind the account, like the other business pages', async () => {
+    renderAt('/dashboard/preview')
+    expect(await screen.findByRole('dialog', { name: 'Create your account' }, { timeout: 5000 })).toBeInTheDocument()
+  })
+
+  it('has the owner preview next to the setup wizard, outside the shell, behind the business guard', () => {
+    const dashboard = routes[0]?.children?.find((route) => route.path === '/dashboard')
+    const paths = dashboard?.children?.map((route) => route.path)
+    expect(paths).toEqual(expect.arrayContaining(['setup', 'preview']))
+    // A sibling of the setup route: the shell's pages are the children of the route that has no path.
+    expect(dashboard?.children?.find((route) => route.path === 'preview')?.children).toBeUndefined()
   })
 
   it.each([

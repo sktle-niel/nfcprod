@@ -1,0 +1,24 @@
+/* The page around a menu. The colors are the menu's own variables, set inline on this element (toCssVars), never the app's tokens.
+   A page that sits under a bar of its own (the owner's preview) sets --frame-min-height to 0 and lets this page fill the rest. */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: var(--frame-min-height, 100dvh);
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--menu-bg);
+  color: var(--menu-text);
+}
+
+/* The menu fills the column down to the bottom of the screen, so a short menu does not end in the middle of the page. */
+.column {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.column > * {
+  flex: 1 0 auto;
+}
