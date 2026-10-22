@@ -1,0 +1,24 @@
+.failure {
+  display: grid;
+  min-height: 100dvh;
+  padding: 1rem;
+  place-content: center;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+/* One line high when empty too, so the page does not jump when it starts to say it is loading. */
+.status {
+  min-height: 1.5em;
+  margin: 16px 0 0;
+  color: var(--color-ink-soft);
+}
+
+/* The LoadError note has its own margins; here it sits right under the status line. */
+.failure [role='alert'] {
+  margin: 0 0 16px;
+}

@@ -1,0 +1,104 @@
+.set {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  padding: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.hint {
+  margin: 4px 0 10px;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* On a phone the two boxes share a line and the tools sit under them; from 560px everything is on one line. */
+.row {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.inputs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px;
+  gap: 8px;
+}
+
+.label,
+.price {
+  position: relative;
+  min-width: 0;
+}
+
+.label input,
+.price input {
+  width: 100%;
+}
+
+.peso {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: var(--color-ink-soft);
+  pointer-events: none;
+}
+
+.priceInput {
+  padding-left: 28px;
+}
+
+.tools {
+  display: flex;
+  gap: 2px;
+  justify-content: flex-end;
+}
+
+.error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-danger-ink);
+}
+
+.row input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.count {
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+
+@media (min-width: 560px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .error {
+    grid-column: 1 / -1;
+  }
+}

@@ -1,0 +1,8 @@
+.tile {
+  display: block;
+  width: min(100%, 280px);
+  height: auto;
+  margin: 0 auto 16px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+}

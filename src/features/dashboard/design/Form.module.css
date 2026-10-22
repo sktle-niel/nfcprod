@@ -1,0 +1,47 @@
+/* Shared by the panels of both tabs. */
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+.note {
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-size: 0.88rem;
+}
+
+/* A field made of a label and a control that is not a plain input (a segmented choice). */
+.field {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.field > * {
+  max-width: 100%;
+}
+
+.label {
+  color: var(--color-ink);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.strong {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.error {
+  margin: 0;
+  color: var(--color-danger-ink);
+  font-size: 0.88rem;
+  font-weight: 600;
+}

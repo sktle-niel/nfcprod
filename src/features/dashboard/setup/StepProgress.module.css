@@ -1,0 +1,35 @@
+.progress {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.label {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-ink-soft);
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.segment {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-line);
+  transition: background-color 200ms ease;
+}
+
+.segment[data-done='true'] {
+  background: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .segment {
+    transition-duration: 0.01ms;
+  }
+}

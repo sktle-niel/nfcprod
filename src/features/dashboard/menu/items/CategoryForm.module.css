@@ -1,0 +1,21 @@
+.form {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.field {
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.alert {
+  margin: 0;
+  color: var(--color-danger-ink);
+  font-size: 0.9rem;
+}

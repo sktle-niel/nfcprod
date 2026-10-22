@@ -1,0 +1,93 @@
+.form {
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+/* A field and the note under it stay close together. */
+.grouped {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.counter,
+.hint,
+.error,
+.legend {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.counter {
+  text-align: right;
+  color: var(--color-ink-soft);
+}
+
+.hint {
+  color: var(--color-ink-soft);
+}
+
+.legend {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.error {
+  margin-top: 6px;
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+/* A group of choices the form can send the focus to when the server refuses it. */
+.block {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  border-radius: var(--radius-sm);
+}
+
+.block:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+/* Save and Cancel stay in view while the form scrolls, edge to edge in the sheet. Sticky offsets count from inside the
+   sheet's padding, so the bottom offset cancels it. */
+.footer {
+  position: sticky;
+  bottom: calc(-1 * var(--sheet-pad-bottom, 24px));
+  z-index: 1;
+  display: grid;
+  margin: 0 calc(-1 * var(--sheet-pad-x, 20px)) calc(-1 * var(--sheet-pad-bottom, 24px));
+  padding: 12px var(--sheet-pad-x, 20px) var(--sheet-pad-bottom, 24px);
+  border-top: 1px solid var(--color-line);
+  background: var(--color-surface);
+}
+
+.alert {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-danger);
+}
+
+/* The region stays in the page when empty, so a message put in it is announced. */
+.alert:not(:empty) {
+  margin-bottom: 8px;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 479px) {
+  .buttons > * {
+    flex: 1 1 140px;
+  }
+}

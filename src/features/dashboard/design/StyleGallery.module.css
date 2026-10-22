@@ -1,0 +1,160 @@
+.group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  container-type: inline-size;
+}
+
+/* The panel title already says "Menu style": the legend is for screen readers. */
+.legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.intro {
+  margin: 0 0 12px;
+  color: var(--color-ink-soft);
+  font-size: 0.88rem;
+}
+
+/* Two on a phone, three once there is room for a readable thumbnail. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@container (min-width: 500px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.option {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+/* The real radio covers the card, above the picture, so a tap anywhere on it chooses and the focus ring has a target. */
+.input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.face {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  height: 100%;
+  padding: 6px 6px 10px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+@media (hover: hover) {
+  .input:hover + .face {
+    border-color: var(--color-muted);
+  }
+}
+
+.input:checked + .face {
+  border-color: var(--color-accent);
+  background: var(--color-accent-tint);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+/* A check in the corner of the chosen style, so the choice does not rest on color alone. */
+.input:checked + .face::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-btn-bg);
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+
+.input:checked + .face::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 17px;
+  right: 18px;
+  width: 6px;
+  height: 10px;
+  border: solid var(--color-btn-fg);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.input:focus-visible + .face {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* The picture: a phone-wide menu shrunk to the box. The box keeps its size before the menu is drawn, so nothing jumps. */
+.thumb {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: calc(var(--radius-sm) - 3px);
+  background: var(--color-line);
+  pointer-events: none;
+}
+
+.page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 360px;
+  transform: scale(var(--thumb-scale, 0.4));
+  transform-origin: 0 0;
+}
+
+.text {
+  display: grid;
+  gap: 2px;
+  padding-inline: 4px;
+}
+
+.name {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.bestFor {
+  color: var(--color-ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .face {
+    transition-duration: 0.01ms;
+  }
+}
+
+@media (forced-colors: active) {
+  .input:checked + .face {
+    border-width: 3px;
+    border-color: Highlight;
+  }
+}

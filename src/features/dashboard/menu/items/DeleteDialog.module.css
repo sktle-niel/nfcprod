@@ -1,0 +1,5 @@
+.alert {
+  display: block;
+  margin-top: 8px;
+  color: var(--color-danger-ink);
+}
