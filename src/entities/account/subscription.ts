@@ -55,6 +55,15 @@ export function isMenuLive(subscription: Subscription, now: number): boolean {
   return kind === 'trial' || kind === 'active'
 }
 
+/** Where the free cards stand: sent, due (a plan was paid for, so they are next) or waiting for a first plan. */
+export type FreeCardsState = 'sent' | 'due' | 'waiting'
+
+/** A plan that has since lapsed still counts: the first payment earned the cards. */
+export function freeCardsState(subscription: Subscription): FreeCardsState {
+  if (subscription.freeCards.sent) return 'sent'
+  return subscription.plan === null ? 'waiting' : 'due'
+}
+
 /** The end of a period of `plan` that starts at `from`. */
 export function periodEnd(plan: Plan, from: number): number {
   const end = new Date(from)
