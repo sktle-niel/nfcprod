@@ -58,7 +58,7 @@ describe('DesignPage: the parts of the look', () => {
   it('says what a cut-out picture needs, only once Cut-out is chosen', async () => {
     const { user } = await renderDesign()
     await openLook(user, 'Cards')
-    const hint = 'Best with PNG or WebP pictures that have a transparent background.'
+    const hint = 'Made for PNG or WebP pictures with a transparent background. An ordinary photo shows with rounded corners instead.'
     expect(screen.queryByText(hint)).not.toBeInTheDocument()
     await user.click(screen.getByRole('radio', { name: 'Cut-out' }))
     expect(screen.getByRole('group', { name: 'Picture shape' })).toHaveAccessibleDescription(hint)

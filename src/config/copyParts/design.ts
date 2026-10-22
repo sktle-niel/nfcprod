@@ -157,7 +157,7 @@ export const designCopy = {
     photo: {
       legend: 'Picture shape',
       options: { rounded: 'Rounded', circle: 'Circle', arch: 'Arch', cutout: 'Cut-out' },
-      cutoutHint: 'Best with PNG or WebP pictures that have a transparent background.',
+      cutoutHint: 'Made for PNG or WebP pictures with a transparent background. An ordinary photo shows with rounded corners instead.',
     },
     spotlight: {
       label: 'Feature a best seller at the top',

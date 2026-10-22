@@ -1,6 +1,7 @@
 import { useLook } from '../look'
 import { Illustration } from './Illustration'
 import type { PlaceholderKind } from './placeholders'
+import { usePictureOpacity } from './usePictureOpacity'
 import styles from './ProductPhoto.module.css'
 
 type Props = {
@@ -21,10 +22,15 @@ type Props = {
  */
 export function ProductPhoto({ src, placeholder, className }: Props) {
   const { photo } = useLook()
-  const classes = [styles.photo, styles[photo], className].filter(Boolean).join(' ')
-  if (src !== null) return <img className={classes} data-shape={photo} src={src} alt="" loading="lazy" decoding="async" />
+  // Cut-out suits only a picture with see-through parts: an opaque photo there floats over the card as a hard rectangle,
+  // so its pixels decide (usePictureOpacity) and an opaque one is framed with rounded corners instead. The placeholder
+  // drawings all have see-through parts, so they keep whatever shape the look asked for.
+  const opacity = usePictureOpacity(photo === 'cutout' ? src : null)
+  const shape = photo === 'cutout' && src !== null && opacity === 'opaque' ? 'rounded' : photo
+  const classes = [styles.photo, styles[shape], className].filter(Boolean).join(' ')
+  if (src !== null) return <img className={classes} data-shape={shape} src={src} alt="" loading="lazy" decoding="async" />
   return (
-    <span className={`${classes} ${styles.empty}`} data-shape={photo} aria-hidden="true">
+    <span className={`${classes} ${styles.empty}`} data-shape={shape} aria-hidden="true">
       <span className={styles.drawing}>
         <Illustration kind={placeholder} />
       </span>

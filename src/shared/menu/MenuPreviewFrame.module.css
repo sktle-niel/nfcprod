@@ -6,10 +6,16 @@
   margin-inline: auto;
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* A phone draws no scrollbar, so neither does its window; wheel, touch and the keyboard still scroll it. */
+  scrollbar-width: none;
   background: var(--color-surface);
   border: 8px solid var(--color-ink);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
+}
+
+.frame::-webkit-scrollbar {
+  display: none;
 }
 
 .frame:focus-visible {
