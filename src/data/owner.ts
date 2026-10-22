@@ -144,9 +144,11 @@ export function createMockOwner(accounts: AuthRepository = auth, options: Option
       changeBusiness((business) => {
         const checked = validateBusinessPatch(patch)
         if (!checked.ok) throw invalid(checked.errors)
-        // The server only keeps pictures from its own storage. The mock keeps the same rule.
+        // The server only keeps pictures from its own storage. The mock keeps the same rule, for every picture field.
         const { logo } = checked.value
         if (typeof logo === 'string' && !isTrustedPicture(logo)) throw invalid({ logo: 'invalid' })
+        const pagePhoto = checked.value.theme?.backdropPicture
+        if (typeof pagePhoto === 'string' && !isTrustedPicture(pagePhoto)) throw invalid({ theme: 'invalid' })
         return { ...business, ...checked.value }
       }),
     async checkSlug(slug) {

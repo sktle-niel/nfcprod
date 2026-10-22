@@ -48,6 +48,9 @@ export function useDesignDraft(business: Business, actions: Pick<OwnerActions, '
   const dirty = edits !== null && !sameDraft(edits, saved)
   const notice = error !== null && Object.keys(errors).length === 0 ? ownerErrorText(error) : ''
 
+  // One upload runs at a time; the error under a picker belongs only to the picker that started the upload.
+  const [uploadTarget, setUploadTarget] = useState<'logo' | 'backdrop'>('logo')
+
   /** Changes the newest draft, whichever render this function comes from. */
   const apply = (update: (current: Draft) => Draft, cleared: readonly FieldKey[]) => {
     setEdits((current) => update(current ?? savedRef.current))
@@ -113,13 +116,28 @@ export function useDesignDraft(business: Business, actions: Pick<OwnerActions, '
   /** Checks and keeps a picture, then puts it in the newest draft. Nothing else waits on it: the draft stays open to typing. */
   const pickLogo = async (file: File) => {
     if (busy || upload.busy) return
+    setUploadTarget('logo')
     const outcome = await upload.run(() => actions.uploadImage(file))
     if (outcome.ok) apply((current) => ({ ...current, logo: outcome.value }), ['logo'])
   }
 
   const removeLogo = () => {
-    upload.clear()
+    // Only this picker's own refusal goes with its picture: the other picker may be showing an error of its own.
+    if (uploadTarget === 'logo') upload.clear()
     change((current) => ({ ...current, logo: null }), ['logo'])
+  }
+
+  /** Checks and keeps the page photo like the logo, then puts it in the newest draft's theme. */
+  const pickBackdropPicture = async (file: File) => {
+    if (busy || upload.busy) return
+    setUploadTarget('backdrop')
+    const outcome = await upload.run(() => actions.uploadImage(file))
+    if (outcome.ok) apply((current) => ({ ...current, theme: { ...current.theme, backdropPicture: outcome.value } }), ['theme'])
+  }
+
+  const removeBackdropPicture = () => {
+    if (uploadTarget === 'backdrop') upload.clear()
+    theme((current) => ({ ...current, backdropPicture: null }))
   }
 
   return {
@@ -131,13 +149,16 @@ export function useDesignDraft(business: Business, actions: Pick<OwnerActions, '
     note,
     busy,
     uploading: upload.busy,
-    logoError: upload.failed ? ownerErrorText(upload.error) : undefined,
+    logoError: upload.failed && uploadTarget === 'logo' ? ownerErrorText(upload.error) : undefined,
+    backdropPictureError: upload.failed && uploadTarget === 'backdrop' ? ownerErrorText(upload.error) : undefined,
     focusAt,
     setText: (key: TextKey, value: string) => change((current) => ({ ...current, [key]: value }), [key]),
     setSocial: (network: keyof SocialLinks, value: string) =>
       change((current) => ({ ...current, social: { ...current.social, [network]: value } }), [network, 'social']),
     pickLogo,
     removeLogo,
+    pickBackdropPicture,
+    removeBackdropPicture,
     ...look,
     discard,
     save,

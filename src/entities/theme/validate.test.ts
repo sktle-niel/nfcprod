@@ -173,3 +173,26 @@ describe('themeIssues', () => {
     expect(themeIssues({ ...DEFAULT_THEME, primary: '#f0f0f0', secondary: '#eeeeee' })).toEqual(['textContrast', 'accentContrast'])
   })
 })
+
+describe('the photo backdrop fields', () => {
+  const PHOTO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+
+  it('takes a checked picture address and refuses a crooked one or an unknown strength', () => {
+    const good = validateTheme({ ...DEFAULT_THEME, backdropPicture: PHOTO, backdropVeil: 'strong' })
+    expect(good.ok && good.value.backdropPicture).toBe(PHOTO)
+    expect(good.ok && good.value.backdropVeil).toBe('strong')
+    expect(validateTheme({ ...DEFAULT_THEME, backdropPicture: 'javascript:alert(1)' }).ok).toBe(false)
+    expect(validateTheme({ ...DEFAULT_THEME, backdropVeil: 'loud' }).ok).toBe(false)
+  })
+
+  it('warns about the owner text color only when the veil lets the photo defeat it', () => {
+    const base = { ...DEFAULT_THEME, primary: '#0b5fff', secondary: '#595959', background: '#f2f2f2' }
+    expect(themeIssues(base)).toEqual([])
+    const photo = { ...base, backdrop: 'picture' as const, backdropPicture: PHOTO }
+    expect(themeIssues({ ...photo, backdropVeil: 'faint' as const })).toEqual([])
+    expect(themeIssues({ ...photo, backdropVeil: 'strong' as const })).toEqual(['textContrast'])
+    // Without the photo, or on another backdrop, the strength alone warns about nothing.
+    expect(themeIssues({ ...photo, backdropPicture: null, backdropVeil: 'strong' as const })).toEqual([])
+    expect(themeIssues({ ...base, backdropVeil: 'strong' as const })).toEqual([])
+  })
+})

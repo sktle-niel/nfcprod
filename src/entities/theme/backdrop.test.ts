@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { backdropLayers, BACKDROP_TILES, NEW_BACKDROPS } from './backdrop'
+import { backdropLayers, BACKDROP_TILES, NEW_BACKDROPS, photoGrounds, PICTURE_SHARES, pictureBackdropImage } from './backdrop'
 import { BACKDROPS, DEFAULT_THEME } from './theme'
 
 const PALETTE = { background: '#f8f3ec', text: '#2b1d14', accent: '#8b5a2b' }
@@ -17,8 +17,9 @@ function svgOf(image: string): string {
 }
 
 describe('backdropLayers', () => {
-  it('lists the drawn kinds as the tail of the BACKDROPS list, each with a tile entry', () => {
-    expect(BACKDROPS.slice(5)).toEqual([...NEW_BACKDROPS])
+  it('lists the drawn kinds between the classic five and the photo, each with a tile entry', () => {
+    expect(BACKDROPS.slice(5, -1)).toEqual([...NEW_BACKDROPS])
+    expect(BACKDROPS.at(-1)).toBe('picture')
     expect(Object.keys(BACKDROP_TILES).sort()).toEqual([...NEW_BACKDROPS].sort())
   })
 
@@ -137,5 +138,26 @@ describe('backdropLayers', () => {
       topo: { inkShare: 0.09, accentShare: 0 },
       bloom: { inkShare: 0, accentShare: 0.16 },
     })
+  })
+})
+
+describe('the photo backdrop image', () => {
+  it('veils the photo with the page color at one minus the share', () => {
+    expect(pictureBackdropImage('data:image/png;base64,AAAA', '#11161f', 'faint')).toBe(
+      'linear-gradient(#11161fe6, #11161fe6), url("data:image/png;base64,AAAA")',
+    )
+  })
+
+  it('falls back to the default page for a color that is not one, and keeps the shares ordered under the texture ceiling', () => {
+    expect(pictureBackdropImage('data:image/png;base64,AAAA', 'red', 'soft')).toContain('#ffffffd6')
+    expect(PICTURE_SHARES.faint).toBeLessThan(PICTURE_SHARES.soft)
+    expect(PICTURE_SHARES.soft).toBeLessThan(PICTURE_SHARES.strong)
+    // Strong stays at the boldest drawn texture's ceiling (marble), so a photo is never louder than a texture.
+    expect(PICTURE_SHARES.strong).toBe(0.23)
+  })
+
+  it('names the photo worst grounds: the page toward black and toward white by the share', () => {
+    expect(photoGrounds('#808080', 'strong')).toEqual(['#636363', '#9d9d9d'])
+    expect(photoGrounds('not a color', 'faint')).toEqual(photoGrounds('#ffffff', 'faint'))
   })
 })

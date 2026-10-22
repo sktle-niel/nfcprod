@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { backdropLayers, BACKDROP_TILES, NEW_BACKDROPS } from '@/entities/theme/backdrop'
+import { backdropLayers, BACKDROP_TILES, NEW_BACKDROPS, PICTURE_SHARES } from '@/entities/theme/backdrop'
 import { contrastRatio, mixHex } from '@/entities/theme/color'
 import { toCssVars } from '@/entities/theme/cssVars'
 import { styleTheme } from '@/entities/theme/styles'
-import { BACKDROPS, MODES, STYLE_IDS, TITLES } from '@/entities/theme/theme'
+import { BACKDROPS, MODES, STYLE_IDS, TITLES, VEILS } from '@/entities/theme/theme'
 import { TEXT_CONTRAST_MIN } from '@/entities/theme/validate'
 import { readCss, rulesOf, type CssRule } from '@/test/css'
 
@@ -15,8 +15,8 @@ import { readCss, rulesOf, type CssRule } from '@/test/css'
 const VIEW = 'src/shared/menu/MenuView.module.css'
 const backdropSelector = (backdrop: string) => `.root[data-menu-backdrop='${backdrop}']`
 
-/** The classic five: drawn by the menu's own CSS, with no texture variable. */
-const CLASSIC_BACKDROPS = BACKDROPS.filter((name) => !(NEW_BACKDROPS as readonly string[]).includes(name))
+/** The classic five: drawn by the menu's own CSS, with no texture variable. The photo backdrop has a variable of its own. */
+const CLASSIC_BACKDROPS = BACKDROPS.filter((name) => !(NEW_BACKDROPS as readonly string[]).includes(name) && name !== 'picture')
 
 async function rules(path: string): Promise<CssRule[]> {
   return rulesOf(await readCss(path))
@@ -174,6 +174,58 @@ describe('the drawn backdrops', () => {
       const vars = toCssVars({ ...styleTheme('classic', 'light'), backdrop })
       expect(vars['--menu-backdrop-image'], backdrop).toBeUndefined()
     }
+  })
+})
+
+/*
+ * The photo backdrop: the owner's picture under a flat veil of the page color. The veil leaves at most
+ * PICTURE_SHARES[veil] of any pixel showing, so the worst grounds under the page text are the page moved toward black
+ * and toward white by that share. The audit holds the text pair to 4.5:1 there for every style, mode and veil.
+ */
+describe('the photo backdrop', () => {
+  const PHOTO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+
+  it('has one rule: the variable, the photo covering the page once under the flat veil', async () => {
+    const all = await rules(VIEW)
+    const matching = all.filter((rule) => rule.selector.includes(backdropSelector('picture')))
+    expect(matching.map((rule) => rule.selector)).toEqual([backdropSelector('picture')])
+    const rule = matching[0]
+    expect(rule?.declarations['background-image']).toBe('var(--menu-backdrop-image)')
+    expect(rule?.declarations['background-size']).toBe('auto, cover')
+    expect(rule?.declarations['background-position']).toBe('center')
+    expect(rule?.declarations['background-repeat']).toBe('no-repeat')
+    expect(rule?.declarations['background']).toBeUndefined()
+    expect(rule?.declarations['background-color']).toBeUndefined()
+    expect(rule?.declarations['background-blend-mode']).toBeUndefined()
+  })
+
+  it('keeps the page text pair at 4.5:1 on the photo worst grounds, for every style, mode and veil', () => {
+    const failures: string[] = []
+    for (const id of STYLE_IDS) {
+      for (const mode of MODES) {
+        for (const veil of VEILS) {
+          const vars = toCssVars({ ...styleTheme(id, mode), backdrop: 'picture', backdropPicture: PHOTO, backdropVeil: veil })
+          expect(vars['--menu-backdrop-image'], `${id} ${mode} ${veil}`).toContain(`url("${PHOTO}")`)
+          const page = vars['--menu-bg'] ?? ''
+          const share = PICTURE_SHARES[veil]
+          const grounds = [mixHex(page, '#000000', share), mixHex(page, '#ffffff', share)]
+          for (const ground of grounds) {
+            for (const text of TEXTS) {
+              const ratio = contrastRatio(vars[text] ?? '', ground ?? '')
+              if (ratio < TEXT_CONTRAST_MIN) failures.push(`${id} ${mode} ${veil}: ${text} on ${ground} is ${ratio.toFixed(2)}`)
+            }
+          }
+        }
+      }
+    }
+    expect(failures).toEqual([])
+  })
+
+  it("sets the variable to 'none' for a refused address or no picture, so a nested root can never inherit a photo", () => {
+    const theme = { ...styleTheme('classic', 'light'), backdrop: 'picture' as const }
+    expect(toCssVars({ ...theme, backdropPicture: null })['--menu-backdrop-image']).toBe('none')
+    expect(toCssVars({ ...theme, backdropPicture: 'https://images.example.com/a(1).png' })['--menu-backdrop-image']).toBe('none')
+    expect(toCssVars({ ...theme, backdropPicture: 'javascript:alert(1)' })['--menu-backdrop-image']).toBe('none')
   })
 })
 

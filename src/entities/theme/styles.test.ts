@@ -75,6 +75,8 @@ describe('the styles', () => {
       secondary: '#19202b',
       background: '#ffffff',
       surface: null,
+      backdropPicture: null,
+      backdropVeil: 'soft',
       style: 'classic',
       card: 'row',
       photo: 'rounded',

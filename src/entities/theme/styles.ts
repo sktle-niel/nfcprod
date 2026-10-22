@@ -5,7 +5,7 @@ import { DEFAULT_THEME, type Mode, type StyleId, type Theme } from './theme'
 type Palette = Pick<Theme, 'primary' | 'secondary' | 'background' | 'surface'>
 
 /** Everything a style sets besides colors and the mode: how the menu is drawn. */
-type Choices = Omit<Theme, keyof Palette | 'mode' | 'style'>
+type Choices = Omit<Theme, keyof Palette | 'mode' | 'style' | 'backdropPicture' | 'backdropVeil'>
 
 export type StyleDef = {
   id: StyleId
@@ -304,5 +304,6 @@ export const STYLES: Record<StyleId, StyleDef> = {
 /** The whole theme of a style in a mode: its choices, its palette for that mode, and the style itself. */
 export function styleTheme(id: StyleId, mode: Mode): Theme {
   const style = STYLES[id]
-  return { ...style.choices, ...style.palettes[mode], style: id, mode }
+  // A ready-made style never carries an owner photo: the picture and its veil are the owner's own choices.
+  return { ...style.choices, ...style.palettes[mode], style: id, mode, backdropPicture: null, backdropVeil: 'soft' }
 }

@@ -124,6 +124,13 @@
   background-color: var(--color-surface);
 }
 
+/* The owner's own photo: a sun over a hill, in the soft ink. */
+.texture[data-texture='picture'] {
+  background-image:
+    radial-gradient(circle 3px at 32% 30%, var(--color-ink-soft) 0 97%, transparent 100%),
+    linear-gradient(135deg, transparent 54%, var(--color-ink-soft) 54%);
+}
+
 .texture[data-texture='paper'] {
   background-image:
     radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--color-muted) 45%, transparent) 0.6px, transparent 1px),

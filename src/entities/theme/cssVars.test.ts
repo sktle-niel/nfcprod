@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { PRESETS } from '@/presets'
+import { PICTURE_SHARES } from './backdrop'
 import { contrastRatio, isDarkColor, mixHex } from './color'
 import { fillOf, toCssVars } from './cssVars'
-import { BUTTON_STYLES, DEFAULT_THEME, FONTS, LAYOUTS, modeDefaults, MODES, withMode, type Theme } from './theme'
+import { BUTTON_STYLES, DEFAULT_THEME, FONTS, LAYOUTS, modeDefaults, MODES, VEILS, withMode, type Theme, type Veil } from './theme'
 import { validateTheme } from './validate'
 
 const SANS = 'var(--font-sans)'
@@ -314,5 +315,34 @@ describe('toCssVars', () => {
   it('falls back to the defaults for values that are not valid', () => {
     const forced = { ...DEFAULT_THEME, ...HOSTILE[0], ...HOSTILE[9], ...HOSTILE[11] } as unknown as Theme
     expect(toCssVars(forced)).toEqual(toCssVars(DEFAULT_THEME))
+  })
+})
+
+describe('the photo backdrop variable', () => {
+  const PHOTO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+  const image = (veil: Veil) =>
+    toCssVars({ ...DEFAULT_THEME, backdrop: 'picture', backdropPicture: PHOTO, backdropVeil: veil })['--menu-backdrop-image']
+
+  it('lays the veil of the page color at one minus the share of each strength', () => {
+    expect(image('faint')).toBe(`linear-gradient(#ffffffe6, #ffffffe6), url("${PHOTO}")`)
+    expect(image('soft')).toBe(`linear-gradient(#ffffffd6, #ffffffd6), url("${PHOTO}")`)
+    expect(image('strong')).toBe(`linear-gradient(#ffffffc4, #ffffffc4), url("${PHOTO}")`)
+  })
+
+  it('keeps muted text at 4.5:1 on the photo worst grounds in both default modes', () => {
+    for (const mode of MODES) {
+      for (const veil of VEILS) {
+        const vars = toCssVars({ ...DEFAULT_THEME, ...modeDefaults(mode), mode, backdrop: 'picture', backdropPicture: PHOTO, backdropVeil: veil })
+        for (const pole of ['#000000', '#ffffff']) {
+          const ground = mixHex(vars['--menu-bg'] ?? '', pole, PICTURE_SHARES[veil]) ?? ''
+          expect(contrastRatio(vars['--menu-muted'] ?? '', ground), `${mode} ${veil} ${pole}`).toBeGreaterThanOrEqual(4.5)
+        }
+      }
+    }
+  })
+
+  it('shows no photo while the backdrop is not the picture, even with an address saved', () => {
+    const vars = toCssVars({ ...DEFAULT_THEME, backdrop: 'plain', backdropPicture: PHOTO })
+    expect(vars['--menu-backdrop-image']).toBeUndefined()
   })
 })

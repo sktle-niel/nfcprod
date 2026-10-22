@@ -140,6 +140,14 @@
   background-repeat: no-repeat;
 }
 
+/* The owner's photo under its veil: the photo covers the page once; the flat veil gradient needs no size of its own. */
+.root[data-menu-backdrop='picture'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: auto, cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 /* Everything the owner can read sits above the line art. */
 .content {
   position: relative;

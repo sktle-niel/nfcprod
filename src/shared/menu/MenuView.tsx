@@ -11,7 +11,7 @@ import { useMenuFonts } from './fonts'
 import { MenuHeader } from './headers/MenuHeader'
 import { lookOf, LookProvider, type Look } from './look'
 import { MenuFooter } from './MenuFooter'
-import { pictureSrc } from './picture'
+import { pictureSrc, renderableTheme } from './picture'
 import { placeholderKind } from './photo/placeholders'
 import { spotlightOf, visibleSections } from './sections'
 import { Spotlight } from './Spotlight'
@@ -48,6 +48,9 @@ const columnsOf = (look: Look) => {
 export function MenuView({ business, menu, headingLevel = 1, interactive = true }: Props) {
   const uid = useId()
   const look = lookOf(business.theme)
+  // The photo backdrop must be a picture this page may show (renderableTheme: checked address, trusted origin) before
+  // its address can reach toCssVars. Outside the storage it is no photo at all, and the page stays the page color.
+  const theme = renderableTheme(business.theme)
   useMenuFonts(business.theme)
   const sections = visibleSections(menu)
   const spotlight = look.spotlight ? spotlightOf(sections) : null
@@ -61,7 +64,7 @@ export function MenuView({ business, menu, headingLevel = 1, interactive = true 
     <LookProvider value={look}>
       <div
         className={styles.root}
-        style={toCssVars(business.theme) as CSSProperties}
+        style={toCssVars(theme) as CSSProperties}
         data-menu-layout={look.layout}
         data-menu-columns={columnsOf(look)}
         data-menu-card={look.card}

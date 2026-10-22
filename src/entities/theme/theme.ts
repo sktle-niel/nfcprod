@@ -56,7 +56,8 @@ export type DecorKind = (typeof DECORS)[number]
 
 /**
  * The texture of the page, in picker order. The first five are drawn by the menu's CSS; the rest are textures drawn from
- * the palette by `backdropLayers` (backdrop.ts) and reach CSS as one variable.
+ * the palette by `backdropLayers` (backdrop.ts) and reach CSS as one variable. 'picture' is the owner's own photo under a
+ * veil of the page color (`pictureBackdropImage`), shown only while `backdropPicture` holds a checked address.
  */
 export const BACKDROPS = [
   'plain',
@@ -77,8 +78,13 @@ export const BACKDROPS = [
   'check',
   'topo',
   'bloom',
+  'picture',
 ] as const
 export type BackdropKind = (typeof BACKDROPS)[number]
+
+/** How strongly a photo backdrop shows through its veil of the page color, from barely to clearly. */
+export const VEILS = ['faint', 'soft', 'strong'] as const
+export type Veil = (typeof VEILS)[number]
 
 /**
  * What makes one business menu look different from another. Plain values only: colors are `#rrggbb`, the rest come
@@ -108,6 +114,14 @@ export type Theme = {
   header: HeaderKind
   decor: DecorKind
   backdrop: BackdropKind
+  /**
+   * The owner's own page photo, drawn only while `backdrop` is 'picture': a data address from a checked upload, or an
+   * https address on the picture storage. It goes through the same checks as every picture (`checkImageAddress`,
+   * `pictureSrc`), and `toCssVars` refuses any address that could not sit inside url("...").
+   */
+  backdropPicture: string | null
+  /** How strongly the photo shows through the veil of the page color over it. */
+  backdropVeil: Veil
   /** Show the first best seller big at the top. */
   spotlight: boolean
   font: Font
@@ -129,6 +143,8 @@ export const DEFAULT_THEME: Theme = {
   header: 'plain',
   decor: 'none',
   backdrop: 'plain',
+  backdropPicture: null,
+  backdropVeil: 'soft',
   spotlight: false,
   font: 'urbanist',
   buttonStyle: 'rounded',

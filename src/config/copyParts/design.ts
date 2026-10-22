@@ -72,6 +72,8 @@ export const designCopy = {
     warnings: {
       textContrast: 'Your text is hard to read on this background. Pick a darker or lighter text color, or use Fix it.',
       accentContrast: 'Your accent color is hard to see on this background. Pick a darker or lighter one, or use Fix it.',
+      /** When no text color can read over the photo: there is nothing to fix a color to. */
+      textContrastNoFix: 'No text color can stay readable over the photo on this page color. Soften the photo in Extras, or pick a darker or lighter page.',
     },
     /** Read aloud when a warning appears or goes away. Fixed words, so they do not change while a color is being dragged. */
     announce: {
@@ -208,6 +210,21 @@ export const designCopy = {
         check: 'Checker',
         topo: 'Contours',
         bloom: 'Bloom',
+        picture: 'Your photo',
+      },
+      picture: {
+        label: 'Page photo',
+        alt: 'The page photo',
+        choose: 'Choose a photo',
+        replace: 'Replace the photo',
+        remove: 'Remove the photo',
+        empty: 'No photo yet',
+        hint: 'JPEG, PNG or WebP, up to 4 MB. It sits under a veil of your page color, so the menu stays easy to read.',
+      },
+      veil: {
+        legend: 'Photo strength',
+        hint: 'How strongly the photo shows through. The Colors panel warns you if your text color cannot take it.',
+        options: { faint: 'Faint', soft: 'Soft', strong: 'Strong' },
       },
     },
     font: {

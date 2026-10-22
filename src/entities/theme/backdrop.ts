@@ -1,5 +1,5 @@
-import { isHexColor, normalizeHex } from './color'
-import { DEFAULT_THEME, type BackdropKind } from './theme'
+import { isHexColor, mixHex, normalizeHex } from './color'
+import { DEFAULT_THEME, type BackdropKind, type Veil } from './theme'
 
 /*
  * The drawn page textures: every backdrop beyond the classic five is an image our own code draws from the owner's palette
@@ -326,6 +326,36 @@ const TEXTURES: Record<NewBackdropKind, { draw: (palette: Palette) => string; in
 
 function isNewBackdrop(backdrop: BackdropKind): backdrop is NewBackdropKind {
   return (NEW_BACKDROPS as readonly BackdropKind[]).includes(backdrop)
+}
+
+/**
+ * The worst share of the photo that shows through each veil; the page color covers the rest. The contrast math and the
+ * audit (menuChrome.style.test.ts) hold the page text to 4.5:1 on the page moved toward black and toward white by this
+ * share — any photo pixel under the veil lands between those two grounds. 'strong' stays at the ceiling of the boldest
+ * drawn texture (marble, 0.23), so a photo is never louder than the textures the palettes are already proven against.
+ */
+export const PICTURE_SHARES: Record<Veil, number> = { faint: 0.1, soft: 0.16, strong: 0.23 }
+
+/**
+ * The two worst grounds a veiled photo can put under the page text: the page moved toward black and toward white by the
+ * veil's share. Any photo pixel under the veil lands between them. One function, so the engine (toCssVars), the editor's
+ * warning (themeIssues) and its fix (contrastFix) can never disagree about what "worst" means.
+ */
+export function photoGrounds(background: string, veil: Veil): [string, string] {
+  const page = colorOr(background, DEFAULT_THEME.background)
+  const share = PICTURE_SHARES[veil]
+  return [mixHex(page, '#000000', share) ?? page, mixHex(page, '#ffffff', share) ?? page]
+}
+
+/**
+ * The CSS image of a photo backdrop: the owner's picture under a flat veil of the page color at 1 - share, so no pixel
+ * ever shows through by more than the declared share. `src` must already be a checked, CSS-safe address (toCssVars does
+ * both checks); the page color is re-checked here like the palette above.
+ */
+export function pictureBackdropImage(src: string, background: string, veil: Veil): string {
+  const page = colorOr(background, DEFAULT_THEME.background)
+  const cover = withAlpha(page, 1 - PICTURE_SHARES[veil])
+  return `linear-gradient(${cover}, ${cover}), url("${src}")`
 }
 
 /**
