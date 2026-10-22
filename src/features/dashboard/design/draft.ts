@@ -22,6 +22,8 @@ export const CHOICE_KEYS = [
   'header',
   'decor',
   'backdrop',
+  'backdropPicture',
+  'backdropVeil',
   'spotlight',
   'font',
   'buttonStyle',

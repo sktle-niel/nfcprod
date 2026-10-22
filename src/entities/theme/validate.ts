@@ -1,5 +1,7 @@
-import { checkBoolean, checkOneOf, combine, fail, isMissing, pass, readField, safely, type Check } from '@/shared/lib/checks'
+import { checkBoolean, checkOneOf, combine, fail, isMissing, isOneOf, pass, readField, safely, type Check } from '@/shared/lib/checks'
 import type { Validated } from '@/shared/lib/validation'
+import { checkImageAddress } from '@/entities/menu/image'
+import { photoGrounds } from './backdrop'
 import { contrastRatio, isHexColor, normalizeHex } from './color'
 import {
   BACKDROPS,
@@ -14,6 +16,7 @@ import {
   PHOTOS,
   STYLE_IDS,
   TITLES,
+  VEILS,
   type Theme,
 } from './theme'
 
@@ -53,6 +56,8 @@ export function validateTheme(input: unknown): Validated<Theme, keyof Theme> {
       header: orDefault(readField(input, 'header'), DEFAULT_THEME.header, (value) => checkOneOf(HEADERS, value)),
       decor: orDefault(readField(input, 'decor'), DEFAULT_THEME.decor, (value) => checkOneOf(DECORS, value)),
       backdrop: orDefault(readField(input, 'backdrop'), DEFAULT_THEME.backdrop, (value) => checkOneOf(BACKDROPS, value)),
+      backdropPicture: orDefault(readField(input, 'backdropPicture'), DEFAULT_THEME.backdropPicture, checkImageAddress),
+      backdropVeil: orDefault(readField(input, 'backdropVeil'), DEFAULT_THEME.backdropVeil, (value) => checkOneOf(VEILS, value)),
       spotlight: orDefault(readField(input, 'spotlight'), DEFAULT_THEME.spotlight, checkBoolean),
       font: checkOneOf(FONTS, readField(input, 'font')),
       buttonStyle: checkOneOf(BUTTON_STYLES, readField(input, 'buttonStyle')),
@@ -73,6 +78,12 @@ export type ThemeIssue = (typeof THEME_ISSUES)[number]
 export function themeIssues(theme: Theme): ThemeIssue[] {
   const issues: ThemeIssue[] = []
   if (contrastRatio(theme.secondary, theme.background) < TEXT_CONTRAST_MIN) issues.push('textContrast')
+  else if (theme.backdrop === 'picture' && theme.backdropPicture !== null) {
+    // The photo's worst grounds, the same ones toCssVars constrains its own tokens against (photoGrounds). The engine
+    // re-derives muted text for them; the owner's text color can only be warned about, like on the page.
+    const veil = isOneOf(VEILS, theme.backdropVeil) ? theme.backdropVeil : DEFAULT_THEME.backdropVeil
+    if (photoGrounds(theme.background, veil).some((ground) => contrastRatio(theme.secondary, ground) < TEXT_CONTRAST_MIN)) issues.push('textContrast')
+  }
   if (contrastRatio(theme.primary, theme.background) < ACCENT_CONTRAST_MIN) issues.push('accentContrast')
   return issues
 }

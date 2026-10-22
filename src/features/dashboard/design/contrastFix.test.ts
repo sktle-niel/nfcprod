@@ -6,8 +6,11 @@ import { contrastFix } from './contrastFix'
 
 const theme = (patch: Partial<Theme>): Theme => ({ ...DEFAULT_THEME, ...patch })
 
+const PHOTO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+
 function applied(issue: 'textContrast' | 'accentContrast', start: Theme): Theme {
   const fix = contrastFix(issue, start)
+  if (fix === null) throw new Error('there is a fix to apply in every case this helper serves')
   return { ...start, [fix.key]: fix.color }
 }
 
@@ -15,8 +18,8 @@ describe('contrastFix', () => {
   it('fixes pale text on a white page by changing the text color', () => {
     const start = theme({ secondary: '#dddddd', background: '#ffffff' })
     const fix = contrastFix('textContrast', start)
-    expect(fix.key).toBe('secondary')
-    expect(fix.color).toBe(readableOn('#ffffff'))
+    expect(fix?.key).toBe('secondary')
+    expect(fix?.color).toBe(readableOn('#ffffff'))
     expect(themeIssues(applied('textContrast', start))).not.toContain('textContrast')
   })
 
@@ -31,20 +34,20 @@ describe('contrastFix', () => {
     // The ink reaches only about 4.1:1 on this grey and white about 4:1, so the usual pair is not enough.
     const start = theme({ secondary: '#858585', background: '#808080' })
     const fix = contrastFix('textContrast', start)
-    expect(fix.color).toBe('#000000')
-    expect(contrastRatio(fix.color, start.background)).toBeGreaterThanOrEqual(TEXT_CONTRAST_MIN)
+    expect(fix?.color).toBe('#000000')
+    expect(contrastRatio(fix?.color ?? '', start.background)).toBeGreaterThanOrEqual(TEXT_CONTRAST_MIN)
   })
 
   it('moves a washed-out accent toward the text side of the page and keeps its hue as long as it can', () => {
     const start = theme({ primary: '#ffe08a', background: '#ffffff' })
     expect(themeIssues(start)).toContain('accentContrast')
     const fix = contrastFix('accentContrast', start)
-    expect(fix.key).toBe('primary')
-    expect(fix.color).not.toBe('#19202b')
-    expect(contrastRatio(fix.color, start.background)).toBeGreaterThanOrEqual(ACCENT_CONTRAST_MIN)
+    expect(fix?.key).toBe('primary')
+    expect(fix?.color).not.toBe('#19202b')
+    expect(contrastRatio(fix?.color ?? '', start.background)).toBeGreaterThanOrEqual(ACCENT_CONTRAST_MIN)
     // Warm stays warm: red is still the strongest channel.
-    const red = Number.parseInt(fix.color.slice(1, 3), 16)
-    const blue = Number.parseInt(fix.color.slice(5, 7), 16)
+    const red = Number.parseInt((fix?.color ?? '').slice(1, 3), 16)
+    const blue = Number.parseInt((fix?.color ?? '').slice(5, 7), 16)
     expect(red).toBeGreaterThan(blue)
   })
 
@@ -52,6 +55,18 @@ describe('contrastFix', () => {
     const start = theme({ primary: '#1a2230', background: '#11161f', mode: 'dark' })
     const fixed = applied('accentContrast', start)
     expect(themeIssues(fixed)).not.toContain('accentContrast')
+  })
+
+  it('fixes the text against the photo grounds too, when a photo backdrop is on', () => {
+    const start = theme({ secondary: '#dddddd', background: '#ffffff', backdrop: 'picture', backdropPicture: PHOTO, backdropVeil: 'strong' })
+    expect(themeIssues(start)).toContain('textContrast')
+    expect(themeIssues(applied('textContrast', start))).toEqual([])
+  })
+
+  it('offers no fix when no text color can read over the photo on a mid-tone page, and the warning stands', () => {
+    const start = theme({ secondary: '#000000', background: '#808080', backdrop: 'picture', backdropPicture: PHOTO, backdropVeil: 'strong' })
+    expect(themeIssues(start)).toContain('textContrast')
+    expect(contrastFix('textContrast', start)).toBeNull()
   })
 
   it('always clears the issue it was asked about, over a spread of colors', () => {

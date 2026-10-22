@@ -377,6 +377,15 @@ describe('the business', () => {
     expect(await owner.getBusiness()).toEqual(business)
   })
 
+  it('refuses a page photo on an https host that is not the storage origin, exactly like the logo', async () => {
+    const { owner } = await withCoffee()
+    const business = await owner.getBusiness()
+    if (business === null) throw new Error('the seeded business exists')
+    const theme = { ...business.theme, backdrop: 'picture' as const, backdropPicture: 'https://tracker.example.com/bg.jpg' }
+    expect(await refusal(owner.saveBusiness({ theme }))).toEqual({ code: 'invalid', fields: { theme: 'invalid' } })
+    expect(await owner.getBusiness()).toEqual(business)
+  })
+
   it('puts the menu on its link and takes it off', async () => {
     const { owner } = await withCoffee()
     expect((await owner.setPublished(true)).published).toBe(true)

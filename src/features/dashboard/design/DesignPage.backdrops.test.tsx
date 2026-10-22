@@ -3,7 +3,7 @@ import type { UserEvent } from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { backdropLayers, NEW_BACKDROPS } from '@/entities/theme/backdrop'
 import { BACKDROPS, DEFAULT_THEME } from '@/entities/theme/theme'
-import { previewRegion, renderDesign, saveButton, showPart } from './designTestkit'
+import { previewRegion, renderDesign, saveButton, seedBusiness, showPart } from './designTestkit'
 
 /** The saved sample business's palette: what the swatches must be painted from until the owner edits a color. */
 const SAVED = { background: '#f8f3ec', text: '#2b1d14', accent: '#8b5a2b' }
@@ -24,13 +24,43 @@ async function openExtras(user: UserEvent) {
 }
 
 describe('DesignPage: the page texture picker', () => {
-  it('offers all 18 textures in picker order, named from the config words, with one line about them', async () => {
+  it('offers all 18 textures and the photo in picker order, named from the config words, with one line about them', async () => {
     const { user } = await renderDesign()
     await openExtras(user)
     expect(within(group()).getAllByRole('radio').map((radio) => radio.getAttribute('value'))).toEqual([...BACKDROPS])
     const names = ['Grain', 'Plaster', 'Marble', 'Linen', 'Weave', 'Terrazzo', 'Waves', 'Scallops', 'Deco fans', 'Gingham', 'Checker', 'Contours', 'Bloom']
     for (const name of names) expect(within(group()).getByRole('radio', { name })).toBeInTheDocument()
     expect(group()).toHaveAccessibleDescription('Drawn from your colors, so every texture stays easy to read.')
+  })
+
+  it('shows the photo picker and its strength only once Your photo is chosen, and the preview follows', async () => {
+    const { user } = await renderDesign()
+    await openExtras(user)
+    expect(screen.queryByText('No photo yet')).not.toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Photo strength' })).not.toBeInTheDocument()
+    await user.click(within(group()).getByRole('radio', { name: 'Your photo' }))
+    expect(screen.getByText('No photo yet')).toBeInTheDocument()
+    const strength = screen.getByRole('group', { name: 'Photo strength' })
+    expect(within(strength).getAllByRole('radio').map((radio) => radio.getAttribute('value'))).toEqual(['faint', 'soft', 'strong'])
+    const root = previewRegion().querySelector('[data-menu-backdrop]')
+    expect(root?.getAttribute('data-menu-backdrop')).toBe('picture')
+    // Without a photo yet there is nothing to paint: 'none' on this root (never inherited), the page stays the page color.
+    expect((root as HTMLElement | null)?.style.getPropertyValue('--menu-backdrop-image')).toBe('none')
+  })
+
+  it('keeps the uploaded photo while trying styles: applying one changes the look, not the asset', async () => {
+    const PHOTO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+    const { user } = await renderDesign({
+      seed: seedBusiness({ theme: { ...DEFAULT_THEME, backdrop: 'picture', backdropPicture: PHOTO, backdropVeil: 'strong' } }),
+    })
+    await user.click(screen.getByRole('tab', { name: 'Look' }))
+    await user.click(screen.getByRole('radio', { name: 'Roast' }))
+    await showPart(user, 'Extras')
+    // The style's own backdrop took over, but the photo and its strength wait under 'Your photo'.
+    expect(within(group()).getByRole('radio', { name: 'Grain' })).toBeChecked()
+    await user.click(within(group()).getByRole('radio', { name: 'Your photo' }))
+    expect(screen.getByText('Replace the photo')).toBeInTheDocument()
+    expect(within(screen.getByRole('group', { name: 'Photo strength' })).getByRole('radio', { name: 'Strong' })).toBeChecked()
   })
 
   it('paints every drawn texture with its real image from the draft palette, as decoration with no tab stop', async () => {

@@ -1,7 +1,8 @@
 import { isOneOf } from '@/shared/lib/checks'
-import { backdropLayers } from './backdrop'
+import { checkImageAddress } from '@/entities/menu/image'
+import { backdropLayers, photoGrounds, pictureBackdropImage } from './backdrop'
 import { contrastRatio, INK, isDarkColor, isHexColor, mixHex, normalizeHex, WHITE } from './color'
-import { BACKDROPS, BUTTON_STYLES, DEFAULT_THEME, FONTS, modeDefaults, MODES, type ButtonStyle, type Font, type Theme } from './theme'
+import { BACKDROPS, BUTTON_STYLES, DEFAULT_THEME, FONTS, modeDefaults, MODES, VEILS, type ButtonStyle, type Font, type Theme } from './theme'
 import { TEXT_CONTRAST_MIN } from './validate'
 
 // Every value below comes from a fixed map or is a color rebuilt as `#rrggbb`: no text a person typed ever reaches CSS.
@@ -42,6 +43,19 @@ const BLACK = '#000000'
 
 function colorOr(value: unknown, fallback: string): string {
   return isHexColor(value) ? normalizeHex(value) : fallback
+}
+
+/**
+ * A photo-backdrop address that may sit inside url("..."): one that passes the picture checks (`checkImageAddress`: a
+ * byte-sniffed base64 data address or a plain https address) AND holds nothing that could close the wrapper or open
+ * another CSS function — no quotes, backslashes, parentheses, spaces or control characters. Anything else is no photo.
+ * (Whether an https address is on the picture storage is the renderer's gate, `pictureSrc` in MenuView: this file stays
+ * free of configuration.)
+ */
+function cssPicture(value: unknown): string | null {
+  const address = checkImageAddress(value)
+  if (!address.ok || address.value === null) return null
+  return /^[A-Za-z0-9:;,/.+=%?&#@_~-]*$/.test(address.value) ? address.value : null
 }
 
 /**
@@ -120,6 +134,11 @@ export function toCssVars(theme: Theme): Record<string, string> {
   // texture's declared ceiling. Muted text must read there too (for the classic five both are the page itself).
   const inkGround = mixHex(background, text, layers.inkShare) ?? background
   const accentGround = mixHex(background, accent, layers.accentShare) ?? background
+  // A photo backdrop's worst grounds: the page moved toward black and toward white by the veil's share. Any pixel of any
+  // photo under the veil lands between those two, so muted text that reads on both reads on the photo.
+  const veil = isOneOf(VEILS, theme.backdropVeil) ? theme.backdropVeil : DEFAULT_THEME.backdropVeil
+  const picture = backdrop === 'picture' ? cssPicture(theme.backdropPicture) : null
+  const [photoDark, photoLight] = picture === null ? [background, background] : photoGrounds(background, veil)
   const vars: Record<string, string> = {
     '--menu-bg': background,
     '--menu-text': text,
@@ -128,7 +147,7 @@ export function toCssVars(theme: Theme): Record<string, string> {
     '--menu-on-surface': onSurface,
     '--menu-line': darkPage ? LINE_ON_DARK : LINE_ON_LIGHT,
     '--menu-card-line': isDarkColor(surface) === true ? LINE_ON_DARK : LINE_ON_LIGHT,
-    '--menu-muted': mutedOf(text, background, [chosenSurface === null ? surface : background, inkGround, accentGround]),
+    '--menu-muted': mutedOf(text, background, [chosenSurface === null ? surface : background, inkGround, accentGround, photoDark, photoLight]),
     '--menu-card-muted': mutedOf(onSurface, surface),
     '--menu-fill': fill,
     '--menu-on-fill': on,
@@ -139,5 +158,10 @@ export function toCssVars(theme: Theme): Record<string, string> {
   }
   // Only the drawn textures travel as a variable; the classic five are painted by the menu's own CSS.
   if (layers.image !== null) vars['--menu-backdrop-image'] = layers.image
+  // The photo backdrop travels the same way: the owner's picture under the veil. A refused or absent photo still sets
+  // the variable, to 'none': custom properties inherit, so without its own value a menu nested inside another themed
+  // element (the public page's frame) would paint that ancestor's photo — the exact address this root just refused.
+  if (picture !== null) vars['--menu-backdrop-image'] = pictureBackdropImage(picture, background, veil)
+  else if (backdrop === 'picture') vars['--menu-backdrop-image'] = 'none'
   return vars
 }

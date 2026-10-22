@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import type { Menu } from '@/entities/menu/menu'
 import { toCssVars } from '@/entities/theme/cssVars'
 import { MenuView, type MenuViewBusiness } from '@/shared/menu/MenuView'
+import { renderableTheme } from '@/shared/menu/picture'
 import styles from './MenuFrame.module.css'
 
 type Props = { business: MenuViewBusiness; menu: Menu }
@@ -12,8 +13,9 @@ type Props = { business: MenuViewBusiness; menu: Menu }
  */
 export function MenuFrame({ business, menu }: Props) {
   return (
-    // The variables are fixed names with checked values (toCssVars), as on the menu's own root.
-    <main className={styles.page} style={toCssVars(business.theme) as CSSProperties}>
+    // The variables are fixed names with checked values (toCssVars), as on the menu's own root — and the same gate
+    // (renderableTheme): the root's variables inherit from here, so this element may not paint what the root refuses.
+    <main className={styles.page} style={toCssVars(renderableTheme(business.theme)) as CSSProperties}>
       <div className={styles.column}>
         <MenuView business={business} menu={menu} headingLevel={1} interactive />
       </div>

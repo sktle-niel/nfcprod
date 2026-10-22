@@ -15,6 +15,7 @@ import {
   PHOTOS,
   STYLE_IDS,
   TITLES,
+  VEILS,
   type Mode,
   type StyleId,
   type Theme,
@@ -61,6 +62,7 @@ function withOverrides(theme: Theme, params: URLSearchParams): Theme {
   }
   const surface = params.get('surface')
   const primary = params.get('accent')
+  const backdrop = pick(BACKDROPS, 'backdrop', theme.backdrop)
   return {
     ...theme,
     card: pick(CARDS, 'card', theme.card),
@@ -68,7 +70,10 @@ function withOverrides(theme: Theme, params: URLSearchParams): Theme {
     title: pick(TITLES, 'title', theme.title),
     header: pick(HEADERS, 'header', theme.header),
     decor: pick(DECORS, 'decor', theme.decor),
-    backdrop: pick(BACKDROPS, 'backdrop', theme.backdrop),
+    backdrop,
+    // The photo backdrop needs a photo: the gallery lends a made-up one, so `?backdrop=picture&veil=strong` shows the veil.
+    backdropPicture: backdrop === 'picture' ? samplePhoto(0) : theme.backdropPicture,
+    backdropVeil: pick(VEILS, 'veil', theme.backdropVeil),
     font: pick(FONTS, 'font', theme.font),
     buttonStyle: pick(BUTTON_STYLES, 'buttons', theme.buttonStyle),
     layout: pick(LAYOUTS, 'layout', theme.layout),
@@ -81,7 +86,8 @@ function withOverrides(theme: Theme, params: URLSearchParams): Theme {
 /**
  * Developers only (the route exists in development builds): every style in light and dark, drawn by the real menu renderer on
  * a small sample menu, each in a phone-wide column. `?style=roast` shows one style, `?mode=dark` one mode. Any other choice
- * can be changed on top: `card`, `photo`, `title`, `header`, `decor`, `backdrop`, `font`, `buttons`, `layout`, `spotlight`
+ * can be changed on top: `card`, `photo`, `title`, `header`, `decor`, `backdrop` (`picture` borrows a made-up photo; `veil`
+ * sets its strength), `font`, `buttons`, `layout`, `spotlight`
  * (1 or 0), `surface` and `accent` (a `#rrggbb` color, written %23rrggbb in the address). `?width=360` sets the phone width, and
  * `?photos=1` gives every item a made-up photo, to see how each picture shape crops a real one.
  */

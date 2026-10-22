@@ -91,12 +91,16 @@ export function useLookActions({ draft, business, busy, theme, setNote }: Contex
       const pair = remembered.current[mode]
       theme((current) => switchedTheme(current, mode, pair), LOOK_COLORS)
     },
-    /** The whole look of a style, in the mode the draft is in. */
-    applyStyle: (id: StyleId) => replace(styleTheme(id, draft.theme.mode), fill(words.styles.applied, { style: styleName(id) })),
-    /** Back to the style the look started from, every choice and color. */
+    /** The whole look of a style, in the mode the draft is in. The owner's uploaded page photo is an asset, not a choice: it survives trying styles. */
+    applyStyle: (id: StyleId) =>
+      replace(
+        { ...styleTheme(id, draft.theme.mode), backdropPicture: draft.theme.backdropPicture, backdropVeil: draft.theme.backdropVeil },
+        fill(words.styles.applied, { style: styleName(id) }),
+      ),
+    /** Back to the style the look started from, every choice and color — the uploaded page photo stays, like on applyStyle. */
     resetStyle: () => {
       const id = styleOf(draft.theme)
-      const next = styleTheme(id, draft.theme.mode)
+      const next = { ...styleTheme(id, draft.theme.mode), backdropPicture: draft.theme.backdropPicture, backdropVeil: draft.theme.backdropVeil }
       const style = styleName(id)
       replace(next, fill(savedOr(next, words.styles.resetStyleNote, words.styles.resetStyleNoteSame), { style }))
     },

@@ -36,17 +36,26 @@ export function ThemeWarnings({ theme, onFix }: Props) {
       {issues.length > 0 && (
         <ul className={styles.list}>
           {issues.map((issue) => {
+            // Under a photo on a mid-tone page there may be no text color to offer: the warning then says the real
+            // remedy (soften the photo, change the page) instead of a Fix button that would change nothing.
             const fix = contrastFix(issue, theme)
-            const label = fill(issue === 'textContrast' ? text.fixText : text.fixAccent, { color: fix.color })
+            const words = fix === null && issue === 'textContrast' ? text.warnings.textContrastNoFix : text.warnings[issue]
             return (
               <li key={issue} className={styles.item}>
                 <span className={styles.icon}>
                   <IconWarning size={20} />
                 </span>
-                <p className={styles.words}>{text.warnings[issue]}</p>
-                <Button variant="secondary" size="sm" aria-label={label} onClick={() => onFix(fix)}>
-                  {text.fix}
-                </Button>
+                <p className={styles.words}>{words}</p>
+                {fix !== null && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    aria-label={fill(issue === 'textContrast' ? text.fixText : text.fixAccent, { color: fix.color })}
+                    onClick={() => onFix(fix)}
+                  >
+                    {text.fix}
+                  </Button>
+                )}
               </li>
             )
           })}
