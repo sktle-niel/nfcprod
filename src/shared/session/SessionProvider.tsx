@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { AuthRepository } from '@/data/auth'
 import type { Session } from '@/entities/account/account'
 import { SessionContext, type SessionState } from './context'
@@ -22,19 +22,22 @@ export function SessionProvider({ repository, children }: Props) {
     }
   }, [repository])
 
+  // The actions do not depend on who is signed in, so they keep their identity: a hook that calls one from an effect or a
+  // watcher does not start over every time the session changes.
+  const signUp = useCallback<SessionState['signUp']>(async (input) => setSession(await repository.signUp(input)), [repository])
+  const logIn = useCallback<SessionState['logIn']>(async (input) => setSession(await repository.logIn(input)), [repository])
+  const continueWithGoogle = useCallback<SessionState['continueWithGoogle']>(
+    async () => setSession(await repository.continueWithGoogle()),
+    [repository],
+  )
+  const logOut = useCallback<SessionState['logOut']>(async () => {
+    await repository.logOut()
+    setSession(null)
+  }, [repository])
+
   const value = useMemo<SessionState>(
-    () => ({
-      session,
-      ready,
-      signUp: async (input) => setSession(await repository.signUp(input)),
-      logIn: async (input) => setSession(await repository.logIn(input)),
-      continueWithGoogle: async () => setSession(await repository.continueWithGoogle()),
-      logOut: async () => {
-        await repository.logOut()
-        setSession(null)
-      },
-    }),
-    [session, ready, repository],
+    () => ({ session, ready, signUp, logIn, continueWithGoogle, logOut }),
+    [session, ready, signUp, logIn, continueWithGoogle, logOut],
   )
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>

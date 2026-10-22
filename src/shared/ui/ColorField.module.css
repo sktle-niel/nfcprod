@@ -1,0 +1,100 @@
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+/* 16px minimum keeps iOS from zooming the page when the field is focused. */
+.text {
+  flex: 1;
+  min-width: 0;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.text:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.text[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.swatch {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  padding: 3px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.swatch::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.swatch::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-sm) - 5px);
+}
+
+.swatch::-moz-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-sm) - 5px);
+}
+
+.swatch:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.text:disabled,
+.swatch:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.hint,
+.error {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.hint {
+  color: var(--color-ink-soft);
+}
+
+.error {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text {
+    transition-duration: 0.01ms;
+  }
+}

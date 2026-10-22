@@ -1,0 +1,17 @@
+.status {
+  min-height: 1.35em;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: var(--color-ink-soft);
+}
+
+.status[data-state='saved'] {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.status[data-state='error'] {
+  color: var(--color-danger-ink);
+  font-weight: 600;
+}

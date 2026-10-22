@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from 'react'
+import { useId, type ChangeEvent, type ReactNode } from 'react'
 import styles from './Field.module.css'
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
   hint?: string | undefined
   multiline?: boolean
   type?: 'text' | 'tel' | 'email' | 'password'
-  inputMode?: 'text' | 'tel' | 'email'
+  inputMode?: 'text' | 'tel' | 'email' | 'decimal' | 'url'
   autoComplete?: string
   placeholder?: string
   maxLength: number
@@ -19,6 +19,9 @@ type Props = {
   exact?: boolean
   /** Fills the field when it first shows. The field stays uncontrolled. */
   defaultValue?: string | undefined
+  /** Makes the field controlled, for pages that edit live. Without it the field is uncontrolled. */
+  value?: string | undefined
+  onChange?: ((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void) | undefined
 }
 
 /** Label, input (or textarea) and error text wired together for screen readers. */
@@ -37,6 +40,8 @@ export function Field({
   trailing,
   exact = type === 'email' || type === 'password',
   defaultValue,
+  value,
+  onChange,
 }: Props) {
   const id = useId()
   const describedBy = [hint ? `${id}-hint` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ')
@@ -48,7 +53,9 @@ export function Field({
     required,
     placeholder,
     autoComplete,
-    defaultValue,
+    // Never both: React warns when a field is given a value and a default.
+    ...(value === undefined ? { defaultValue } : { value }),
+    onChange,
     className: trailing ? `${styles.input} ${styles.withTrailing}` : styles.input,
     'aria-invalid': error ? true : undefined,
     'aria-describedby': describedBy || undefined,

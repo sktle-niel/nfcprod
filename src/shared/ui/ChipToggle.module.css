@@ -1,0 +1,88 @@
+.group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.hint {
+  margin: -4px 0 8px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--color-ink-soft);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Visually hidden but still focusable, and it fills the chip so a click anywhere on it lands on the input. */
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.face {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink-soft);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.input:checked + .face {
+  border-color: var(--color-accent);
+  background: var(--color-accent-tint);
+  color: var(--color-ink);
+}
+
+.input:focus-visible + .face {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.input:disabled + .face {
+  opacity: 0.55;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .input:not(:checked):not(:disabled):hover + .face {
+    border-color: var(--color-ink-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .face {
+    transition-duration: 0.01ms;
+  }
+}

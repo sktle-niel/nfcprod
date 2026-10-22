@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { Modal } from './Modal'
+import { useModalBusy } from './modalBusy'
 
 function setup() {
   const onClose = vi.fn()
@@ -25,6 +26,22 @@ describe('Modal', () => {
     const { dialog } = setup()
     expect(dialog).toHaveAttribute('open')
     expect(dialog).toHaveAccessibleName('Get your card')
+  })
+
+  it('is described by the element it is pointed at, and by nothing when none is', () => {
+    const { unmount } = render(
+      <Modal title="Sure?" describedBy="why" closeLabel="Close" onClose={() => {}}>
+        <p id="why">Three items go too.</p>
+      </Modal>,
+    )
+    expect(screen.getByRole('dialog')).toHaveAccessibleDescription('Three items go too.')
+    unmount()
+    render(
+      <Modal title="Sure?" closeLabel="Close" onClose={() => {}}>
+        <p>Three items go too.</p>
+      </Modal>,
+    )
+    expect(screen.getByRole('dialog')).not.toHaveAttribute('aria-describedby')
   })
 
   it('closes when the dimmed backdrop is clicked', async () => {
@@ -119,5 +136,87 @@ describe('Modal', () => {
 
     ;(dialog as HTMLDialogElement).close()
     expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  // Work is running (a save, a delete) and cannot be called back: the person's ways out do nothing until it ends.
+  describe('while busy', () => {
+    function busySetup() {
+      const onClose = vi.fn()
+      const ui = (busy: boolean) => (
+        <Modal title="Get your card" closeLabel="Close" busy={busy} onClose={onClose}>
+          {(close) => (
+            <button type="button" onClick={close}>
+              Done
+            </button>
+          )}
+        </Modal>
+      )
+      const view = render(ui(true))
+      return { ...view, ui, onClose, dialog: screen.getByRole('dialog') as HTMLDialogElement, user: userEvent.setup() }
+    }
+
+    it('turns the corner button off', async () => {
+      const { onClose, user } = busySetup()
+      const corner = screen.getByRole('button', { name: 'Close' })
+      expect(corner).toBeDisabled()
+      await user.click(corner)
+      expect(onClose).not.toHaveBeenCalled()
+    })
+
+    it('ignores a click on the backdrop', async () => {
+      const { dialog, onClose, user } = busySetup()
+      await user.click(dialog)
+      expect(onClose).not.toHaveBeenCalled()
+      expect(dialog).toHaveAttribute('open')
+    })
+
+    it('stops Escape and the cancel event, and asks the browser not to close it at all', () => {
+      const { dialog } = busySetup()
+      expect(dialog).toHaveAttribute('closedby', 'none')
+      expect(fireEvent.keyDown(dialog, { key: 'Escape' })).toBe(false)
+      expect(fireEvent(dialog, new Event('cancel', { cancelable: true }))).toBe(false)
+    })
+
+    it('opens the dialog again when a browser closed it anyway, without telling the parent', () => {
+      const { dialog, onClose } = busySetup()
+      dialog.close()
+      expect(dialog).toHaveAttribute('open')
+      expect(onClose).not.toHaveBeenCalled()
+    })
+
+    it('still lets the content close it, for a form that saved', async () => {
+      const { dialog, onClose, user } = busySetup()
+      await user.click(screen.getByRole('button', { name: 'Done' }))
+      expect(dialog).not.toHaveAttribute('open')
+      expect(onClose).toHaveBeenCalledTimes(1)
+    })
+
+    it('gives every way out back when the work ends', async () => {
+      const { dialog, onClose, rerender, ui, user } = busySetup()
+      rerender(ui(false))
+      expect(dialog).not.toHaveAttribute('closedby')
+      expect(screen.getByRole('button', { name: 'Close' })).toBeEnabled()
+      await user.click(dialog)
+      expect(onClose).toHaveBeenCalledTimes(1)
+    })
+
+    it('follows a form inside that says it is busy through useModalBusy, and lets go when it unmounts', () => {
+      function Form({ saving }: { saving: boolean }) {
+        useModalBusy(saving)
+        return <p>Form</p>
+      }
+      const ui = (saving: boolean) => (
+        <Modal title="Edit" closeLabel="Close" onClose={() => {}}>
+          <Form saving={saving} />
+        </Modal>
+      )
+      const { rerender } = render(ui(false))
+      expect(screen.getByRole('button', { name: 'Close' })).toBeEnabled()
+      rerender(ui(true))
+      expect(screen.getByRole('button', { name: 'Close' })).toBeDisabled()
+      expect(screen.getByRole('dialog')).toHaveAttribute('closedby', 'none')
+      rerender(ui(false))
+      expect(screen.getByRole('button', { name: 'Close' })).toBeEnabled()
+    })
   })
 })

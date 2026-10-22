@@ -40,6 +40,8 @@
   overscroll-behavior: contain;
   scrollbar-width: none;
   scroll-padding-top: 64px;
+  /* A sticky footer in the sheet sets its own height here, so a focused field is not left under it. */
+  scroll-padding-bottom: var(--sheet-footer-h, 96px);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
   box-shadow: var(--shadow-lift);
@@ -92,8 +94,8 @@
   display: inline-grid;
   flex: none;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 1px solid var(--color-line);
   border-radius: var(--radius-pill);
@@ -107,13 +109,23 @@
   transform: scale(0.92);
 }
 
+/* Work is running and cannot be taken back: the way out is off until it ends. */
+.close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.close:disabled:active {
+  transform: none;
+}
+
 .close:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .close:hover {
+  .close:hover:not(:disabled) {
     background-image: linear-gradient(var(--color-pill-hover), var(--color-pill-hover));
   }
 }
