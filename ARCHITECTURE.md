@@ -36,7 +36,7 @@ Status: **frontend first**. Backend and infrastructure sections are the target d
 Four surfaces, one codebase:
 - **Platform landing** `/`: anonymous marketing page with pricing and the "Get now" card order form (section 7.8). The owner sign-up and log-in modal opens over any page from the address (`?auth=signup`, `?auth=login`).
 - **Public menu** `/m/:slug`: anonymous, read-only, cached, lightest bundle.
-- **Owner account** `/dashboard/*`: authenticated. Trial and plan, free cards, and (next) the editors for one business.
+- **Owner dashboard** `/dashboard/*`: authenticated. A sidebar (a tab bar on phones) with five pages: Overview (status, setup checklist, plan, sample visitor numbers), Menu (items and add-ons), Design (business details, branding and the look, with a live preview), Share (publish, link, QR code, NFC guide) and Account (plan, billing, profile). A new owner first meets the setup wizard at `/dashboard/setup` (name, business types, link). Section 7.10.
 - **Admin** `/admin/*`: platform staff only, strongest controls.
 
 Each surface is a separate lazy-loaded route group so the public bundle never carries dashboard or admin code.
@@ -50,37 +50,37 @@ src/
   app/            app shell, router, providers, error boundary
   features/
     landing/      platform landing page (pricing, card bundles, "Get now" order form)
-    landing/      platform landing page (pricing, "Get now" card order form)
-    menu/         public menu (categories, product, variant and add-on picker)
+    menu/         public menu page /m/:slug (the renderer is shared/menu)
     auth/         sign-up and log-in modal
-    onboarding/   business type selection, preset apply
-    dashboard/    editors (branding, theme, categories, products, modifiers)
-    admin/        Overview, Orders, Customers (sample data until the backend exists)
-  entities/       domain types and pure logic (Business, Product, Variant, Modifier, Theme, Order)
-  entities/       domain types and pure logic (Business, Product, Variant, Modifier, Theme, Order, Account)
+    dashboard/    the owner's area: setup wizard, shell, Overview, Menu (items, add-ons, product editor), Design, Share, Account
+    admin/        Overview, Orders, Customers, Pricing (sample data until the backend exists)
+  entities/       domain types and pure logic (Business, Menu, Product, Variant, Modifier, Theme, Order, Account, Pricing)
   shared/
-    ui/           design-system components (Button, Card, Sheet, Input, Tabs, Skeleton ...)
-    theme/        tokens, theme provider, theme-to-CSS-variables
-    lib/          pure utils (money, slug, a11y, validation schemas)
+    ui/           design-system components: the app shell (sidebar, tab bar), Button, Switch, Tabs, ConfirmDialog, fields, charts, icons, skeletons
+    menu/         MenuView: the one renderer of a business's menu (Design preview, owner preview, public page): cards, titles, headers, line art, pictures, fonts
+    theme/        tokens and the light and dark themes
+    lib/          pure utils (checks, validation, text, lines, urls, format, money, dates)
     hooks/        generic hooks
     session/      the signed-in owner (provider, useSession, sign-in links)
   data/           data layer: interface + adapters (mock now, real API later)
-  presets/        business type presets as plain data
-  config/         env access, all user-facing copy, feature flags, constants
+  presets/        business type presets as plain data, and the merge for hybrids
+  test/           test harnesses and fixtures (never imported by the app)
+  config/         env access, all user-facing copy (the owner dashboard's words in their own module, so the public pages do not download them), feature flags, constants
 ```
 
 Dependency rule (one direction only):
 `app` -> `features` -> `entities` + `shared` + `data`.
 `shared` and `entities` import nothing from `features`. Features never import each other; they share through `shared` or `entities`.
+`presets` (plain data) imports `entities` and `shared`, and `data` and the dashboard use it. `config` imports only entity types and pure helpers from `shared/lib`. `test` holds harnesses and fixtures that only tests import. The slug rules live in `entities/business`.
 
 ### 3.2 Principles
 
-- **Data driven UI.** The menu is rendered from a `Business` object (theme, layout, categories, products). No business-specific code anywhere.
+- **Data driven UI.** The menu is rendered from a `Business` (theme and details) and its `Menu` (categories, products, add-on groups). No business-specific code anywhere.
 - **Design tokens.** Every color, radius, font, spacing and shadow is a CSS variable. A business theme is just a set of token values applied at the root. This is what makes the background, colors and fonts customizable.
 - **Presets are data.** `presets/*.ts` are plain objects. Hybrid = a pure `mergePresets()` function.
-- **Reuse.** One `ProductCard` with layout variants, one `ModifierGroup` picker, one `Sheet`. No per-type copies.
-- **Validate at the edge.** Every external value (API response, URL param, form input, stored value) is parsed by a schema before use. Types come from the schemas, one source of truth.
-- **State.** Server data through a query cache (fetch, cache, retry, dedupe). Local UI state stays local. Global client state only for session and theme. No giant store.
+- **Reuse.** One `ProductCard` that draws the card kind of the menu's look, one `Modal` and `ConfirmDialog`, one `ChipToggle` for tags. The add-on picker and the product detail sheet come with the public page. No per-type copies.
+- **Validate at the edge.** Every external value (API response, URL param, form input, stored value) is checked by a validator before use: hand-written, taking `unknown` and giving back the clean value or the refused fields (`shared/lib/checks.ts`, `entities/**/validate*.ts`). The types are written once, in `entities`. There is no schema library.
+- **State.** Server data through the small `useResource` hook (load, retry, replace) and, in the owner's area, one `DashboardProvider` context. There is no query cache. Local UI state stays local. Global client state only for session and theme. No giant store.
 - **Routing.** Route-level code splitting. Public route first, nothing else loaded.
 - **Performance.** Image sizes and `srcset`, lazy loading below the fold, font subset with `font-display: swap`, skeletons, no layout shift, virtualized lists only if a menu is very large.
 - **Accessibility.** Semantic HTML, focus states, contrast checks on the generated theme (reject unreadable color pairs), reduced-motion support.
@@ -90,33 +90,46 @@ Dependency rule (one direction only):
 ### 3.3 Data layer contract (the seam between frontend and backend)
 
 ```ts
-interface MenuRepository {
-  getBusinessBySlug(slug: string): Promise<Business>        // public, cacheable
+interface PublicMenuRepository {      // src/data/publicRepository.ts, built (read-only, nobody signed in)
+  get(slug: string): Promise<PublicMenu | null>             // public, cacheable; null = no menu at that link
 }
-interface OwnerRepository {
-  getMyBusiness(): Promise<Business>
-  updateTheme(patch: ThemePatch): Promise<void>
-  upsertProduct(p: ProductInput): Promise<Product>
-  // ...
+interface OwnerRepository {           // src/data/ownerRepository.ts, built
+  getBusiness(): Promise<Business | null>
+  createBusiness(input: NewBusinessInput): Promise<{ business: Business; menu: Menu }>
+  saveBusiness(patch: BusinessPatch): Promise<Business>
+  checkSlug(slug: string): Promise<SlugStatus>
+  changeSlug(slug: string): Promise<Business>
+  setPublished(published: boolean): Promise<Business>
+  getMenu(): Promise<Menu>
+  saveProduct(input: ProductInput): Promise<Menu>   // and the same for categories and add-on groups, moves, deletes
+  uploadImage(file: File): Promise<string>
+  insights(): Promise<Insights>
 }
 ```
 
-- Today: no menu repository yet. `OrderRepository` (`src/data/orders.ts`) has a mock adapter, and an `http` adapter that is used when `VITE_ORDERS_ENDPOINT` is an `https:` URL (or localhost). `AdminOrderRepository` (`src/data/adminOrders.ts`), `AuthRepository` (`src/data/auth.ts`), `PricingRepository` (`src/data/pricing.ts`) and `BillingRepository` (`src/data/billing.ts`) are mock only.
-- Phase 1: a `mock` menu adapter returns sample businesses (coffee, fine dining, hybrid).
+- The owner's calls never name an account or a business: the server knows the owner from the session. Every change comes back as the new whole `Menu` or `Business`, so a page puts the answer in place and does not drift from the server. The page numbers its calls (one counter for the menu, one for the business) and drops a reply that is older than one it already applied, which is right when the server runs calls in the order it got them. If the real server may run them in parallel, the adapter needs a queue or a refetch when the last call settles. A refusal is an `OwnerError` with a code and, for a bad input, the refused fields. The pages turn codes into words and never show a raw message.
+- Today: `OwnerRepository` has a mock adapter (`src/data/owner.ts`) that keeps each owner's business and menu in the tab's memory, gone on reload (the dashboard says so). The public `PublicMenuRepository` has a mock adapter (`src/data/publicMenu.ts`) that answers for five sample businesses built from the presets (`publicSamples.ts`: Cafe Luna, Kapehan ni Ana, La Bella, Bean There, Tea Hub); an unknown or invalid link gets no menu. An owner's own menu lives only in their tab in demo mode, so they see it through the preview page (`/dashboard/preview`). `OrderRepository` (`src/data/orders.ts`) has a mock adapter, and an `http` adapter that is used when `VITE_ORDERS_ENDPOINT` is an `https:` URL (or localhost). `AdminOrderRepository` (`src/data/adminOrders.ts`), `AuthRepository` (`src/data/auth.ts`), `PricingRepository` (`src/data/pricing.ts`) and `BillingRepository` (`src/data/billing.ts`) are mock only.
 - Later: `http` adapters call the real API. The UI does not change.
 - Components never call `fetch` directly.
 - The "Get now" form gets its province, city and barangay lists from a second repository, `LocationRepository` (`src/data/locations.ts`). See section 7.8.
 - The delivery pin on that form uses a third seam, `ReverseGeocoder` (`src/data/geocoder.ts`): it turns a spot into a hint about the address, and a name into a spot (OpenStreetMap Nominatim today). `resolveAddress` (`src/data/resolveAddress.ts`) then matches the hint to the `LocationRepository` lists. See section 7.8.
 
-### 3.4 Theme engine
+### 3.4 Theme engine and menu styles
 
 ```
-Business.theme (validated)  ->  toCssVars()  ->  <div style="--color-primary: ...">
+Business.theme (validated)  ->  toCssVars() + lookOf()  ->  <div style="--menu-accent: ..." data-menu-card="poster" ...>   (src/entities/theme, src/shared/menu)
 ```
 
-- Theme fields: colors, background (color, gradient, image), font family (from an allow-list), radius, density, light or dark.
-- Safety: colors validated against a strict pattern, fonts from an allow-list, background image URLs only from our storage origin. User values are never injected as raw CSS or HTML.
-- Contrast guard: if text and background contrast fails WCAG AA, auto-adjust the text color or warn in the editor.
+- **A look is a style plus choices.** A *style* is a named bundle of independent choices. The theme stores the result of the pick, not the name alone, so an owner can change any one choice after picking a style, and an older theme still reads (a missing key takes its default). The choices: the card kind (row, leader, tile, badge, outline, soft, plate, poster), the picture shape (rounded, circle, arch, cutout), the section titles (plain, bullets, script, ribbon, ornament, rule, stripe), the header (plain, awning, poster, script, frame), the line art behind the page (none, coffee, leaves, dining, bakery, bar, sparkles), the page backdrop (plain, paper, dots, stripes and glow, painted by the menu's own CSS, plus thirteen textures drawn from the palette by `backdrop.ts`: grain, plaster, marble, linen, weave, terrazzo, waves, arches, deco, gingham, check, topo and bloom), a spotlight for the best seller, one of eight font pairings, the button corner, the layout (grid or list) and light or dark. The colors are the accent `primary`, the text `secondary`, the page `background` and a card color `surface` (automatic when null).
+- **Thirteen ready-made styles** (`src/entities/theme/styles.ts`: `STYLES` and `styleTheme(id, mode)`): Classic, Roast, Atelier, Sunny, Editorial, Cocoa, Retro, Gourmet, Fresh, Blush, Diner, Noir and Catalog. Each has a palette for light and one for dark, the kinds of business it suits and the mode it was made for. The business-type presets start from one of them in its own mode (coffee: Atelier, milk tea: Fresh, casual dining: Diner, fine dining: Gourmet, bakery: Blush, bar: Noir; a hybrid takes its first type). The Design page shows them as a gallery with a small live picture of the owner's own menu in each.
+- **One renderer, painted from variables.** `MenuView` paints only from the `--menu-*` variables: `--menu-bg`, `--menu-text`, `--menu-accent`, `--menu-surface`, `--menu-on-surface`, `--menu-line`, `--menu-card-line`, `--menu-muted`, `--menu-card-muted`, `--menu-fill`, `--menu-on-fill`, `--menu-font`, `--menu-display`, `--menu-script`, `--menu-radius` and, for a drawn texture, `--menu-backdrop-image`; never the app's own tokens, so a customer's theme does not depend on the app's light or dark mode. The accent is drawn as shapes only (bars, outlines, patterns), never as text; text on a filled shape uses `--menu-fill` and `--menu-on-fill`, and `fillOf` nudges the fill until that pair reads at 4.5:1. How a card, a title, the header and the line art are drawn comes from `useLook()` (a context `MenuView` sets); those components never read the theme themselves.
+- **Every product has a picture slot.** A card draws the owner's picture (`ProductPhoto`), or, when the item has none, a flat line illustration chosen from the words of the item and the kind of business (cup, iced drink, boba, bowl, plate, pastry, cake slice, burger, cocktail; `placeholders.ts`). The name is read before the category, and a plural or a compound ("burgers", "cheeseburger") counts. A picture goes only through `pictureSrc` (section 7.10).
+- **Sized by its own width.** The renderer uses container queries, never viewport media queries, so one menu fits a phone, a small preview frame and a desktop column. The root says how many columns its card kind takes (`data-menu-columns`: one, many or wide).
+- **Fonts load on demand.** Urbanist and Instrument Serif come with the app. The other pairings (Playfair Display, DM Serif Display, Anton, Fredoka, Pacifico) are self-hosted `@fontsource` packages, imported by `useMenuFonts` only for a menu that uses them, so the landing page and the other menus download none of them. The script face (Pacifico) is also loaded for a script title or header.
+- **Safety:** colors are `#rrggbb` and rebuilt from the parsed value; every other choice is one value of a fixed list, and an unknown value falls back to the default, even from a theme that skipped `validateTheme`. Nothing a person typed reaches CSS or HTML: the `data-menu-*` attributes only ever hold our own list values.
+- **Contrast guard:** `themeIssues` warns in the Design page when the text on the page is under 4.5:1 or the accent is under 3:1, and offers a one-tap fix. Card and muted colors are derived so that their text stays at 4.5:1.
+- **Tests that keep it honest:** every style in both modes is tested for contrast (the text on the page at 4.5:1, the accent at 3:1, a dark mode has a dark page). `src/shared/menu/menuStyleRules.test.ts` reads every menu stylesheet and refuses a color literal, a variable that does not exist, text in the accent, and a text color on a ground it was not made for. Vitest does not load CSS, so the rules that matter (columns, strikes, patterns) are read from disk with `src/test/css.ts`.
+- **Developer pages (development server only):** `/__styles` draws every style on a sample menu (`?style=`, `?mode=`, any single choice, `?width=360`), and `/__look` draws the Design page's Look tab with no sign-in.
 
 ## 4. Domain Model
 
@@ -124,17 +137,21 @@ Business.theme (validated)  ->  toCssVars()  ->  <div style="--color-primary: ..
 User 1--* Business 1--* Category 1--* Product 1--* Variant
                    Business 1--* ModifierGroup 1--* ModifierOption
                    Product *--* ModifierGroup
-Business: id, ownerId, slug, name, types[], theme, settings, plan, status, version
-Preset:   type, defaultCategories, defaultTheme, defaultFeatures
-Order:    reference, bundleId, platforms[], delivery details, status, total, createdAt
+Built today (src/entities):
+Business: id, slug, name, tagline, types[], logo, phone, address, hours, social, theme, published   (one business per owner)
+Category: id, name, visible            (the order of the array is the order on the page)
+Product:  id, categoryId, name, description, price, variants[], tags[], available, image, groupIds[]
+ModifierGroup: id, name, required, min, max, options[]
+Preset:   type, categories, theme, groups, sizes, samples
 Order:    reference, items[] (platform, quantity), delivery details, status, total, createdAt
+Target (database): Business also has ownerId, settings, plan, status, version; every row has businessId.
 ```
 
 Rules:
 - Money stored as integer minor units plus currency code. Never floats.
 - `Business.version` increments on every publish. It is used for cache busting and optimistic concurrency.
-- Draft and published copies are separate, so owners edit safely and publish in one atomic step.
-- Slugs: lowercase, a-z 0-9 and hyphen, reserved-word blocklist, unique, with a redirect table so the link on an NFC card never breaks.
+- Target: draft and published copies are separate, so owners edit safely and publish in one atomic step. Today there is one copy and a `published` switch; an edit shows on the public link when it is saved. The menu is live when it is published AND the trial or plan is running (`isMenuLive`).
+- Slugs: lowercase, a-z 0-9 and hyphen, reserved-word blocklist, unique, with a redirect table so the link on an NFC card never breaks. Today (no server) there are no redirects: the app asks before a link changes and says that written cards and printed QR codes stop working, and every link a business had stays reserved for it, so it can never open another business's menu.
 - Every tenant row carries `businessId`. All queries filter by it.
 - `Order` is platform data, not tenant data: a card sale from the landing page, so it has no `businessId`. Its delivery details are personal data and follow section 7.8. Status goes New, then Confirmed, then Delivered, or Cancelled.
 
@@ -210,8 +227,8 @@ Layer: **F** frontend, **B** backend, **D** database, **I** infrastructure.
 ### 7.3 Frontend security checklist (enforce now)
 
 - [ ] No `dangerouslySetInnerHTML`, `eval`, `new Function`, `document.write`, or inline event handlers.
-- [ ] All external data parsed by a schema before use (API, URL params, localStorage).
-- [ ] User-provided URLs (links, images) accepted only with `https:` and, for images, our storage origin. Reject `javascript:` and `data:` schemes.
+- [ ] All external data validated before use (API, URL params, forms): hand-written validators that take `unknown`.
+- [ ] User-provided URLs (links, images) accepted only with `https:` and, for images, our storage origin. Reject `javascript:` and `data:` schemes. (Demo only: an upload comes back as a base64 `data:` image, accepted only when its first bytes are a real JPEG, PNG or WebP. It asks the network for nothing, and the real server never produces one. An https picture is shown or kept only when it is on the storage origin, `VITE_STORAGE_ORIGIN`; with none set, no https picture is shown. The menu renderer and the mock repository both apply this, `isTrustedPicture` in `src/config/pictures.ts`, and the real server must enforce the same rule on its side.)
 - [ ] Links with `target="_blank"` use `rel="noopener noreferrer"`.
 - [ ] Theme and text values never become raw CSS or HTML.
 - [ ] No tokens or secrets in code or `localStorage`. Session lives in HttpOnly cookies.
@@ -256,7 +273,7 @@ Keep `Referrer-Policy` at `strict-origin-when-cross-origin` or looser: the map a
 | Signup | 3 per hour per IP | IP |
 | Password reset / email verify | 3 per hour per account | account + IP |
 | Owner write APIs | 60 per min per user | user |
-| Image upload | 20 per hour per user, **4 MB max per product image**, one image per product | user |
+| Image upload | 20 per hour per user, **4 MB max per picture** (a product image or the logo), one image per product | user |
 | Invite / claim link | Single use, expires (for example 7 days), 10 created per day per reseller | reseller |
 | Admin APIs | Strict, IP allow-list optional, MFA required | user |
 
@@ -310,7 +327,7 @@ The review card offer has a "Get now" form. It collects: the chosen cards and ho
 
 Owners need an account for everything they buy: "Get your card" and "Get now" open the sign-up modal first. "Get now" comes back to the home page with the order form open (`/?order=cards`, the only non-owner path `safeNext` allows).
 
-- **Trial:** the server starts a 7-day trial at sign-up (`TRIAL_DAYS`, `src/entities/account/subscription.ts`). The owner's menu website is live during the trial.
+- **Trial:** the server starts a 7-day trial at sign-up (`TRIAL_DAYS`, `src/entities/account/subscription.ts`). The owner's menu website can be live during the trial: it is live once the owner has published it and the trial or plan is running (`isMenuLive`), and a draft is never visible. (In demo mode the trial starts the first time the dashboard loads the account, on any dashboard page, the setup wizard included.)
 - **Free cards:** every account carries 2 free NFC cards that open the owner's menu website (`FREE_WEBSITE_CARDS`). They are sent only once a plan is paid, so a trial costs nothing to hand out. One set per account; the server must also limit it per phone number and delivery address, because emails are cheap to make.
 - **Plans:** monthly or annual, at the prices the admin sets (section 7.8, discount included). The server reads the price from its own offers, never from the browser.
 - **Payments: hosted checkout only (PayMongo, planned).** The browser asks the server to start a checkout, gets back the provider's checkout address and goes there. Card details never touch our pages or servers (PCI SAQ A). Rules:
@@ -322,6 +339,23 @@ Owners need an account for everything they buy: "Get your card" and "Get now" op
 - **Today:** `BillingRepository` (`src/data/billing.ts`) is a mock. Each owner's standing lives in the tab's memory, the trial starts the first time the account page asks, and "checkout" turns the plan on at once without taking any payment. The account page says so.
 - **CSP:** going to the checkout is a navigation, not a fetch, so `connect-src` does not change. `form-action` stays `'self'`.
 
+### 7.10 Owner dashboard: the business, the menu and pictures
+
+What an owner types becomes public on the menu, so it is checked before it is kept.
+
+- **One check, twice.** Every input goes through a validator in `src/entities/**` (`validateNewBusiness`, `validateBusinessPatch`, `validateCategoryInput`, `validateProductInput`, `validateGroupInput`, `validateTheme`). Each takes `unknown`, never throws, never changes its argument, and gives back the clean value or the refused fields. The pages use them for instant feedback, and the repository runs them again. The real server must run the same rules (it cannot trust the browser).
+- **Text:** cleaned (control characters out, spaces collapsed), length-limited (`LIMITS`, `BUSINESS_LIMITS`), and rendered as React text only. Nothing is ever put in as markup. Prices are integer centavos.
+- **Links:** the owner's social links must be https on the network's own domain (Facebook, Instagram, TikTok; the website may be any https address), with no user name or password (and, for the three networks, no port). They open with `rel="noopener noreferrer"`. The phone becomes a `tel:` link of digits and a leading plus only.
+- **Pictures:** JPEG, PNG or WebP, decided from the file's first bytes and never from its name or declared type; at most 4 MB; no SVG. In demo mode an upload comes back as a base64 data URL (`data:` is already in `img-src`); `checkImageAddress` accepts only none, such a data URL whose bytes match its type, or an https link, and refuses `blob:`. The real flow is a signed upload to our storage, where the server re-encodes, resizes and strips metadata (sections 5 and 8), and `img-src` names the storage origin.
+- **The look:** see section 3.4. Colors, fonts and corners come from fixed maps, and every other choice (card, picture shape, titles, header, line art, backdrop) is one value of a fixed list; nothing typed reaches CSS. The fonts are self-hosted packages, so `font-src 'self'` stays, and the placeholder illustrations are inline SVG, so they ask for nothing.
+- **The link on the cards:** a slug is checked (`isValidSlug`, the blocklist, taken or not) before it is created or changed. Changing it asks first and says plainly that written cards and printed QR codes stop working. The real server keeps a redirect table (section 4) and rate-limits the availability check, because it tells anyone which links are taken.
+- **The address on the cards:** menu links start with `VITE_PUBLIC_ORIGIN` (`menuLink()` in `src/features/dashboard/menuLink.ts`), never with the address the dashboard happens to be open on, because a card keeps its link for good. While it is empty (development) the address of the page is used. When the page is open on another address, the Share page says so next to the link and the QR code. Before launch: set it to the final domain and redirect every other host (previews, the platform's own address) to it, or a card written from one of them breaks.
+- **Where pictures come from:** `VITE_STORAGE_ORIGIN` is the one https origin that serves owners' pictures, and the CSP `img-src` names the same origin. A picture from any other host is neither shown (`pictureSrc` in `src/shared/menu`) nor kept (the mock repository refuses it, as the server must). Until a storage exists the demo keeps uploads as checked `data:` addresses.
+- **What becomes public:** a published menu shows the name, tagline, logo, phone, address, hours, social links and the items. The Design page says so next to the fields, and the Share page repeats it before the publish switch. The menu collects nothing from customers.
+- **QR code:** drawn in the browser from the menu link with `uqr` (MIT, no dependencies, pinned to 0.1.3; only `encode` is used, and the SVG is built as React elements, never injected as markup). No QR service is called, so no link leaves the browser. The code stays black on white in both themes. Downloads use blob URLs that are freed afterwards.
+- **Demo mode:** `OwnerRepository` (`src/data/owner.ts`) keeps each owner's business in the tab's memory. The shell says "Demo: resets on reload", and the Overview's visitor numbers are labeled "Sample data" (seeded from the slug, not measured).
+- **Server rules to keep when it exists:** the owner id comes from the session, never from the request; every row carries `businessId` with row-level security; limits and rate limits on uploads, saves and the slug check; an audit entry for publish, link change and plan changes. A link a business had stays reserved for it (a redirect table needs that), so a business that changes its link again and again holds every old name: the server needs a cumulative cap on link changes per business (the number and the window are a product decision, open question 14 in PROJECT_FLOW.md), and the reservations of an account that never paid should be released after a grace period. The mock has no cap.
+
 ## 8. Scalability and Bottleneck Avoidance
 
 - **Read path is static.** The public menu is a versioned JSON snapshot on a CDN. A viral tap burst never hits the database.
@@ -331,14 +365,14 @@ Owners need an account for everything they buy: "Get your card" and "Get now" op
 - **Cache with versions.** Cache key includes `Business.version`. Publish invalidates by version, not by purge storms.
 - **Images:** resized variants, modern formats, CDN, lazy loading. The biggest payload is images, not code.
 - **Frontend:** route code splitting, tree shaking, no heavy libraries on the public route, preconnect to API and image origin.
-- **Multi-tenant limits:** no product-count limit for now (product decision). Image upload is capped at 4 MB per product image. Because storage is otherwise unbounded, keep a hidden abuse ceiling (for example a generous max products and total storage per business) enforced server-side, plus rate limits, so one client cannot degrade the rest or run up the bill. Raise the ceiling per business on request.
+- **Multi-tenant limits:** no product-count limit for now (product decision). Image upload is capped at 4 MB per picture (a product image or the logo). The editors also cap what one menu holds (40 categories, 30 add-on groups, 20 options per group, 8 sizes per item), so a paste gone wrong stops early. Because storage is otherwise unbounded, keep a hidden abuse ceiling (for example a generous max products and total storage per business) enforced server-side, plus rate limits, so one client cannot degrade the rest or run up the bill. Raise the ceiling per business on request.
 - **Images:** the 4 MB limit is the upload cap. The server re-encodes to resized WebP/AVIF variants, so what customers download is far smaller.
 - **Observability:** request ids, basic metrics (latency, error rate, cache hit rate), so bottlenecks are measured, not guessed.
 - **Cost control:** rate limits and quotas also protect the bill.
 
 ## 9. Maintainability
 
-- TypeScript strict, schema-derived types, one source of truth.
+- TypeScript strict, types written once in `entities` with their validators next to them.
 - Typecheck, oxlint, tests, secret scan and `npm audit` in one `npm run verify`. No formatter yet.
 - Tests: pure logic unit tests (theme, presets merge, money, slug, validation), component tests for the menu, a few end-to-end flows (tap link, view menu, pick add-on). Security tests: cross-tenant access, rate limit, input rejection.
 - Conventional commits, small PRs, changelog for releases.
@@ -350,13 +384,13 @@ Owners need an account for everything they buy: "Get your card" and "Get now" op
 
 1. Tooling: strict TS, lint, formatter, `verify` script, `.env.example`, `.gitignore` check.
 2. Folder structure from section 3.1, router, error boundary, providers.
-3. Design tokens and theme engine (`toCssVars`, contrast guard).
-4. Shared UI kit (Button, Card, Sheet, Tabs, Input, Skeleton, Toast).
-5. Entities, schemas, and the `MenuRepository` interface with the mock adapter.
-6. Public menu `/m/:slug` for three sample businesses (coffee, fine dining, hybrid).
-7. Presets and `mergePresets()`.
-8. Auth screens and onboarding (against a mock auth adapter).
-9. Owner dashboard editors with live preview.
+3. Design tokens and theme engine (`toCssVars`, contrast guard). Done.
+4. Shared UI kit (Button, Switch, Tabs, Modal and ConfirmDialog, fields, Skeleton, the app shell). Done; Card, Sheet and Toast were not needed.
+5. Entities and their validators, and the `OwnerRepository` interface with the mock adapter. Done; the `PublicMenuRepository` came with step 6.
+6. Public menu `/m/:slug` for five sample businesses, the owner's preview at `/dashboard/preview`, and the menu styles (section 3.4). Done on the mock `PublicMenuRepository`; the product detail view and the add-on picker are not built.
+7. Presets and `mergePresets()`. Done.
+8. Auth screens and onboarding (against a mock auth adapter). Done: the sign-up modal and the setup wizard.
+9. Owner dashboard editors with live preview. Done, on the mock repository.
 10. Security headers config, CSP check, bundle size budget check.
 11. Backend, database, and infrastructure phases (separate plan when we start).
 
@@ -426,12 +460,12 @@ Until there is a team: the project owner is the single owner of all of the above
 | Backend platform | **Decided: Supabase** (Postgres, Auth, Storage, row-level security). Free plan for development. Move to the paid plan before real clients (free plan pauses after a week of inactivity and has no automated backups, which conflicts with section 11). Keep the `MenuRepository` seam so the platform can still be swapped | Done |
 | Currency | **Decided: Philippine peso only** (stored as integer centavos, `PHP`) | Done |
 | Reseller payment | **Decided: outside the app.** The app only tracks which reseller referred which business | Done |
-| Server state library | TanStack Query vs a small custom hook | Step 5 |
-| Validation library | Zod vs Valibot (smaller) | Step 5 |
+| Server state library | Decided: a small custom hook (`useResource`), no TanStack Query for now | Step 5, done |
+| Validation library | Decided: our own validators, no Zod or Valibot | Step 5, done |
 | Styling approach | **Decided: CSS Modules + CSS variable tokens** (`src/shared/theme/tokens.css`) | Done |
 | Place lists (province, city, barangay) | **Decided: the free public PSGC API** (`psgc.gitlab.io`) behind `LocationRepository`, with typing as the fallback. It is a free community service with 2022 data. Before launch, either keep it or host our own copy of the latest PSA PSGC data and point `VITE_LOCATIONS_API` at it | Done |
 | Delivery pin (map and address lookup) | **Decided: required pin on a MapLibre GL map**, light and Philippines only, drawn from the public OpenFreeMap Positron style (`VITE_MAP_STYLE`), with Nominatim for lookup and search (`VITE_GEOCODER_API`). The public servers have no SLA, and Nominatim has a light-use policy. Before real traffic, move to our own style, tile and geocoder host or a paid provider, and decide whether the service must be switchable without a redeploy | Before launch |
 | Hosting / CDN | To pick with WAF and rate limits in mind | Before launch |
-| Brand name / domain | **Brand decided: NFC Menu** (`env.appName` reads `VITE_APP_NAME`, default NFC Menu). Domain still undecided | Domain: before the first card is printed |
+| Brand name / domain | **Brand decided: NFC Menu** (`env.appName` reads `VITE_APP_NAME`, default NFC Menu). Domain still undecided; once chosen it goes in `VITE_PUBLIC_ORIGIN` and every other host redirects to it | Domain: before the first card is printed |
 
 Decided: no ordering in the menu, no customer accounts. Owners sign up with email and pay for their plan through a hosted checkout (section 7.9). Resellers set up clients through claim links.
