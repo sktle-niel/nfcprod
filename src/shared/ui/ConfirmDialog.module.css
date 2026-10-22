@@ -1,0 +1,21 @@
+.body {
+  margin: 14px 0 0;
+  color: var(--color-ink-soft);
+  line-height: 1.5;
+}
+
+/* The main action comes first in the page, so the order on screen is the order of Tab and of a screen reader.
+   Stacked on a phone; side by side from 480px. */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+@media (min-width: 480px) {
+  .actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}

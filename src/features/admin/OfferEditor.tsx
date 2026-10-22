@@ -9,10 +9,10 @@ import {
   type OfferKey,
 } from '@/entities/pricing/pricing'
 import { formatPeso } from '@/shared/lib/money'
-import { Panel } from './Panel'
+import { Panel } from '@/shared/ui/Panel'
 import { PerkList } from './PerkList'
 import styles from './PricingPage.module.css'
-import ui from './ui.module.css'
+import ui from '@/shared/ui/ui.module.css'
 import type { OfferValues } from './usePricingEditor'
 
 const text = copy.admin.pricing

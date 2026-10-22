@@ -46,7 +46,7 @@ textarea.input {
 }
 
 .input::placeholder {
-  color: var(--color-muted);
+  color: var(--color-placeholder);
 }
 
 .input:focus-visible {
@@ -86,7 +86,7 @@ textarea.input {
 
 /* The empty first option is the prompt, so it reads like a placeholder. */
 .select:required:invalid {
-  color: var(--color-muted);
+  color: var(--color-placeholder);
 }
 
 .select option {

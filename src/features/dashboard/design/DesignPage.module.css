@@ -1,0 +1,58 @@
+.page {
+  display: grid;
+  gap: 16px;
+  max-width: 1160px;
+}
+
+/* Phones: one column in reading order. The folded preview sits under the tabs, then the form and its save bar. The bar
+   sticks to the bottom of the screen for as long as the form is on it. */
+.layout {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'tabs'
+    'preview'
+    'body';
+  min-width: 0;
+}
+
+.tabs {
+  grid-area: tabs;
+}
+
+.preview {
+  grid-area: preview;
+}
+
+.body {
+  grid-area: body;
+  /* A flex column, not a grid: a sticky save bar needs the whole body as its room, not one grid cell. */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* The gap above already separates the form from what is over it. */
+.body > :global([role='tabpanel']) {
+  margin-top: 0;
+}
+
+/* Wide screens: the form on the left, the preview on the right and in view as the form scrolls. */
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) 392px;
+    grid-template-areas:
+      'tabs preview'
+      'body preview';
+    grid-template-rows: auto 1fr;
+    column-gap: 24px;
+  }
+
+  .preview {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+  }
+}

@@ -1,0 +1,42 @@
+/* Two lines in one heading: a tilted script word that leans on the bold capitals below it. */
+.title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 14px 0 16px;
+  line-height: 1;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.script {
+  max-width: 100%;
+  margin: 0 0 -0.12em 2px;
+  font-family: var(--menu-script);
+  font-size: 1.875rem;
+  font-weight: 400;
+  line-height: 1.25;
+  text-transform: none;
+  transform: rotate(-4deg);
+  transform-origin: left bottom;
+}
+
+.bold {
+  max-width: 100%;
+  font-family: var(--menu-display);
+  font-size: 1.625rem;
+  font-weight: 800;
+  font-synthesis-weight: none;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* A short brush line in the accent under the words, also for a one-word name. A text-free shape. */
+.title::after {
+  content: '';
+  width: 44px;
+  margin-top: 8px;
+  border-top: 3px solid var(--menu-accent);
+  border-radius: 2px;
+}

@@ -1,0 +1,298 @@
+/* Painted from the --menu-* variables only (set inline on the root by toCssVars): a customer's theme must not depend
+   on the app's own tokens. Sizes follow the width of the root, not of the window, so a preview frame lays out the same. */
+.root {
+  position: relative;
+  container-type: inline-size;
+  box-sizing: border-box;
+  min-height: 100%;
+  padding-bottom: 24px;
+  color: var(--menu-text);
+  background: var(--menu-bg);
+  font-family: var(--menu-font);
+  line-height: 1.4;
+}
+
+/* The backdrops: a texture over the page color, which stays the base (the `background` above is never replaced). No image
+   files. Paper, dots and stripes are drawn in the page color itself and blended with `overlay`, which moves a color away
+   from the middle: a light page gets lighter marks, a dark page darker ones. So the texture only ever moves the page away from
+   its text and never lowers the contrast of any words on it (menuChrome.style.test.ts works this out for every style). */
+.root[data-menu-backdrop='paper'] {
+  background-image:
+    radial-gradient(ellipse 70% 38% at 16% 10%, var(--menu-bg), transparent),
+    radial-gradient(ellipse 60% 30% at 88% 52%, color-mix(in srgb, var(--menu-bg) 80%, transparent), transparent),
+    radial-gradient(color-mix(in srgb, var(--menu-bg) 60%, transparent) 0.7px, transparent 1.2px),
+    radial-gradient(color-mix(in srgb, var(--menu-bg) 50%, transparent) 0.6px, transparent 1.3px),
+    repeating-linear-gradient(103deg, color-mix(in srgb, var(--menu-bg) 30%, transparent) 0 1px, transparent 1px 6px);
+  background-size:
+    100% 100%,
+    100% 100%,
+    5px 5px,
+    9px 11px,
+    auto;
+  background-position:
+    0 0,
+    0 0,
+    0 0,
+    3px 4px,
+    0 0;
+  background-blend-mode: overlay;
+}
+
+.root[data-menu-backdrop='dots'] {
+  background-image:
+    radial-gradient(var(--menu-bg) 1.3px, transparent 1.9px),
+    radial-gradient(var(--menu-bg) 1.3px, transparent 1.9px);
+  background-size: 18px 18px;
+  background-position: 9px 9px;
+  background-blend-mode: overlay;
+}
+
+.root[data-menu-backdrop='stripes'] {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--menu-bg) 45%, transparent) 0 16px,
+    transparent 16px 32px
+  );
+  background-blend-mode: overlay;
+}
+
+/* A soft light of the accent behind the header, and only there: drawn on the header itself, it fades out at the header's
+   edges, however tall the header is, so no category or card sits under it. It lightens a dark page, so the words of the header
+   use the page text color under it (the tagline rules of the headers), which keeps 4.5:1 even at its center (tested). */
+.root[data-menu-backdrop='glow'] .content > header {
+  background-image: radial-gradient(
+    ellipse 100% 100% at 50% 0,
+    color-mix(in srgb, var(--menu-accent) 18%, transparent),
+    transparent
+  );
+}
+
+/* The drawn textures (grain … bloom): the page color above stays the base, and the texture itself arrives as one variable,
+   --menu-backdrop-image, an SVG data URL or gradients that toCssVars builds from the palette only (backdrop.ts). They
+   composite by plain alpha (no blend mode): each texture declares the largest share of ink or accent it ever lays over the
+   page, and menuChrome.style.test.ts proves the page text pair still reads at 4.5:1 on that worst ground for every style
+   and mode, and that each background-size below matches BACKDROP_TILES. */
+.root[data-menu-backdrop='grain'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 120px 120px;
+}
+
+.root[data-menu-backdrop='plaster'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 420px 420px;
+}
+
+.root[data-menu-backdrop='marble'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 460px 460px;
+}
+
+.root[data-menu-backdrop='linen'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 48px 48px;
+}
+
+.root[data-menu-backdrop='weave'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 60px 60px;
+}
+
+.root[data-menu-backdrop='terrazzo'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 220px 220px;
+}
+
+.root[data-menu-backdrop='waves'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 52px 26px;
+}
+
+.root[data-menu-backdrop='arches'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 64px 32px;
+}
+
+.root[data-menu-backdrop='deco'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 96px 48px;
+}
+
+/* The gingham gradients carry their own 28px period. */
+.root[data-menu-backdrop='gingham'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: auto;
+}
+
+.root[data-menu-backdrop='check'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 36px 36px;
+}
+
+.root[data-menu-backdrop='topo'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 420px 420px;
+}
+
+/* The bloom auras cover the page once. */
+.root[data-menu-backdrop='bloom'] {
+  background-image: var(--menu-backdrop-image);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* Everything the owner can read sits above the line art. */
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+.root *,
+.root *::before,
+.root *::after {
+  box-sizing: border-box;
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--menu-bg);
+  /* The accent underlines the category links. It is a shape on the page color (the guard measures it at 3:1) and shows
+     without any interaction, so the Design preview, where nothing can be focused, shows the owner's accent too. */
+  border-bottom: 2px solid var(--menu-accent);
+}
+
+.navList {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 16px;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.navList li {
+  flex: none;
+}
+
+.navLink,
+.link,
+.linkPlain {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--menu-text);
+  font-weight: 600;
+}
+
+.navLink {
+  padding: 0 16px;
+  /* A chip is drawn on the card color, so its words use the card text color. */
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+  border: 1px solid var(--menu-line);
+  border-radius: var(--menu-radius);
+  font-size: 0.875rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.navLink:focus-visible,
+.link:focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: 2px;
+}
+
+.section {
+  /* A title drawn as a full-width band (titles/StripeTitle) reads the gutter to reach the edges. */
+  --section-gutter: 16px;
+  padding: 20px var(--section-gutter) 0;
+  /* The sticky bar must not cover the title the link scrolls to. */
+  scroll-margin-top: 64px;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Two columns when the root is wide enough for two readable cards, for the card kinds that sit side by side (the root says
+   so in data-menu-columns). The other kinds are one column. */
+@container (min-width: 340px) {
+  [data-menu-columns='many'] .products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 640px) {
+  [data-menu-columns='many'] .products {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* A kind that is one column on a phone and two on a wide menu (the poster). */
+@container (min-width: 640px) {
+  [data-menu-columns='wide'] .products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 24px;
+    row-gap: 16px;
+  }
+}
+
+.empty {
+  margin: 0;
+  padding: 48px 16px;
+  color: var(--menu-muted);
+  text-align: center;
+}
+
+.footer {
+  display: grid;
+  gap: 16px;
+  margin: 32px 16px 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--menu-line);
+}
+
+.fact {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+}
+
+.factTitle {
+  margin: 0;
+  color: var(--menu-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.factText {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Hours keep the owner's line breaks. */
+.hours {
+  white-space: pre-line;
+}
+
+.social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

@@ -1,0 +1,35 @@
+/* A layer behind the menu's content. The art inside is positioned by its own set; it is drawn in the muted color. */
+.decor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: clip;
+  color: var(--menu-muted);
+  pointer-events: none;
+}
+
+/* The awning is an opaque band across the top of the menu: the art starts under it, or the top pieces would hide behind it. */
+[data-menu-header='awning'] .decor {
+  top: 3em;
+}
+
+/* Every piece of every set: placed by its set (corners and edges, sized in % of the menu width so it scales from 360 to
+   720 px), faint so it never competes with the words, and its height follows its drawing. */
+.decor svg {
+  position: absolute;
+  display: block;
+  height: auto;
+  opacity: 0.24;
+}
+
+/* The strokes keep one width in screen pixels however large a piece is drawn. */
+.decor svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+/* With forced colors the decoration steps aside; the content stays. */
+@media (forced-colors: active) {
+  .decor {
+    display: none;
+  }
+}

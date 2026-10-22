@@ -1,0 +1,31 @@
+/* Where the sparkles sit: a burst in the top left, a twinkle in the top right, a small twinkle peeking in at the bottom left
+   corner and a burst at the bottom right beside the footer. */
+.topLeft {
+  top: 0.25em;
+  left: 1.5%;
+  width: 16%;
+  max-width: 6em;
+}
+
+.topRight {
+  top: 0.25em;
+  right: 1.5%;
+  width: 11%;
+  max-width: 4.25em;
+}
+
+.footLeft {
+  bottom: -0.75em;
+  left: -1%;
+  width: 10%;
+  max-width: 4em;
+  transform: rotate(20deg);
+}
+
+.footRight {
+  bottom: 0.5em;
+  right: 4%;
+  width: 18%;
+  max-width: 7em;
+  transform: scaleX(-1);
+}

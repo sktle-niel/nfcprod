@@ -1,0 +1,34 @@
+/* The band reaches the edges of the menu: the section's gutter (MenuView.module.css) is taken back with a negative margin. */
+.title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px calc(-1 * var(--section-gutter, 16px)) 16px;
+  padding: 10px var(--section-gutter, 16px);
+  color: var(--menu-on-fill);
+  background: var(--menu-fill);
+  font-family: var(--menu-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-synthesis-weight: none;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* Slanted stripes in the band's own text color, beside the words and never under them. */
+.title::after {
+  content: '';
+  flex: none;
+  align-self: stretch;
+  width: 44px;
+  min-height: 1.1em;
+  margin-left: auto;
+  background-image: repeating-linear-gradient(
+    -55deg,
+    color-mix(in srgb, var(--menu-on-fill) 45%, transparent) 0 5px,
+    transparent 5px 11px
+  );
+}

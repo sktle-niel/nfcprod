@@ -1,0 +1,61 @@
+.tab {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.intro {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--color-ink-soft);
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Two columns once there is room, so a long list does not run down the page. */
+@media (min-width: 1024px) {
+  .list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.empty {
+  padding: 24px 12px;
+  text-align: center;
+}
+
+.emptyTitle {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.emptyBody {
+  margin: 6px 0 0;
+  color: var(--color-ink-soft);
+}
+
+.note {
+  margin: 0 0 12px;
+  color: var(--color-ink-soft);
+}
+
+.failure {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-bg);
+  color: var(--color-danger-ink);
+  font-weight: 600;
+}
+
+.inline {
+  display: block;
+  margin-top: 8px;
+  color: var(--color-danger-ink);
+}

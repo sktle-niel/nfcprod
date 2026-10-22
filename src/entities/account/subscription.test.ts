@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { accessOf, isMenuLive, periodEnd, startTrial, type Subscription } from './subscription'
+import { accessOf, freeCardsState, isMenuLive, periodEnd, startTrial, type Subscription } from './subscription'
 
 const DAY = 86_400_000
 const START = Date.parse('2026-10-19T02:00:00Z')
@@ -44,5 +44,25 @@ describe('periodEnd', () => {
   it('adds a calendar month or year', () => {
     expect(new Date(periodEnd('month', START)).toISOString()).toBe('2026-11-19T02:00:00.000Z')
     expect(new Date(periodEnd('year', START)).toISOString()).toBe('2027-10-19T02:00:00.000Z')
+  })
+})
+
+describe('freeCardsState', () => {
+  const trial = startTrial(START)
+
+  it('waits for a first plan during the trial', () => {
+    expect(freeCardsState(trial)).toBe('waiting')
+  })
+
+  it('is due once a plan was paid for, and stays due if the plan lapses', () => {
+    const paid: Subscription = { ...trial, plan: 'month', paidUntil: '2026-11-19T02:00:00.000Z' }
+    expect(freeCardsState(paid)).toBe('due')
+    expect(accessOf(paid, Date.parse('2027-01-01T00:00:00Z')).kind).toBe('lapsed')
+    expect(freeCardsState(paid)).toBe('due')
+  })
+
+  it('is sent when the cards are on their way, whatever the plan', () => {
+    expect(freeCardsState({ ...trial, freeCards: { count: 2, sent: true } })).toBe('sent')
+    expect(freeCardsState({ ...trial, plan: 'year', paidUntil: '2027-10-19T02:00:00.000Z', freeCards: { count: 2, sent: true } })).toBe('sent')
   })
 })

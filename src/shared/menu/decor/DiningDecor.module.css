@@ -1,0 +1,30 @@
+/* Where the dining set sits: a sprig falls in from the top left, a crossed fork and knife lie in the top right corner (both
+   stay above a framed header's box), a plate rim peeks in at the bottom left corner, a sprig rises at the bottom right. */
+.herbTop {
+  top: -0.5em;
+  left: -1%;
+  width: 26%;
+  max-width: 10em;
+}
+
+.cutlery {
+  top: 0.25em;
+  right: 2%;
+  width: 12%;
+  max-width: 4.5em;
+}
+
+.plate {
+  bottom: 0;
+  left: 0;
+  width: 10%;
+  max-width: 3.75em;
+}
+
+.herbFoot {
+  bottom: -0.5em;
+  right: -1%;
+  width: 24%;
+  max-width: 9em;
+  transform: scale(-1, -1);
+}

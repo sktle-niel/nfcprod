@@ -1,0 +1,30 @@
+.body {
+  margin: 0 0 16px;
+  color: var(--color-ink-soft);
+  line-height: 1.5;
+}
+
+.add {
+  margin-bottom: 20px;
+}
+
+.heading {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.alert {
+  margin: 12px 0 0;
+  color: var(--color-danger-ink);
+  font-size: 0.9rem;
+}

@@ -1,0 +1,176 @@
+.group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 104px), 1fr));
+  gap: 8px;
+}
+
+.wide {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 148px), 1fr));
+}
+
+/* A wide sample spans the card, like a title spans the menu. */
+.wide .sample {
+  justify-self: stretch;
+  min-width: 0;
+}
+
+.option {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+/* The real radio covers the card, so a tap anywhere on it chooses and the focus ring has something to follow. */
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.face {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  min-height: 76px;
+  padding: 10px 8px;
+  border: 1.5px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  text-align: center;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.input:checked + .face {
+  border-color: var(--color-accent);
+  background: var(--color-accent-tint);
+}
+
+/* A check in the corner of the chosen card, as in the style gallery, so the choice does not rest on color alone. */
+.input:checked + .face::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-btn-bg);
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+
+.input:checked + .face::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+  right: 12px;
+  width: 5px;
+  height: 8px;
+  border: solid var(--color-btn-fg);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.input:focus-visible + .face {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.sample {
+  display: grid;
+  place-items: center;
+  min-height: 28px;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.label {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* The name for screen readers when the sample already writes it. */
+.hiddenLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The sample button of the "Buttons" choice: the radius is set inline from the theme's own table. */
+.button {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--color-btn-bg);
+  color: var(--color-btn-fg);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* The two layouts drawn as blocks. */
+.glyph {
+  display: grid;
+  width: 36px;
+  gap: 4px;
+}
+
+.glyph > span {
+  display: block;
+  border-radius: 3px;
+  background: var(--color-ink-soft);
+}
+
+.glyphGrid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.glyphGrid > span {
+  height: 11px;
+}
+
+.glyphList > span {
+  height: 7px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .face {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* A contrast theme strips the tint and the drawn check's colors: the border says what is chosen. */
+@media (forced-colors: active) {
+  .input:checked + .face {
+    border-width: 3px;
+    border-color: Highlight;
+  }
+}
+
+.hint {
+  margin: 8px 0 0;
+  color: var(--color-ink-soft);
+  font-size: 0.85rem;
+}

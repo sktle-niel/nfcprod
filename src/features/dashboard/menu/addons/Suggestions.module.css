@@ -1,0 +1,43 @@
+.body {
+  margin: 0 0 12px;
+  color: var(--color-ink-soft);
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1.5px dashed var(--color-line);
+  border-radius: var(--radius-sm);
+}
+
+.text {
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.detail {
+  margin: 2px 0 0;
+  font-size: 0.88rem;
+  color: var(--color-ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.item button {
+  flex: none;
+}

@@ -1,0 +1,182 @@
+/* The best seller, big: a panel in the card color, so its text is the card pair (--menu-on-surface, --menu-card-muted).
+   The accent only draws shapes: the soft disc behind the picture and the swash under a script label. Sized by the width of
+   the menu (container queries): stacked on a phone, picture and words side by side from 520px. */
+.panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 16px 16px 4px;
+  overflow: hidden;
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+  border: 1px solid var(--menu-card-line);
+  border-radius: min(calc(var(--menu-radius) + 8px), 24px);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.18);
+}
+
+/* A cut-out stands on a soft disc of the accent, like a product under a light. A framed picture has its own edge and a
+   shadow instead. */
+.media {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 20px 20px 4px;
+}
+
+.panel[data-photo="cutout"] .media::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(210px, 66%);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--menu-accent) 22%, transparent);
+  translate: -50% -50%;
+}
+
+.media .photo {
+  position: relative;
+  width: min(220px, 70%);
+  color: var(--menu-card-muted);
+  --photo-ratio: 1 / 1;
+}
+
+.panel:not([data-photo="cutout"]) .media .photo {
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.22);
+}
+
+/* An arch is tall: narrower, so the words still show on a phone without scrolling past the picture. */
+.media .photo[data-shape="arch"] {
+  width: min(180px, 56%);
+}
+
+/* A framed rectangle runs across the panel, like a hero picture. */
+.media .photo[data-shape="rounded"] {
+  width: 100%;
+  --photo-ratio: 16 / 10;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px 20px 22px;
+  text-align: center;
+}
+
+/* The label as a small chip on the fill pair. */
+.label {
+  margin: 0;
+  padding: 3px 12px;
+  color: var(--menu-on-fill);
+  background: var(--menu-fill);
+  border-radius: var(--menu-radius);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+/* The label in the script font, tilted a little, with an accent swash under it (when the category titles are script). */
+.script {
+  position: relative;
+  margin: 0 0 4px;
+  padding-bottom: 6px;
+  color: var(--menu-on-surface);
+  font-family: var(--menu-script);
+  font-size: 1.75rem;
+  line-height: 1.2;
+  rotate: -4deg;
+}
+
+.script::after {
+  content: "";
+  position: absolute;
+  right: 10%;
+  bottom: 0;
+  left: 18%;
+  height: 6px;
+  border-bottom: 2px solid var(--menu-accent);
+  border-radius: 0 0 50% 50%;
+}
+
+.name {
+  max-width: 100%;
+  margin: 0;
+  font-family: var(--menu-display);
+  font-synthesis: none;
+  font-size: clamp(1.625rem, 7.5cqi, 2.5rem);
+  font-weight: 800;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+}
+
+.description,
+.variants {
+  max-width: 38ch;
+  margin: 0;
+  color: var(--menu-card-muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.variants {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.price {
+  margin: 4px 0 0;
+  font-family: var(--menu-display);
+  font-synthesis: none;
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 1.2;
+}
+
+/* The inverse label of the card (the spotlight shows a product that is on sale, but it stays honest if it is not). */
+.soldOut {
+  padding: 2px 8px;
+  color: var(--menu-surface);
+  background: var(--menu-on-surface);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.panel[data-sold-out] .price {
+  text-decoration: line-through;
+}
+
+.panel[data-sold-out] .photo {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+/* Wide: the picture on the left, the words on the right, read from the left edge. */
+@container (min-width: 520px) {
+  .panel {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+  }
+
+  .media {
+    padding: 20px 0 20px 20px;
+  }
+
+  .body {
+    align-items: flex-start;
+    padding: 24px 24px 24px 8px;
+    text-align: left;
+  }
+
+  .script::after {
+    left: 0;
+  }
+}

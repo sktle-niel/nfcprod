@@ -1,0 +1,69 @@
+/* Stays in view at the bottom of the screen, above the tab bar on phones. */
+.bar {
+  position: sticky;
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lift);
+}
+
+@media (min-width: 1024px) {
+  .bar {
+    bottom: 16px;
+  }
+}
+
+.messages {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.hint,
+.notice {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.hint {
+  color: var(--color-ink-soft);
+}
+
+.notice {
+  color: var(--color-danger-ink);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Nothing to say: no empty line above the buttons. The region stays in the page, so words put in it are still announced. */
+.messages > [role='status']:empty {
+  min-height: 0;
+}
+
+/* On a phone the two buttons share one row under the words, so the bar stays low and leaves room for the form (a bar that
+   wraps its buttons is 170px tall, a third of the screen once the keyboard is up). */
+@media (max-width: 599px) {
+  .actions {
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+  }
+
+  .actions > button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-inline: 10px;
+  }
+}

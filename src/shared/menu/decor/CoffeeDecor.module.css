@@ -1,0 +1,39 @@
+/* Where the coffee set sits: lamps hang from the top left, beans spill off the top right corner, a cup and a moka pot stand
+   at the bottom right (the footer's words start at the left), and two beans peek in at the bottom left corner. Sizes are
+   shares of the menu width, capped in em so a wide menu does not get giant drawings. */
+.lamps {
+  top: 0;
+  left: 4%;
+  width: 27%;
+  max-width: 10em;
+}
+
+.beansTop {
+  top: -1em;
+  right: -2.5%;
+  width: 15%;
+  max-width: 5.5em;
+  transform: rotate(-12deg);
+}
+
+.moka {
+  bottom: 0.5em;
+  right: 3%;
+  width: 14%;
+  max-width: 5.5em;
+}
+
+.cup {
+  bottom: 0.5em;
+  right: 18%;
+  width: 17%;
+  max-width: 6.5em;
+}
+
+.beansFoot {
+  bottom: -1.2em;
+  left: -2%;
+  width: 12%;
+  max-width: 4.5em;
+  transform: rotate(40deg);
+}

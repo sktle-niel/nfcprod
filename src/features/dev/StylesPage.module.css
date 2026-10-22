@@ -1,0 +1,35 @@
+/* A developer's page, neutral on purpose (not the app's themed tokens) so every menu style is judged against the same grey. */
+.page {
+  padding: 24px 16px 64px;
+  background: #e4e2de;
+  color: #1d1d1d;
+}
+
+.title {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 390px);
+  gap: 24px;
+  align-items: start;
+}
+
+.figure {
+  margin: 0;
+}
+
+.caption {
+  margin: 0 0 8px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.phone {
+  width: 390px;
+  overflow: hidden;
+  border: 1px solid #b9b6b0;
+  border-radius: 20px;
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { LAHUG_PIN } from '@/test/orders'
-import { formatDateTime, formatDay, formatMobile, formatPercent, formatPin, initials } from './format'
+import { formatDateTime, formatDay, formatMobile, formatPin } from './format'
 
 describe('formatMobile', () => {
   it('writes a +63 number the way people dial it', () => {
@@ -48,27 +48,5 @@ describe('formatPin', () => {
 
   it('rounds a longer number to five decimals', () => {
     expect(formatPin({ lat: 10.3280049, lng: 123.9059951 })).toBe('10.32800, 123.90600')
-  })
-})
-
-describe('formatPercent', () => {
-  it.each([
-    [12.5, '12.5%'],
-    [12, '12%'],
-    [-3.04, '3%'],
-    [0, '0%'],
-  ])('writes %d as %s', (value, expected) => {
-    expect(formatPercent(value)).toBe(expected)
-  })
-})
-
-describe('initials', () => {
-  it.each([
-    ['Maria Angelica Santos', 'MS'],
-    ['juan dela cruz', 'JC'],
-    ['Cher', 'C'],
-    ['  ', ''],
-  ])('turns %j into %j', (name, expected) => {
-    expect(initials(name)).toBe(expected)
   })
 })

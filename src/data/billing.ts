@@ -34,7 +34,7 @@ type Options = { delay?: number; now?: () => number }
 
 /**
  * Demo mode: each owner's standing lives in this tab's memory. The trial starts the first time the
- * account page asks (the server would start it at sign-up), and "checkout" turns the plan on at once.
+ * dashboard loads the account, on any page (the server would start it at sign-up), and "checkout" turns the plan on at once.
  */
 export function createMockBilling(accounts: AuthRepository = auth, { delay = 300, now = Date.now }: Options = {}): BillingRepository {
   const byAccount = new Map<string, Subscription>()

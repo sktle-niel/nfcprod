@@ -1,0 +1,22 @@
+.step {
+  display: grid;
+  gap: 14px;
+}
+
+/* A long link breaks inside the line instead of scrolling the page sideways. */
+.preview {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.careful {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-tint);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--color-ink-soft);
+}

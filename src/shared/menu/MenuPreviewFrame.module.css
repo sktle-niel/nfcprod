@@ -1,0 +1,24 @@
+/* The frame is the app's own chrome (app tokens); what it holds is the customer's menu (--menu-* only). */
+.frame {
+  width: 100%;
+  max-width: 360px;
+  max-height: min(640px, 80dvh);
+  margin-inline: auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* A phone draws no scrollbar, so neither does its window; wheel, touch and the keyboard still scroll it. */
+  scrollbar-width: none;
+  background: var(--color-surface);
+  border: 8px solid var(--color-ink);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.frame::-webkit-scrollbar {
+  display: none;
+}
+
+.frame:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

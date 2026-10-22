@@ -1,0 +1,19 @@
+.tab {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.list {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.none {
+  margin: 0;
+  padding: 24px 0;
+  color: var(--color-ink-soft);
+  text-align: center;
+  overflow-wrap: anywhere;
+}

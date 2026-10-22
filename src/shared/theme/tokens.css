@@ -9,6 +9,8 @@
   --color-ink: #19202b;
   --color-ink-soft: #4a5565;
   --color-muted: #9aa3b2;
+  /* Hint text inside an empty field. Readable on the field background (4.5:1), unlike the muted decoration color. */
+  --color-placeholder: #6b7280;
 
   /* Surfaces */
   --color-surface: #ffffff;
@@ -73,6 +75,7 @@
   --color-ink: #eef2f9;
   --color-ink-soft: #a8b3c7;
   --color-muted: #6d7b95;
+  --color-placeholder: #8b98ae;
 
   --color-surface: #141d30;
   --color-glass: rgb(255 255 255 / 0.06);

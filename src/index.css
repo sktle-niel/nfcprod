@@ -8,6 +8,16 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* A focused field must not stay under a fixed bar. On phones the tab bar (65px plus the home indicator) sits at the
+     bottom, and the Design page's save bar floats above it. --save-bar-h is everything the save bar covers from the bottom
+     edge while it shows, the room of the tab bar included, so the larger of the two counts, not their sum. */
+  scroll-padding-bottom: max(calc(96px + env(safe-area-inset-bottom)), calc(var(--save-bar-h, 0px) + 16px));
+}
+
+@media (min-width: 1024px) {
+  html {
+    scroll-padding-bottom: calc(32px + var(--save-bar-h, 0px));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -44,6 +54,10 @@ svg {
 
 ::view-transition-new(root) {
   z-index: 2;
+}
+
+.page-center-inline {
+  min-height: 60dvh;
 }
 
 .page-center {

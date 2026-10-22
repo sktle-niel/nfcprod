@@ -1,0 +1,22 @@
+.title {
+  margin: 14px 0 16px;
+  font-family: var(--menu-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-synthesis-weight: none;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* The accent of this title: a thick rule and a thin one across the column, text-free shapes on the page color. */
+.title::after {
+  content: '';
+  display: block;
+  height: 7px;
+  margin-top: 8px;
+  border-top: 4px solid var(--menu-accent);
+  border-bottom: 1px solid var(--menu-accent);
+}

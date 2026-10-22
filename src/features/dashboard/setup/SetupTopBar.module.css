@@ -1,0 +1,29 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 14px var(--gutter) 0;
+}
+
+.logo {
+  --logo-height: 28px;
+}
+
+.brand {
+  display: inline-flex;
+  margin-right: auto;
+  text-decoration: none;
+}
+
+.brand:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

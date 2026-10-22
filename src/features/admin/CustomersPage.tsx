@@ -5,11 +5,11 @@ import { customersOf, customerText } from './customers'
 import { CustomersTable, CustomersTableSkeleton } from './CustomersTable'
 import styles from './CustomersPage.module.css'
 import { matchesQuery } from './filterOrders'
-import { PageHeader } from './PageHeader'
+import { PageHeader } from '@/shared/ui/PageHeader'
 import { Pagination } from './Pagination'
 import { paginate, showTop } from './paging'
-import { Panel } from './Panel'
-import ui from './ui.module.css'
+import { Panel } from '@/shared/ui/Panel'
+import ui from '@/shared/ui/ui.module.css'
 
 const text = copy.admin.customers
 const PAGE_SIZE = 10

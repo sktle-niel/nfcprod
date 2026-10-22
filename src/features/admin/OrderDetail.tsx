@@ -8,12 +8,12 @@ import { formatPeso } from '@/shared/lib/money'
 import { plural } from '@/shared/lib/plural'
 import { useAdminData } from './adminData'
 import { formatDateTime, formatItems, formatMobile, formatPin } from './format'
-import { IconBack, IconPhone } from './icons'
+import { IconBack, IconPhone } from '@/shared/ui/icons'
 import styles from './OrderDetail.module.css'
-import { Block, Pulse } from './Skeleton'
+import { Block, Pulse } from '@/shared/ui/Skeleton'
 import { toStatus } from './status'
 import { StatusPill } from './StatusPill'
-import ui from './ui.module.css'
+import ui from '@/shared/ui/ui.module.css'
 
 const text = copy.admin.orders
 

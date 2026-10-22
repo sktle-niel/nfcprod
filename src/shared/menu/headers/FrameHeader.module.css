@@ -1,0 +1,67 @@
+.header {
+  --logo-size: 56px;
+  --logo-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 20px 20px;
+  text-align: center;
+}
+
+/* Text-free line art in the accent: two lines, two dots and a diamond. */
+.ornament {
+  width: 80px;
+  height: 16px;
+  fill: var(--menu-accent);
+  stroke: var(--menu-accent);
+  stroke-width: 1;
+}
+
+.gem {
+  fill: none;
+  stroke-width: 1.25;
+}
+
+/* The double frame: an outer line (the border) and an inner one (the outline drawn inside it). Text-free shapes in the accent. */
+.frame {
+  width: min(100%, 26rem);
+  min-width: min(100%, 240px);
+  padding: 22px 18px 20px;
+  border: 1px solid var(--menu-accent);
+  outline: 1px solid var(--menu-accent);
+  outline-offset: -6px;
+}
+
+/* Letter spacing also adds space after the last letter: the same space before the first one keeps the name centered. */
+.name {
+  margin: 0;
+  padding-left: 0.16em;
+  font-family: var(--menu-display);
+  font-size: clamp(1.5rem, 8cqi, 2.25rem);
+  font-weight: 600;
+  font-synthesis-weight: none;
+  line-height: 1.15;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.tagline {
+  margin: 10px 0 0;
+  padding-left: 0.14em;
+  color: var(--menu-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* Under the glow backdrop the page is lighter or darker than its own color: the tagline takes the full text color, which keeps
+   4.5:1 there. */
+[data-menu-backdrop='glow'] .tagline {
+  color: var(--menu-text);
+}

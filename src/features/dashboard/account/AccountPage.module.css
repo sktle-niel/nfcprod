@@ -1,0 +1,35 @@
+.page {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.note {
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-size: 0.9rem;
+}
+
+.loading {
+  display: grid;
+  gap: 12px;
+}
+
+/* Plan on the left, cards and menu on the right; stacked on phones. */
+.grid {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  }
+}
+
+.side {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}

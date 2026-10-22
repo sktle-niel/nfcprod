@@ -1,0 +1,22 @@
+/* The Look tab as the Design page lays it out: the form, and the preview beside it on a wide screen. */
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  max-width: 1160px;
+  padding: 16px;
+  background: var(--page-bg);
+  color: var(--color-ink);
+}
+
+.form,
+.preview {
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr) 392px;
+    align-items: start;
+  }
+}

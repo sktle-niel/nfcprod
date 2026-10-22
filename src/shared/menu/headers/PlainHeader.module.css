@@ -1,0 +1,32 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 28px 16px 16px;
+  text-align: center;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.15;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.tagline {
+  margin: 0;
+  color: var(--menu-muted);
+  font-size: 0.9375rem;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* Under the glow backdrop the page is lighter or darker than its own color: the tagline takes the full text color, which keeps
+   4.5:1 there. */
+[data-menu-backdrop='glow'] .tagline {
+  color: var(--menu-text);
+}

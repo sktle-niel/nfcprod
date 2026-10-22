@@ -1,0 +1,64 @@
+.header {
+  --logo-size: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 30px 16px 18px;
+  text-align: center;
+}
+
+.name {
+  max-width: 100%;
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: clamp(2.2rem, 13cqi, 3.6rem);
+  font-weight: 800;
+  font-synthesis-weight: none;
+  line-height: 0.95;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* The stars ride with the first and the last word, sized with the name. Moved with relative offsets, so they never change the
+   height of a line. Text-free shapes in the accent. */
+.starBefore svg,
+.starAfter svg {
+  position: relative;
+  display: inline-block;
+  fill: var(--menu-accent);
+}
+
+.starBefore svg {
+  top: 0.08em;
+  width: 0.34em;
+  height: 0.34em;
+  margin-right: 0.14em;
+}
+
+.starAfter svg {
+  top: -0.4em;
+  width: 0.46em;
+  height: 0.46em;
+  margin-left: 0.06em;
+}
+
+.tagline {
+  max-width: 34ch;
+  margin: 0;
+  color: var(--menu-muted);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* Under the glow backdrop the page is lighter or darker than its own color: the tagline takes the full text color, which keeps
+   4.5:1 there. */
+[data-menu-backdrop='glow'] .tagline {
+  color: var(--menu-text);
+}

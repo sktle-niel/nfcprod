@@ -1,3 +1,9 @@
+/* The status tabs scroll inside their own box on a narrow screen. They do not widen the page. */
+.tabs {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .filters {
   display: flex;
   flex-wrap: wrap;

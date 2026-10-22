@@ -1,0 +1,39 @@
+/* Where the bakery set sits: two crossed stalks of wheat in the top left corner, a whisk in the top right, a croissant and a
+   stalk of wheat at the bottom right beside the footer. */
+.wheatA {
+  top: -1.5em;
+  left: 3%;
+  width: 11%;
+  max-width: 4em;
+  transform: rotate(-30deg);
+}
+
+.wheatB {
+  top: -1.5em;
+  left: 9%;
+  width: 9%;
+  max-width: 3.5em;
+  transform: rotate(-8deg);
+}
+
+.whisk {
+  top: -0.5em;
+  right: 1%;
+  width: 12%;
+  max-width: 4.75em;
+}
+
+.croissant {
+  bottom: 0.5em;
+  right: 15%;
+  width: 18%;
+  max-width: 7em;
+}
+
+.wheatFoot {
+  bottom: -1em;
+  right: 3%;
+  width: 9%;
+  max-width: 3.5em;
+  transform: rotate(16deg);
+}

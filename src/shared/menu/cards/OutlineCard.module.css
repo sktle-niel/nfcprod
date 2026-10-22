@@ -1,0 +1,173 @@
+/* The "outline" card: a rounded outline on the page, no fill, so its text is the page pair (--menu-text, --menu-muted on
+   --menu-bg). The price pill is the fill pair. The picture and the price pill reach past the card's edge on purpose, so the
+   card never clips (no overflow hidden) and keeps room above for the picture. Painted from the --menu-* variables only. */
+.card {
+  --card-pad: 16px;
+  --card-rise: 10px;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  min-width: 0;
+  /* Room for the picture that rises over the top edge, so it never touches the card above. */
+  margin-top: var(--card-rise);
+  padding: var(--card-pad) 0 var(--card-pad) 18px;
+  list-style: none;
+  color: var(--menu-text);
+  border: 1px solid color-mix(in srgb, var(--menu-accent) 60%, transparent);
+  /* Twice the button roundness, kept between a soft corner and a wide round one (a pill would make a capsule). */
+  border-radius: clamp(8px, calc(var(--menu-radius) * 2), 22px);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: 1.0625rem;
+  font-weight: 800;
+  font-synthesis-weight: none;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.description,
+.addOns {
+  margin: 0;
+  color: var(--menu-muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.addOns {
+  font-style: italic;
+}
+
+/* The sizes as a row of small pills: the size in bold, its price after it. */
+.sizes,
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.size {
+  list-style: none;
+  padding: 1px 8px;
+  border: 1px solid var(--menu-line);
+  border-radius: var(--menu-radius);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sizeLabel {
+  font-weight: 700;
+}
+
+.sizePrice {
+  color: var(--menu-muted);
+}
+
+/* Page text on the page color; the accent only draws the outline. */
+.tag {
+  list-style: none;
+  padding: 1px 8px;
+  color: var(--menu-text);
+  background: var(--menu-bg);
+  border: 1px solid var(--menu-accent);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* The price: a filled pill that starts a little outside the card's left edge, like a label pinned to it. It stays inside
+   the section's side padding (16px), so it never makes the page scroll sideways. */
+.price {
+  margin: 4px 0 0 -26px;
+  padding: 5px 18px 5px 26px;
+  color: var(--menu-on-fill);
+  background: var(--menu-fill);
+  border-radius: calc(var(--menu-radius) * 2);
+  font-family: var(--menu-display);
+  font-size: 1rem;
+  font-weight: 700;
+  font-synthesis-weight: none;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+}
+
+/* The picture at the top right: it rises over the top edge and reaches past the right edge a little (less than the section's
+   side padding). */
+.photo {
+  position: relative;
+  align-self: start;
+  width: 108px;
+  margin: calc(-1 * (var(--card-pad) + var(--card-rise))) -12px -4px 0;
+  --photo-ratio: 1 / 1;
+}
+
+/* A placeholder drawing without a frame stands at the foot of its box, like a cut-out picture. */
+span.photo[data-shape='cutout'] {
+  place-items: end center;
+}
+
+/* The drawing fills its box, so that it reaches the card's edge like a cut-out picture does. */
+.card span.photo[data-shape='cutout'] > span {
+  width: 100%;
+  height: 100%;
+}
+
+/* "Sold out" under the name: the page colors swapped, so the words keep full contrast. */
+.soldOut {
+  padding: 1px 8px;
+  color: var(--menu-bg);
+  background: var(--menu-text);
+  border-radius: var(--menu-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* Sold out: the words stay readable, the price is struck through, only the picture is quieter. */
+.card[data-sold-out] .price {
+  text-decoration: line-through;
+}
+
+.card[data-sold-out] .photo {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+@container (min-width: 640px) {
+  .card {
+    padding-left: 22px;
+  }
+
+  .name {
+    font-size: 1.25rem;
+  }
+
+  .price {
+    margin-left: -30px;
+    padding-left: 30px;
+  }
+
+  .photo {
+    width: 140px;
+  }
+}

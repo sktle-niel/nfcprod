@@ -1,5 +1,5 @@
 import { copy } from '@/config/copy'
-import { IconBack, IconForward } from './icons'
+import { IconBack, IconForward } from '@/shared/ui/icons'
 import { pageItems, type Paged } from './paging'
 import styles from './Pagination.module.css'
 

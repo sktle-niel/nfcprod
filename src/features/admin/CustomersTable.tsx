@@ -3,7 +3,7 @@ import { formatPeso } from '@/shared/lib/money'
 import type { Customer } from './customers'
 import styles from './CustomersTable.module.css'
 import { formatDay, formatMobile } from './format'
-import { Block, Pulse } from './Skeleton'
+import { Block, Pulse } from '@/shared/ui/Skeleton'
 
 const text = copy.admin.customers
 const columns = text.columns
