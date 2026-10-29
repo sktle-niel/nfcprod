@@ -3,7 +3,7 @@ import { backdropLayers, BACKDROP_TILES, NEW_BACKDROPS, PICTURE_SHARES } from '@
 import { contrastRatio, mixHex } from '@/entities/theme/color'
 import { toCssVars } from '@/entities/theme/cssVars'
 import { styleTheme } from '@/entities/theme/styles'
-import { BACKDROPS, MODES, STYLE_IDS, TITLES, VEILS } from '@/entities/theme/theme'
+import { BACKDROPS, MODES, PHOTO_FITS, PHOTO_POSITIONS, STYLE_IDS, TITLES, VEILS } from '@/entities/theme/theme'
 import { TEXT_CONTRAST_MIN } from '@/entities/theme/validate'
 import { readCss, rulesOf, type CssRule } from '@/test/css'
 
@@ -185,18 +185,48 @@ describe('the drawn backdrops', () => {
 describe('the photo backdrop', () => {
   const PHOTO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
 
-  it('has one rule: the variable, the photo covering the page once under the flat veil', async () => {
+  it('is drawn on a sticky layer one screen tall under the content, covering it once under the flat veil, and the root paints no photo itself', async () => {
     const all = await rules(VIEW)
-    const matching = all.filter((rule) => rule.selector.includes(backdropSelector('picture')))
-    expect(matching.map((rule) => rule.selector)).toEqual([backdropSelector('picture')])
-    const rule = matching[0]
-    expect(rule?.declarations['background-image']).toBe('var(--menu-backdrop-image)')
-    expect(rule?.declarations['background-size']).toBe('auto, cover')
-    expect(rule?.declarations['background-position']).toBe('center')
-    expect(rule?.declarations['background-repeat']).toBe('no-repeat')
-    expect(rule?.declarations['background']).toBeUndefined()
-    expect(rule?.declarations['background-color']).toBeUndefined()
-    expect(rule?.declarations['background-blend-mode']).toBeUndefined()
+    // The root keeps the page color; the only rule on the picture backdrop hands the variable to the layer.
+    expect(all.filter((rule) => rule.selector.includes(backdropSelector('picture'))).map((rule) => rule.selector)).toEqual([
+      `${backdropSelector('picture')} > .photo`,
+    ])
+    expect(all.find((rule) => rule.selector === `${backdropSelector('picture')} > .photo`)?.declarations).toEqual({
+      'background-image': 'var(--menu-backdrop-image)',
+    })
+    const layer = all.find((rule) => rule.selector === '.photo')?.declarations
+    expect(layer?.['position']).toBe('sticky')
+    expect(layer?.['top']).toBe('0')
+    expect(layer?.['z-index']).toBe('0')
+    // One screen tall (the frame's, or the viewport), pulled back up so the content starts over it; as wide as the frame allows.
+    expect(layer?.['height']).toBe('var(--frame-screen, 100vh)')
+    expect(layer?.['margin-bottom']).toBe('calc(-1 * var(--frame-screen, 100vh))')
+    expect(layer?.['margin-inline']).toBe('calc(-1 * var(--frame-bleed, 0px))')
+    expect(layer?.['background-size']).toBe('auto, cover')
+    expect(layer?.['background-position']).toBe('center')
+    expect(layer?.['background-repeat']).toBe('no-repeat')
+    expect(layer?.['pointer-events']).toBe('none')
+    expect(layer?.['background-image']).toBeUndefined()
+    expect(layer?.['background']).toBeUndefined()
+    expect(layer?.['background-color']).toBeUndefined()
+    expect(layer?.['background-blend-mode']).toBeUndefined()
+  })
+
+  it('sizes the photo for every fit and places it for every position, the veil always whole', async () => {
+    const all = await rules(VIEW)
+    const layerRule = (attribute: string, value: string) => all.find((rule) => rule.selector === `.root[${attribute}='${value}'] > .photo`)
+    const sizes: Record<(typeof PHOTO_FITS)[number], string | undefined> = { cover: undefined, contain: 'auto, contain', stretch: 'auto, 100% 100%' }
+    for (const fit of PHOTO_FITS) {
+      const rule = layerRule('data-menu-backdrop-fit', fit)
+      // Cover is what the layer does by itself; the others set only the size.
+      if (sizes[fit] === undefined) expect(rule, fit).toBeUndefined()
+      else expect(rule?.declarations, fit).toEqual({ 'background-size': sizes[fit] })
+    }
+    for (const position of PHOTO_POSITIONS) {
+      const rule = layerRule('data-menu-backdrop-position', position)
+      if (position === 'center') expect(rule, position).toBeUndefined()
+      else expect(rule?.declarations['background-position'], position).toContain(position)
+    }
   })
 
   it('keeps the page text pair at 4.5:1 on the photo worst grounds, for every style, mode and veil', () => {

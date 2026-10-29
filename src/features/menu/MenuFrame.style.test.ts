@@ -22,6 +22,13 @@ describe('the page around a menu', () => {
     expect(column).toMatch(/margin-inline:\s*auto/)
   })
 
+  it('lets the photo backdrop reach the edges of the screen, and clips it there without a scroll box that would unstick it', async () => {
+    const page = ruleBody(await readCss(FRAME), '.page')
+    expect(page).toMatch(/--frame-bleed:\s*calc\(50vw - 50%\)/)
+    expect(page).toMatch(/overflow:\s*clip/)
+    expect(page).not.toMatch(/overflow(-[xy])?:\s*(hidden|auto|scroll)/)
+  })
+
   it('holds no color of its own', async () => {
     for (const path of [FRAME, PAGE, PREVIEW]) {
       expect(await readCss(path), path).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i)

@@ -140,12 +140,54 @@
   background-repeat: no-repeat;
 }
 
-/* The owner's photo under its veil: the photo covers the page once; the flat veil gradient needs no size of its own. */
-.root[data-menu-backdrop='picture'] {
-  background-image: var(--menu-backdrop-image);
-  background-size: auto, cover;
+/* The owner's photo under its veil, on a layer of its own under the content: one screen tall, and it stays put while the menu
+   scrolls over it (sticky to the nearest box that scrolls: the page, or the preview frame), so the photo is drawn at the size of
+   the screen and never stretched over the whole length of the menu. The root keeps the page color under it. Two hints come
+   from the frame around the menu: --frame-screen, the height of the screen the menu is shown on (when none is given, 100vh:
+   phones count it with their toolbars hidden, so the photo still fills the screen when they slide away; not 100lvh, which an
+   older browser would refuse inside var() and leave the layer with no height at all), and --frame-bleed, how far the photo
+   may reach past the menu on each side (the page's gutters around the column; nothing inside a frame). The photo itself
+   arrives as --menu-backdrop-image: the flat veil, which needs no size, then the picture. The fit and the position below are
+   the theme's choices (data-menu-backdrop-fit, data-menu-backdrop-position). */
+.photo {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: var(--frame-screen, 100vh);
+  margin-bottom: calc(-1 * var(--frame-screen, 100vh));
+  margin-inline: calc(-1 * var(--frame-bleed, 0px));
   background-position: center;
   background-repeat: no-repeat;
+  background-size: auto, cover;
+  pointer-events: none;
+}
+
+.root[data-menu-backdrop='picture'] > .photo {
+  background-image: var(--menu-backdrop-image);
+}
+
+.root[data-menu-backdrop-fit='contain'] > .photo {
+  background-size: auto, contain;
+}
+
+.root[data-menu-backdrop-fit='stretch'] > .photo {
+  background-size: auto, 100% 100%;
+}
+
+.root[data-menu-backdrop-position='top'] > .photo {
+  background-position: center top;
+}
+
+.root[data-menu-backdrop-position='bottom'] > .photo {
+  background-position: center bottom;
+}
+
+.root[data-menu-backdrop-position='left'] > .photo {
+  background-position: left center;
+}
+
+.root[data-menu-backdrop-position='right'] > .photo {
+  background-position: right center;
 }
 
 /* Everything the owner can read sits above the line art. */

@@ -1,15 +1,20 @@
 /* The frame is the app's own chrome (app tokens); what it holds is the customer's menu (--menu-* only). */
 .frame {
+  /* The screen the menu is shown on is the inside of this frame, a phone's height less the border above and below: the
+     menu's photo backdrop reads it (MenuView.module.css), so the photo neither hides under the border nor scrolls past it. */
+  --frame-border: 8px;
+  --frame-height: min(640px, 80dvh);
+  --frame-screen: calc(var(--frame-height) - 2 * var(--frame-border));
   width: 100%;
   max-width: 360px;
-  max-height: min(640px, 80dvh);
+  height: var(--frame-height);
   margin-inline: auto;
   overflow-y: auto;
   overscroll-behavior: contain;
   /* A phone draws no scrollbar, so neither does its window; wheel, touch and the keyboard still scroll it. */
   scrollbar-width: none;
   background: var(--color-surface);
-  border: 8px solid var(--color-ink);
+  border: var(--frame-border) solid var(--color-ink);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
 }

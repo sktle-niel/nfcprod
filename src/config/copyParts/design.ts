@@ -226,6 +226,16 @@ export const designCopy = {
         hint: 'How strongly the photo shows through. The Colors panel warns you if your text color cannot take it.',
         options: { faint: 'Faint', soft: 'Soft', strong: 'Strong' },
       },
+      fit: {
+        legend: 'Photo fit',
+        hint: 'How the photo fills the screen. It stays put while the menu scrolls. On a screen wider than the photo can fill, the menu shows the texture of your style instead, so the photo never looks blurred or stretched.',
+        options: { cover: 'Fill the screen', contain: 'Fit inside', stretch: 'Stretch' },
+      },
+      position: {
+        legend: 'Photo position',
+        hint: 'Which part of the photo stays in view when the screen cuts it off.',
+        options: { center: 'Center', top: 'Top', bottom: 'Bottom', left: 'Left', right: 'Right' },
+      },
     },
     font: {
       legend: 'Font',

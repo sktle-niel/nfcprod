@@ -362,6 +362,35 @@ describe('MenuView with interactive off', () => {
   })
 })
 
+describe('MenuView and the page photo', () => {
+  const PICTURE = { ...DEFAULT_THEME, backdrop: 'picture' as const, backdropPicture: PNG_DATA_URL }
+
+  it('says how the photo is laid on its root, and falls back to the defaults for a value off the lists', () => {
+    const laid = { ...PICTURE, backdropFit: 'stretch' as const, backdropPosition: 'top' as const }
+    const { container, rerender } = render(<MenuView business={business({ theme: laid })} menu={menu()} />)
+    const root = () => container.querySelector('[data-menu-backdrop]')
+    expect(root()).toHaveAttribute('data-menu-backdrop-fit', 'stretch')
+    expect(root()).toHaveAttribute('data-menu-backdrop-position', 'top')
+    const crooked = { ...PICTURE, backdropFit: 'tile', backdropPosition: 'corner' } as unknown as typeof PICTURE
+    rerender(<MenuView business={business({ theme: crooked })} menu={menu()} />)
+    expect(root()).toHaveAttribute('data-menu-backdrop-fit', 'cover')
+    expect(root()).toHaveAttribute('data-menu-backdrop-position', 'center')
+  })
+
+  it('draws the photo on a layer of its own, first under the content and hidden from readers, only when there is a photo', () => {
+    const { container, rerender } = render(<MenuView business={business({ theme: PICTURE })} menu={menu()} />)
+    const root = () => container.querySelector<HTMLElement>('[data-menu-backdrop]')
+    const layer = root()?.firstElementChild
+    expect(layer?.getAttribute('aria-hidden')).toBe('true')
+    expect(layer?.textContent).toBe('')
+    expect(root()?.style.getPropertyValue('--menu-backdrop-image')).toContain(`url("${PNG_DATA_URL}")`)
+    rerender(<MenuView business={business({ theme: { ...PICTURE, backdropPicture: null } })} menu={menu()} />)
+    expect(root()?.firstElementChild?.getAttribute('aria-hidden')).toBeNull()
+    rerender(<MenuView business={business()} menu={menu()} />)
+    expect(root()?.firstElementChild?.getAttribute('aria-hidden')).toBeNull()
+  })
+})
+
 describe('MenuPreviewFrame', () => {
   it('holds the menu in a labelled region that scrolls', () => {
     render(<MenuPreviewFrame business={business()} menu={menu()} />)

@@ -86,6 +86,14 @@ export type BackdropKind = (typeof BACKDROPS)[number]
 export const VEILS = ['faint', 'soft', 'strong'] as const
 export type Veil = (typeof VEILS)[number]
 
+/** How the page photo fills the screen: covering it (cut off at the edges), whole inside it (page color around), or stretched to it. */
+export const PHOTO_FITS = ['cover', 'contain', 'stretch'] as const
+export type PhotoFit = (typeof PHOTO_FITS)[number]
+
+/** Which part of the page photo stays in view when the screen cuts it off. */
+export const PHOTO_POSITIONS = ['center', 'top', 'bottom', 'left', 'right'] as const
+export type PhotoPosition = (typeof PHOTO_POSITIONS)[number]
+
 /**
  * What makes one business menu look different from another. Plain values only: colors are `#rrggbb`, the rest come
  * from the lists above. It becomes CSS variables through a pure function (`toCssVars`), never raw CSS from text.
@@ -122,6 +130,13 @@ export type Theme = {
   backdropPicture: string | null
   /** How strongly the photo shows through the veil of the page color over it. */
   backdropVeil: Veil
+  /**
+   * How the photo fills the screen. It is drawn one screen tall and stays put while the menu scrolls; on a screen wider than
+   * the photo can fill, the menu shows the texture of its style instead (`usePhotoBackdrop` in src/shared/menu).
+   */
+  backdropFit: PhotoFit
+  /** Which part of the photo stays in view when the screen cuts it off. */
+  backdropPosition: PhotoPosition
   /** Show the first best seller big at the top. */
   spotlight: boolean
   font: Font
@@ -145,6 +160,8 @@ export const DEFAULT_THEME: Theme = {
   backdrop: 'plain',
   backdropPicture: null,
   backdropVeil: 'soft',
+  backdropFit: 'cover',
+  backdropPosition: 'center',
   spotlight: false,
   font: 'urbanist',
   buttonStyle: 'rounded',
