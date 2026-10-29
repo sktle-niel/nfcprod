@@ -342,6 +342,24 @@ describe('MenuView with interactive off', () => {
     render(<MenuView business={business(contact)} menu={menu()} />)
     expect(screen.getAllByRole('link')).toHaveLength(5)
   })
+
+  it('still scrolls the box around the preview to the category a tap lands on, and nothing else', async () => {
+    const { container } = render(
+      <div style={{ overflowY: 'auto' }}>
+        <MenuView business={business(contact)} menu={menu()} interactive={false} />
+      </div>,
+    )
+    const box = container.firstElementChild as HTMLElement
+    const scrolled: ScrollToOptions[] = []
+    box.scrollTo = (options?: ScrollToOptions | number) => {
+      if (typeof options === 'object') scrolled.push(options)
+    }
+    const row = screen.getAllByRole('list')[0]!
+    await userEvent.setup().click(within(row).getByText('Pastry'))
+    expect(scrolled).toHaveLength(1)
+    expect(scrolled[0]).toMatchObject({ top: 0 })
+    expect(document.activeElement).toBe(document.body)
+  })
 })
 
 describe('MenuPreviewFrame', () => {

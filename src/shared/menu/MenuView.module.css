@@ -206,6 +206,12 @@
   white-space: nowrap;
 }
 
+/* A category chip in the Design preview: not a link, but a tap still goes to the category, as it will on the phone. */
+.navTap {
+  cursor: pointer;
+  user-select: none;
+}
+
 .link {
   text-decoration: underline;
   text-underline-offset: 3px;
