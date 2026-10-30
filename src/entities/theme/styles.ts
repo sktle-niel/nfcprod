@@ -4,8 +4,8 @@ import { DEFAULT_THEME, type Mode, type StyleId, type Theme } from './theme'
 /** The colors a style has in one mode. `surface` null is the automatic card color. */
 type Palette = Pick<Theme, 'primary' | 'secondary' | 'background' | 'surface'>
 
-/** Everything a style sets besides colors and the mode: how the menu is drawn. */
-type Choices = Omit<Theme, keyof Palette | 'mode' | 'style' | 'backdropPicture' | 'backdropVeil'>
+/** Everything a style sets besides colors and the mode: how the menu is drawn. The page photo and how it is laid are the owner's. */
+type Choices = Omit<Theme, keyof Palette | 'mode' | 'style' | 'backdropPicture' | 'backdropVeil' | 'backdropFit' | 'backdropPosition'>
 
 export type StyleDef = {
   id: StyleId
@@ -304,6 +304,15 @@ export const STYLES: Record<StyleId, StyleDef> = {
 /** The whole theme of a style in a mode: its choices, its palette for that mode, and the style itself. */
 export function styleTheme(id: StyleId, mode: Mode): Theme {
   const style = STYLES[id]
-  // A ready-made style never carries an owner photo: the picture and its veil are the owner's own choices.
-  return { ...style.choices, ...style.palettes[mode], style: id, mode, backdropPicture: null, backdropVeil: 'soft' }
+  // A ready-made style never carries an owner photo: the picture, its veil and how it is laid are the owner's own choices.
+  return {
+    ...style.choices,
+    ...style.palettes[mode],
+    style: id,
+    mode,
+    backdropPicture: null,
+    backdropVeil: 'soft',
+    backdropFit: 'cover',
+    backdropPosition: 'center',
+  }
 }

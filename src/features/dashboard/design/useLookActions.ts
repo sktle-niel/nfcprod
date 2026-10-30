@@ -29,6 +29,15 @@ export function styleOf(theme: Theme): StyleId {
   return isOneOf(STYLE_IDS, theme.style) ? theme.style : 'classic'
 }
 
+/**
+ * `next` with the owner's page photo as it is in `from`: the picture, its strength, its fit and its position. The photo is an
+ * asset and its settings go with it, not a choice of a style, so they survive trying styles and going back to one.
+ */
+function withOwnerPhoto(next: Theme, from: Theme): Theme {
+  const { backdropPicture, backdropVeil, backdropFit, backdropPosition } = from
+  return { ...next, backdropPicture, backdropVeil, backdropFit, backdropPosition }
+}
+
 function samePalette(theme: Theme, palette: Palette): boolean {
   const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase()
   return (
@@ -93,14 +102,11 @@ export function useLookActions({ draft, business, busy, theme, setNote }: Contex
     },
     /** The whole look of a style, in the mode the draft is in. The owner's uploaded page photo is an asset, not a choice: it survives trying styles. */
     applyStyle: (id: StyleId) =>
-      replace(
-        { ...styleTheme(id, draft.theme.mode), backdropPicture: draft.theme.backdropPicture, backdropVeil: draft.theme.backdropVeil },
-        fill(words.styles.applied, { style: styleName(id) }),
-      ),
+      replace(withOwnerPhoto(styleTheme(id, draft.theme.mode), draft.theme), fill(words.styles.applied, { style: styleName(id) })),
     /** Back to the style the look started from, every choice and color — the uploaded page photo stays, like on applyStyle. */
     resetStyle: () => {
       const id = styleOf(draft.theme)
-      const next = { ...styleTheme(id, draft.theme.mode), backdropPicture: draft.theme.backdropPicture, backdropVeil: draft.theme.backdropVeil }
+      const next = withOwnerPhoto(styleTheme(id, draft.theme.mode), draft.theme)
       const style = styleName(id)
       replace(next, fill(savedOr(next, words.styles.resetStyleNote, words.styles.resetStyleNoteSame), { style }))
     },

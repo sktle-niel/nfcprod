@@ -77,6 +77,8 @@ describe('the styles', () => {
       surface: null,
       backdropPicture: null,
       backdropVeil: 'soft',
+      backdropFit: 'cover',
+      backdropPosition: 'center',
       style: 'classic',
       card: 'row',
       photo: 'rounded',

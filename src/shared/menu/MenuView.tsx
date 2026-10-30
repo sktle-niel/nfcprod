@@ -16,6 +16,7 @@ import { placeholderKind } from './photo/placeholders'
 import { spotlightOf, visibleSections } from './sections'
 import { Spotlight } from './Spotlight'
 import { SectionTitle } from './titles/SectionTitle'
+import { usePhotoBackdrop } from './usePhotoBackdrop'
 import styles from './MenuView.module.css'
 
 export type MenuViewBusiness = Pick<Business, 'name' | 'tagline' | 'logo' | 'phone' | 'address' | 'hours' | 'social' | 'theme'> & {
@@ -47,10 +48,11 @@ const columnsOf = (look: Look) => {
  */
 export function MenuView({ business, menu, headingLevel = 1, interactive = true }: Props) {
   const uid = useId()
-  const look = lookOf(business.theme)
   // The photo backdrop must be a picture this page may show (renderableTheme: checked address, trusted origin) before
-  // its address can reach toCssVars. Outside the storage it is no photo at all, and the page stays the page color.
-  const theme = renderableTheme(business.theme)
+  // its address can reach toCssVars. Outside the storage it is no photo at all, and the page stays the page color. And on
+  // a screen wider than the photo can fill, the menu paints the texture of its style instead (usePhotoBackdrop).
+  const { theme, layer, layerRef } = usePhotoBackdrop(renderableTheme(business.theme))
+  const look = lookOf(theme)
   useMenuFonts(business.theme)
   const sections = visibleSections(menu)
   const spotlight = look.spotlight ? spotlightOf(sections) : null
@@ -73,7 +75,11 @@ export function MenuView({ business, menu, headingLevel = 1, interactive = true 
         data-menu-header={look.header}
         data-menu-decor={look.decor}
         data-menu-backdrop={look.backdrop}
+        data-menu-backdrop-fit={look.backdropFit}
+        data-menu-backdrop-position={look.backdropPosition}
       >
+        {/* The photo under the page: one screen tall, it stays put while the menu scrolls over it (MenuView.module.css). */}
+        {layer && <div ref={layerRef} className={styles.photo} aria-hidden="true" />}
         <Decor />
         <div className={styles.content}>
           <MenuHeader business={business} as={headingLevel === 1 ? 'h1' : 'h2'} />

@@ -2,13 +2,12 @@ import type { CSSProperties } from 'react'
 import { dashboardCopy } from '@/config/dashboardCopy'
 import { NEW_BACKDROPS, type NewBackdropKind } from '@/entities/theme/backdrop'
 import { toCssVars } from '@/entities/theme/cssVars'
-import { BACKDROPS, BUTTON_STYLES, DECORS, DEFAULT_THEME, FONTS, LAYOUTS, VEILS, type BackdropKind, type Font } from '@/entities/theme/theme'
+import { BACKDROPS, BUTTON_STYLES, DECORS, DEFAULT_THEME, FONTS, LAYOUTS, type BackdropKind, type Font } from '@/entities/theme/theme'
 import { useMenuFonts } from '@/shared/menu/fonts'
-import { pictureSrc } from '@/shared/menu/picture'
-import { ImagePicker } from '@/shared/ui/ImagePicker'
 import { Panel } from '@/shared/ui/Panel'
 import { ChoiceRadios } from './ChoiceRadios'
 import { TextureGlyph } from './Glyph'
+import { PagePhotoFields } from './PagePhotoFields'
 import { TextureSwatch } from './TextureSwatch'
 import type { DesignForm } from './useDesignDraft'
 import choice from './ChoiceRadios.module.css'
@@ -58,31 +57,7 @@ export function ExtrasPanel({ form }: { form: DesignForm }) {
             sample: isDrawnBackdrop(backdrop) ? <TextureSwatch kind={backdrop} theme={theme} /> : <TextureGlyph kind={backdrop} />,
           }))}
         />
-        {theme.backdrop === 'picture' && (
-          <>
-            <ImagePicker
-              label={text.backdrop.picture.label}
-              value={pictureSrc(theme.backdropPicture)}
-              alt={text.backdrop.picture.alt}
-              chooseLabel={text.backdrop.picture.choose}
-              replaceLabel={text.backdrop.picture.replace}
-              removeLabel={text.backdrop.picture.remove}
-              emptyLabel={text.backdrop.picture.empty}
-              hint={text.backdrop.picture.hint}
-              busy={form.uploading || form.busy}
-              error={form.backdropPictureError}
-              onPick={(file) => void form.pickBackdropPicture(file)}
-              onRemove={form.removeBackdropPicture}
-            />
-            <ChoiceRadios
-              legend={text.backdrop.veil.legend}
-              hint={text.backdrop.veil.hint}
-              value={theme.backdropVeil}
-              onChange={(veil) => form.setChoice('backdropVeil', veil)}
-              options={VEILS.map((veil) => ({ value: veil, label: text.backdrop.veil.options[veil] }))}
-            />
-          </>
-        )}
+        {theme.backdrop === 'picture' && <PagePhotoFields form={form} />}
         <ChoiceRadios
           legend={text.font.legend}
           value={theme.font}

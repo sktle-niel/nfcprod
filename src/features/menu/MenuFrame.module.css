@@ -1,6 +1,12 @@
 /* The page around a menu. The colors are the menu's own variables, set inline on this element (toCssVars), never the app's tokens.
    A page that sits under a bar of its own (the owner's preview) sets --frame-min-height to 0 and lets this page fill the rest. */
 .page {
+  /* The menu's photo backdrop may reach past the column to the edges of the screen (MenuView.module.css reads this). */
+  --frame-bleed: calc(50vw - 50%);
+  /* That reach is 100vw, which counts a desktop scrollbar, and the photo is one screen tall even under a short menu: clip what
+     goes past the page, or it would add a sideways scroll. Clip, not hidden: hidden would make a scroll box and unstick the
+     photo and the category row. */
+  overflow: clip;
   display: flex;
   flex-direction: column;
   min-height: var(--frame-min-height, 100dvh);

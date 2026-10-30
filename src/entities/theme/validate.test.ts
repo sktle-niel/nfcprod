@@ -185,6 +185,18 @@ describe('the photo backdrop fields', () => {
     expect(validateTheme({ ...DEFAULT_THEME, backdropVeil: 'loud' }).ok).toBe(false)
   })
 
+  it('takes the fit and the position of the photo, defaults them for an older theme, and refuses an unknown one', () => {
+    const older = Object.fromEntries(Object.entries(DEFAULT_THEME).filter(([key]) => key !== 'backdropFit' && key !== 'backdropPosition'))
+    const good = validateTheme({ ...older, backdropFit: 'stretch', backdropPosition: 'top' })
+    expect(good.ok && good.value.backdropFit).toBe('stretch')
+    expect(good.ok && good.value.backdropPosition).toBe('top')
+    const old = validateTheme(older)
+    expect(old.ok && old.value.backdropFit).toBe('cover')
+    expect(old.ok && old.value.backdropPosition).toBe('center')
+    expect(validateTheme({ ...DEFAULT_THEME, backdropFit: 'tile' }).ok).toBe(false)
+    expect(validateTheme({ ...DEFAULT_THEME, backdropPosition: 'corner' }).ok).toBe(false)
+  })
+
   it('warns about the owner text color only when the veil lets the photo defeat it', () => {
     const base = { ...DEFAULT_THEME, primary: '#0b5fff', secondary: '#595959', background: '#f2f2f2' }
     expect(themeIssues(base)).toEqual([])
