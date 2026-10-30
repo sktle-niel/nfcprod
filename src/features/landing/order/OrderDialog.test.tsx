@@ -1,10 +1,12 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { copy } from '@/config/copy'
 import type { ReverseGeocoder } from '@/data/geocoder'
 import type { LocationRepository } from '@/data/locations'
 import { OrderError, type OrderRepository } from '@/data/orders'
 import type { ResolvedPlaces } from '@/data/resolveAddress'
+import type { OrderReceipt } from '@/entities/order/order'
 import { fakeGeocoder } from '@/test/geocoder'
 import { ALCANTARA, CEBU, CEBU_CITY, fakeLocations, ILOCOS_NORTE, LAHUG } from '@/test/locations'
 import { OrderDialog } from './OrderDialog'
@@ -278,6 +280,46 @@ describe('OrderDialog', () => {
     await user.click(screen.getByRole('button', { name: /place order/i }))
     expect(await screen.findByText(/could not reach the server/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /place order/i })).toBeEnabled()
+  })
+
+  it('holds the dialog open while the order is sending, then shows the reference', async () => {
+    let answer: (receipt: OrderReceipt) => void = () => {}
+    const pending = new Promise<OrderReceipt>((resolve) => {
+      answer = resolve
+    })
+    const repo: OrderRepository = { submit: vi.fn().mockReturnValue(pending) }
+    const { onClose, user } = setup(repo)
+    await user.click(screen.getByRole('checkbox', { name: /facebook/i }))
+    await fillDetails(user)
+    await user.click(screen.getByLabelText(/i agree/i))
+    await user.click(screen.getByRole('button', { name: /place order/i }))
+
+    // The dialog hears about the call one commit after the form (useModalBusy is an effect), so wait for it.
+    await waitFor(() => expect(screen.getByRole('button', { name: copy.order.close })).toBeDisabled())
+    expect(screen.getByRole('button', { name: copy.order.sending })).toBeDisabled()
+    // jsdom has no Escape key of its own. A browser sends a keydown, then a cancel event, and both must be held back here.
+    const dialog = screen.getByRole('dialog', { name: /get your nfc card/i })
+    expect(fireEvent.keyDown(dialog, { key: 'Escape' })).toBe(false)
+    expect(fireEvent(dialog, new Event('cancel', { cancelable: true }))).toBe(false)
+    expect(onClose).not.toHaveBeenCalled()
+
+    answer({ reference: 'NM-TEST1', demo: false })
+    expect(await screen.findByText(/NM-TEST1/)).toBeInTheDocument()
+  })
+
+  it('lets the customer close the dialog again when the order fails', async () => {
+    const repo: OrderRepository = { submit: vi.fn().mockRejectedValue(new OrderError('network')) }
+    const { onClose, user } = setup(repo)
+    await user.click(screen.getByRole('checkbox', { name: /facebook/i }))
+    await fillDetails(user)
+    await user.click(screen.getByLabelText(/i agree/i))
+    await user.click(screen.getByRole('button', { name: /place order/i }))
+
+    expect(await screen.findByText(/could not reach the server/i)).toBeInTheDocument()
+    // The same one-commit wait as above: the dialog hears that the call ended after the form did.
+    await waitFor(() => expect(screen.getByRole('button', { name: copy.order.close })).toBeEnabled())
+    await user.click(screen.getByRole('button', { name: copy.order.close }))
+    expect(onClose).toHaveBeenCalledTimes(1)
   })
 
   it('silently ignores a filled trap field', async () => {

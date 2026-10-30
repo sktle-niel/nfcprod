@@ -6,7 +6,7 @@ Last updated: 2026-10-30.
 
 ## 1. State
 
-- `main` holds everything up to PR #24. Nothing is waiting for review.
+- `main` holds everything up to PR #24. The queue in section 3 says what comes next.
 - Frontend only. Every repository is a mock: the demo data lives in the tab's memory and resets on reload. The one exception is the card order form, which posts to `VITE_ORDERS_ENDPOINT` when it is set.
 
 ## 2. Done lately (2026-10-22 to 2026-10-30)
@@ -22,8 +22,8 @@ Last updated: 2026-10-30.
 
 Queue, decided 2026-10-30. Each item is its own small pull request, in this order:
 
-1. Docs in step with the code (this change).
-2. Guards: the order dialog cannot be closed while it sends; Design asks before it is left with unsaved changes; `SessionProvider` handles a failed session read; the plan state updates when a trial or plan ends while the dashboard is open; a production build warns when `VITE_PUBLIC_ORIGIN` is empty.
+1. Docs in step with the code. Done, in review.
+2. Guards: the order dialog cannot be closed while it sends; Design asks before it is left with unsaved changes; `SessionProvider` handles a failed session read; the plan state updates when a trial or plan ends while the dashboard is open; a production build warns when `VITE_PUBLIC_ORIGIN` is empty. Done, in review.
 3. Repo hygiene: GitHub Actions CI that runs `npm run verify`, Dependabot, a Node pin (`.nvmrc` and `engines`), the empty `.gitkeep` files removed, `MenuFrame` moved to `shared/menu`, and a test for the layer rule of `ARCHITECTURE.md` section 3.1.
 4. The product and add-on dialogs ask before they drop typed work. `Modal` needs a way to hold back a dismissal (Escape, the backdrop, the corner button) while a form has changes.
 5. The product detail sheet and the add-on picker (the plan below). First ask the owner whether the sidebar-style category list with a filter, asked for on 2026-10-22 and never built, is still wanted.

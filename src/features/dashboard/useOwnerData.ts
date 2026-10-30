@@ -1,10 +1,11 @@
 import { useCallback, useMemo } from 'react'
 import { owner as defaultOwner } from '@/data/owner'
 import { ownerDemo, type OwnerRepository } from '@/data/ownerRepository'
-import { accessOf, isMenuLive } from '@/entities/account/subscription'
+import { accessOf, isMenuLive, nextAccessChange } from '@/entities/account/subscription'
 import type { Business } from '@/entities/business/business'
 import type { Menu } from '@/entities/menu/menu'
 import { useResource } from '@/shared/hooks/useResource'
+import { useTimeAt } from '@/shared/hooks/useTimeAt'
 import { useSession } from '@/shared/session/context'
 import type { DashboardData, OwnerActions } from './dashboardData'
 import { useAccount, type Repositories } from './useAccount'
@@ -83,6 +84,9 @@ export function useOwnerData({ owner: repository = defaultOwner, now = Date.now,
   const subscription = account.resource.status === 'ready' ? account.resource.value.subscription : null
   const access = subscription ? accessOf(subscription, time) : null
   const business = loaded?.business ?? null
+
+  // A trial or plan can end while the page stays open: render again at the next moment its state or its day count changes.
+  useTimeAt(subscription ? nextAccessChange(subscription, time) : null, now)
 
   return {
     loading: resource.status === 'loading',

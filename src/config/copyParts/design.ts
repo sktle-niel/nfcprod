@@ -287,4 +287,12 @@ export const designCopy = {
       error: 'We could not save your changes.',
     },
   },
+  /** The question asked before the owner leaves the page with changes that are not saved. */
+  leave: {
+    title: 'Leave without saving?',
+    body: 'You have changes that are not saved. If you leave now, they are lost.',
+    confirm: 'Leave and lose changes',
+    stay: 'Keep editing',
+    close: 'Close',
+  },
 } as const

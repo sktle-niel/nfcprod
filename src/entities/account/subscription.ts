@@ -55,6 +55,17 @@ export function isMenuLive(subscription: Subscription, now: number): boolean {
   return kind === 'trial' || kind === 'active'
 }
 
+/**
+ * The next moment (ms) at which what `accessOf` says changes: the day count of a trial dropping, the end of a trial, or the end
+ * of a paid period. Null when nothing more will change by itself (a trial or plan that already ended).
+ */
+export function nextAccessChange(subscription: Subscription, now: number): number | null {
+  const access = accessOf(subscription, now)
+  if (access.kind === 'trial') return access.endsAt - (access.daysLeft - 1) * DAY
+  if (access.kind === 'active') return access.renewsAt
+  return null
+}
+
 /** Where the free cards stand: sent, due (a plan was paid for, so they are next) or waiting for a first plan. */
 export type FreeCardsState = 'sent' | 'due' | 'waiting'
 
