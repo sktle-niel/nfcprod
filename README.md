@@ -15,10 +15,12 @@ Built for cafés, restaurants and other businesses with a menu. Each owner gets 
 
 ## Getting started
 
+Needs Node 22.12 or newer.
+
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm run verify     # typecheck, lint, tests, secret scan, npm audit
+npm run verify     # typecheck, lint, tests, secret scan, npm audit (about 7 to 16 minutes)
 npm run build
 ```
 
@@ -33,6 +35,7 @@ With the dev server running, `/__styles` shows every menu style on a sample menu
 | `PROJECT_FLOW.md` | Product idea, user flows, roadmap, decision log |
 | `ARCHITECTURE.md` | Layers, data model, security design, backup and recovery |
 | `MARKETING.md` | Go-to-market plan, offer ladder, sales process |
+| `NEXT_STEPS.md` | Where the work stands: what comes next, what is not started, known issues, setting up a machine |
 | `CLAUDE.md` | Working rules for AI-assisted development (tokens, models, security, git) |
 
 ## Structure

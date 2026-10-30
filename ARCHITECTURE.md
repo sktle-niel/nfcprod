@@ -374,7 +374,7 @@ What an owner types becomes public on the menu, so it is checked before it is ke
 ## 9. Maintainability
 
 - TypeScript strict, types written once in `entities` with their validators next to them.
-- Typecheck, oxlint, tests, secret scan and `npm audit` in one `npm run verify`. No formatter yet.
+- Typecheck, oxlint, tests, secret scan and `npm audit` in one `npm run verify`. No formatter yet. The git hooks run it before every commit and every push. The tests run in two workers with a 30 s timeout (`vite.config.ts`), and the dashboard page harness (`src/test/dashboard.tsx`) waits up to 5 s for the data, so a machine with little free memory stays steady; the run still takes about 7 to 16 minutes.
 - Tests: pure logic unit tests (theme, presets merge, money, slug, validation), component tests for the menu, a few end-to-end flows (tap link, view menu, pick add-on). Security tests: cross-tenant access, rate limit, input rejection.
 - Conventional commits, small PRs, changelog for releases.
 - Docs updated with the change (`ARCHITECTURE.md`, decision log).
