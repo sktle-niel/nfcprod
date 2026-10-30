@@ -1,6 +1,6 @@
 # CLAUDE.md — Working Rules
 
-Auto-loaded every session. Read `ARCHITECTURE.md` before any design or code decision. Read `PROJECT_FLOW.md` for product flow and roadmap.
+Auto-loaded every session. Read `ARCHITECTURE.md` before any design or code decision. Read `PROJECT_FLOW.md` for product flow and roadmap. Read `NEXT_STEPS.md` for where the work stands and what comes next; update it when a step is done.
 
 ## 1. Save tokens (caveman mode)
 
