@@ -5,6 +5,7 @@ import { validateBusinessPatch, validateNewBusiness } from '@/entities/business/
 import { IMAGE_MAX_BYTES, type CategoryInput, type Menu, type Product, type ProductInput, type ProductTag } from '@/entities/menu/menu'
 import { validateCategoryInput, validateGroupInput } from '@/entities/menu/validate'
 import { validateProductInput } from '@/entities/menu/validateProduct'
+import { STOCK_PHOTOS } from '@/entities/theme/stockPhotos'
 import { mergePresets, PRESETS } from '@/presets'
 import { TEST_PASSWORD, testOwner } from '@/test/auth'
 import { sampleBusiness, sampleImageFile, sampleMenu } from '@/test/ownerFixtures'
@@ -384,6 +385,17 @@ describe('the business', () => {
     const theme = { ...business.theme, backdrop: 'picture' as const, backdropPicture: 'https://tracker.example.com/bg.jpg' }
     expect(await refusal(owner.saveBusiness({ theme }))).toEqual({ code: 'invalid', fields: { theme: 'invalid' } })
     expect(await owner.getBusiness()).toEqual(business)
+  })
+
+  it('keeps a library photo as it is, with no storage rule to meet, and saves an id the library does not have as no photo', async () => {
+    const { owner } = await withCoffee()
+    const business = await owner.getBusiness()
+    if (business === null) throw new Error('the seeded business exists')
+    const theme = { ...business.theme, backdrop: 'stock' as const, backdropStock: STOCK_PHOTOS[0].id }
+    expect((await owner.saveBusiness({ theme })).theme).toEqual(theme)
+    expect((await owner.getBusiness())?.theme).toEqual(theme)
+    const forged = { ...theme, backdropStock: 'https://tracker.example.com/bg.jpg' as unknown as typeof theme.backdropStock }
+    expect((await owner.saveBusiness({ theme: forged })).theme).toEqual({ ...theme, backdropStock: null })
   })
 
   it('puts the menu on its link and takes it off', async () => {

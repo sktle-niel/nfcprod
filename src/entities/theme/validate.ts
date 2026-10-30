@@ -1,8 +1,9 @@
 import { checkBoolean, checkOneOf, combine, fail, isMissing, isOneOf, pass, readField, safely, type Check } from '@/shared/lib/checks'
 import type { Validated } from '@/shared/lib/validation'
 import { checkImageAddress } from '@/entities/menu/image'
-import { photoGrounds } from './backdrop'
+import { hasPagePhoto, photoGrounds } from './backdrop'
 import { contrastRatio, isHexColor, normalizeHex } from './color'
+import { STOCK_IDS, type StockId } from './stockPhotos'
 import {
   BACKDROPS,
   BUTTON_STYLES,
@@ -39,10 +40,19 @@ function orDefault<T>(value: unknown, fallback: T, check: (value: unknown) => Ch
 }
 
 /**
+ * A library photo: its id when the table has it, else none. An id the table has lost (a photo taken out of the library
+ * later) must not make a saved theme unreadable, so it reads as no photo instead of being refused.
+ */
+function checkStock(value: unknown): Check<StockId | null> {
+  return pass(isOneOf(STOCK_IDS, value) ? value : null)
+}
+
+/**
  * A clean theme from outside input: the colors `#rrggbb` (stored lowercase), the rest from their lists. A missing key
  * is 'required' for the three colors, the font, the corners, the layout and the mode, and the default for the choices
  * added later (the style and what it sets, and the card color), so a theme saved before them still reads. Anything else
- * wrong is 'invalid'. Keys a theme does not have are dropped.
+ * wrong is 'invalid', except a library photo id the table does not know, which reads as no photo. Keys a theme does not
+ * have are dropped.
  */
 export function validateTheme(input: unknown): Validated<Theme, keyof Theme> {
   return safely<Theme, keyof Theme>('primary', () =>
@@ -59,6 +69,7 @@ export function validateTheme(input: unknown): Validated<Theme, keyof Theme> {
       decor: orDefault(readField(input, 'decor'), DEFAULT_THEME.decor, (value) => checkOneOf(DECORS, value)),
       backdrop: orDefault(readField(input, 'backdrop'), DEFAULT_THEME.backdrop, (value) => checkOneOf(BACKDROPS, value)),
       backdropPicture: orDefault(readField(input, 'backdropPicture'), DEFAULT_THEME.backdropPicture, checkImageAddress),
+      backdropStock: checkStock(readField(input, 'backdropStock')),
       backdropVeil: orDefault(readField(input, 'backdropVeil'), DEFAULT_THEME.backdropVeil, (value) => checkOneOf(VEILS, value)),
       backdropFit: orDefault(readField(input, 'backdropFit'), DEFAULT_THEME.backdropFit, (value) => checkOneOf(PHOTO_FITS, value)),
       backdropPosition: orDefault(readField(input, 'backdropPosition'), DEFAULT_THEME.backdropPosition, (value) =>
@@ -84,9 +95,10 @@ export type ThemeIssue = (typeof THEME_ISSUES)[number]
 export function themeIssues(theme: Theme): ThemeIssue[] {
   const issues: ThemeIssue[] = []
   if (contrastRatio(theme.secondary, theme.background) < TEXT_CONTRAST_MIN) issues.push('textContrast')
-  else if (theme.backdrop === 'picture' && theme.backdropPicture !== null) {
-    // The photo's worst grounds, the same ones toCssVars constrains its own tokens against (photoGrounds). The engine
-    // re-derives muted text for them; the owner's text color can only be warned about, like on the page.
+  else if (hasPagePhoto(theme)) {
+    // The photo's worst grounds (the owner's picture or a library photo alike), the same ones toCssVars constrains its own
+    // tokens against (photoGrounds). The engine re-derives muted text for them; the owner's text color can only be warned
+    // about, like on the page.
     const veil = isOneOf(VEILS, theme.backdropVeil) ? theme.backdropVeil : DEFAULT_THEME.backdropVeil
     if (photoGrounds(theme.background, veil).some((ground) => contrastRatio(theme.secondary, ground) < TEXT_CONTRAST_MIN)) issues.push('textContrast')
   }

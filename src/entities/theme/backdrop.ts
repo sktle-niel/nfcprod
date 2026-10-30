@@ -1,5 +1,6 @@
 import { isHexColor, mixHex, normalizeHex } from './color'
-import { DEFAULT_THEME, type BackdropKind, type Veil } from './theme'
+import { stockPhoto } from './stock'
+import { DEFAULT_THEME, type BackdropKind, type Theme, type Veil } from './theme'
 
 /*
  * The drawn page textures: every backdrop beyond the classic five is an image our own code draws from the owner's palette
@@ -348,9 +349,21 @@ export function photoGrounds(background: string, veil: Veil): [string, string] {
 }
 
 /**
- * The CSS image of a photo backdrop: the owner's picture under a flat veil of the page color at 1 - share, so no pixel
- * ever shows through by more than the declared share. `src` must already be a checked, CSS-safe address (toCssVars does
- * both checks); the page color is re-checked here like the palette above.
+ * Whether a theme asks for a photo under its veil: the owner's picture while the backdrop is 'picture' and one is set, or a
+ * library photo while it is 'stock' and the table knows its id. The editor's warning (themeIssues) and its fix (contrastFix)
+ * both ask this, so they agree with each other about when the photo's worst grounds apply.
+ */
+export function hasPagePhoto(theme: Theme): boolean {
+  if (theme.backdrop === 'picture') return theme.backdropPicture !== null
+  if (theme.backdrop === 'stock') return stockPhoto(theme.backdropStock) !== null
+  return false
+}
+
+/**
+ * The CSS image of a photo backdrop: the owner's picture or a library photo under a flat veil of the page color at 1 - share,
+ * so no pixel ever shows through by more than the declared share. `src` must already be a CSS-safe address: toCssVars checks
+ * the owner's picture and takes a library photo's from its table entry (`stockSrc`). The page color is re-checked here like
+ * the palette above.
  */
 export function pictureBackdropImage(src: string, background: string, veil: Veil): string {
   const page = colorOr(background, DEFAULT_THEME.background)

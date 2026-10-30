@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { sampleBusiness } from '@/test/ownerFixtures'
+import { STOCK_PHOTOS } from '@/entities/theme/stockPhotos'
 import { DEFAULT_THEME, type Theme } from '@/entities/theme/theme'
 import { CHOICE_KEYS, draftOf, previewOf, sameDraft, sameSocial, sameSurface, sameTheme } from './draft'
 
@@ -59,6 +60,7 @@ describe('sameDraft', () => {
     ['the header', { header: 'awning' }],
     ['the decoration', { decor: 'leaves' }],
     ['the page texture', { backdrop: 'dots' }],
+    ['the library photo', { backdropStock: STOCK_PHOTOS[0].id }],
     ['the best seller spotlight', { spotlight: true }],
   ])('sees a change in %s', (_name, patch) => {
     expect(sameTheme(DEFAULT_THEME, { ...DEFAULT_THEME, ...patch })).toBe(false)

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { backdropLayers, BACKDROP_TILES, NEW_BACKDROPS, photoGrounds, PICTURE_SHARES, pictureBackdropImage } from './backdrop'
+import { backdropLayers, BACKDROP_TILES, hasPagePhoto, NEW_BACKDROPS, photoGrounds, PICTURE_SHARES, pictureBackdropImage } from './backdrop'
+import { STOCK_PHOTOS } from './stockPhotos'
 import { BACKDROPS, DEFAULT_THEME } from './theme'
 
 const PALETTE = { background: '#f8f3ec', text: '#2b1d14', accent: '#8b5a2b' }
@@ -17,9 +18,9 @@ function svgOf(image: string): string {
 }
 
 describe('backdropLayers', () => {
-  it('lists the drawn kinds between the classic five and the photo, each with a tile entry', () => {
-    expect(BACKDROPS.slice(5, -1)).toEqual([...NEW_BACKDROPS])
-    expect(BACKDROPS.at(-1)).toBe('picture')
+  it('lists the drawn kinds between the classic five and the two photos, each with a tile entry', () => {
+    expect(BACKDROPS.slice(5, -2)).toEqual([...NEW_BACKDROPS])
+    expect(BACKDROPS.slice(-2)).toEqual(['picture', 'stock'])
     expect(Object.keys(BACKDROP_TILES).sort()).toEqual([...NEW_BACKDROPS].sort())
   })
 
@@ -138,6 +139,26 @@ describe('backdropLayers', () => {
       topo: { inkShare: 0.09, accentShare: 0 },
       bloom: { inkShare: 0, accentShare: 0.16 },
     })
+  })
+})
+
+describe('hasPagePhoto', () => {
+  const PHOTO = 'data:image/png;base64,AAAA'
+  const id = STOCK_PHOTOS[0].id
+
+  it('is true for the owner picture and for a library photo the table knows', () => {
+    expect(hasPagePhoto({ ...DEFAULT_THEME, backdrop: 'picture', backdropPicture: PHOTO })).toBe(true)
+    expect(hasPagePhoto({ ...DEFAULT_THEME, backdrop: 'stock', backdropStock: id })).toBe(true)
+  })
+
+  it('is false when no photo would be drawn: none chosen, an id the table does not have, or another backdrop', () => {
+    expect(hasPagePhoto({ ...DEFAULT_THEME, backdrop: 'picture', backdropPicture: null })).toBe(false)
+    expect(hasPagePhoto({ ...DEFAULT_THEME, backdrop: 'stock', backdropStock: null })).toBe(false)
+    expect(hasPagePhoto({ ...DEFAULT_THEME, backdrop: 'stock', backdropStock: '../x' as unknown as typeof id })).toBe(false)
+    // A photo kept under another backdrop waits and draws nothing, and the two kinds never stand in for each other.
+    expect(hasPagePhoto({ ...DEFAULT_THEME, backdrop: 'grain', backdropPicture: PHOTO, backdropStock: id })).toBe(false)
+    expect(hasPagePhoto({ ...DEFAULT_THEME, backdrop: 'picture', backdropPicture: null, backdropStock: id })).toBe(false)
+    expect(hasPagePhoto({ ...DEFAULT_THEME, backdrop: 'stock', backdropPicture: PHOTO, backdropStock: null })).toBe(false)
   })
 })
 

@@ -36,6 +36,7 @@ With the dev server running, `/__styles` shows every menu style on a sample menu
 | `ARCHITECTURE.md` | Layers, data model, security design, backup and recovery |
 | `MARKETING.md` | Go-to-market plan, offer ladder, sales process |
 | `NEXT_STEPS.md` | Where the work stands: what comes next, what is not started, known issues, setting up a machine |
+| `CREDITS.md` | Who took the photos of the photo library |
 | `CLAUDE.md` | Working rules for AI-assisted development (tokens, models, security, git) |
 
 ## Structure

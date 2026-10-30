@@ -76,6 +76,7 @@ describe('the styles', () => {
       background: '#ffffff',
       surface: null,
       backdropPicture: null,
+      backdropStock: null,
       backdropVeil: 'soft',
       backdropFit: 'cover',
       backdropPosition: 'center',

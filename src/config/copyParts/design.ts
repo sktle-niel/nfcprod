@@ -211,6 +211,7 @@ export const designCopy = {
         topo: 'Contours',
         bloom: 'Bloom',
         picture: 'Your photo',
+        stock: 'Photo library',
       },
       picture: {
         label: 'Page photo',
@@ -220,6 +221,24 @@ export const designCopy = {
         remove: 'Remove the photo',
         empty: 'No photo yet',
         hint: 'JPEG, PNG or WebP, up to 4 MB. It sits under a veil of your page color, so the menu stays easy to read.',
+      },
+      stock: {
+        legend: 'Page photo',
+        hint: 'Choose a photo for the background of your menu. It sits under a veil of your page color, so the menu stays easy to read.',
+        categoryLabel: 'Kind of business',
+        categoryPlaceholder: 'Choose a kind of business',
+        categories: {
+          coffee: 'Coffee shop',
+          milktea: 'Milk tea and drinks',
+          casual: 'Casual dining',
+          fine: 'Fine dining',
+          bakery: 'Bakery and desserts',
+          bar: 'Bar',
+        },
+        photosLabel: 'Photos to choose from',
+        none: 'No photo chosen yet.',
+        chosen: 'Photo by {credit} on Pexels.',
+        remove: 'Remove the photo',
       },
       veil: {
         legend: 'Photo strength',

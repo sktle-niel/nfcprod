@@ -3,6 +3,7 @@ import { PRESETS } from '@/presets'
 import { PICTURE_SHARES } from './backdrop'
 import { contrastRatio, isDarkColor, mixHex } from './color'
 import { fillOf, toCssVars } from './cssVars'
+import { STOCK_PHOTOS } from './stockPhotos'
 import { BUTTON_STYLES, DEFAULT_THEME, FONTS, LAYOUTS, modeDefaults, MODES, VEILS, withMode, type Theme, type Veil } from './theme'
 import { validateTheme } from './validate'
 
@@ -344,5 +345,79 @@ describe('the photo backdrop variable', () => {
   it('shows no photo while the backdrop is not the picture, even with an address saved', () => {
     const vars = toCssVars({ ...DEFAULT_THEME, backdrop: 'plain', backdropPicture: PHOTO })
     expect(vars['--menu-backdrop-image']).toBeUndefined()
+  })
+})
+
+describe('the library photo backdrop variable', () => {
+  const PHOTO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+  const photo = STOCK_PHOTOS[0]
+  const library = (patch: Partial<Theme> = {}): Theme => ({ ...DEFAULT_THEME, backdrop: 'stock', backdropStock: photo.id, ...patch })
+  const image = (veil: Veil) => toCssVars(library({ backdropVeil: veil }))['--menu-backdrop-image']
+  const withoutImage = (vars: Record<string, string>) => Object.fromEntries(Object.entries(vars).filter(([key]) => key !== '--menu-backdrop-image'))
+
+  it('lays the veil of the page color, at one minus the share of each strength, over the path of the table entry', () => {
+    expect(image('faint')).toBe(`linear-gradient(#ffffffe6, #ffffffe6), url("/stock/${photo.file}.jpg")`)
+    expect(image('soft')).toBe(`linear-gradient(#ffffffd6, #ffffffd6), url("/stock/${photo.file}.jpg")`)
+    expect(image('strong')).toBe(`linear-gradient(#ffffffc4, #ffffffc4), url("/stock/${photo.file}.jpg")`)
+  })
+
+  it('keeps muted text at 4.5:1 on the photo worst grounds in both default modes', () => {
+    for (const mode of MODES) {
+      for (const veil of VEILS) {
+        const vars = toCssVars(library({ ...modeDefaults(mode), mode, backdropVeil: veil }))
+        for (const pole of ['#000000', '#ffffff']) {
+          const ground = mixHex(vars['--menu-bg'] ?? '', pole, PICTURE_SHARES[veil]) ?? ''
+          expect(contrastRatio(vars['--menu-muted'] ?? '', ground), `${mode} ${veil} ${pole}`).toBeGreaterThanOrEqual(4.5)
+        }
+      }
+    }
+  })
+
+  it('moves the muted text for the photo grounds exactly as the owner photo does', () => {
+    const secondary = '#4a4a4a'
+    const plain = toCssVars({ ...DEFAULT_THEME, secondary })['--menu-muted']
+    for (const veil of VEILS) {
+      const owned = toCssVars({ ...DEFAULT_THEME, secondary, backdrop: 'picture', backdropPicture: PHOTO, backdropVeil: veil })['--menu-muted']
+      const fromLibrary = toCssVars(library({ secondary, backdropVeil: veil }))['--menu-muted']
+      expect(fromLibrary, veil).toBe(owned)
+      // The photo does move it away from what a plain page gets, or this would prove nothing.
+      expect(fromLibrary, veil).not.toBe(plain)
+    }
+  })
+
+  it('builds the path of every photo from the table and nothing else', () => {
+    for (const entry of STOCK_PHOTOS) {
+      expect(toCssVars(library({ backdropStock: entry.id }))['--menu-backdrop-image'], entry.id).toBe(
+        `linear-gradient(#ffffffd6, #ffffffd6), url("/stock/${entry.file}.jpg")`,
+      )
+    }
+  })
+
+  it("pins the variable to 'none' for an id the table does not have, so a nested root can never inherit a photo", () => {
+    const hostile: unknown[] = [
+      null,
+      '',
+      42,
+      '../../etc/passwd',
+      `${photo.id}/../x`,
+      'https://evil.example/pixel.jpg',
+      'x"), url(//evil.example/x.jpg',
+      '__proto__',
+      'constructor',
+    ]
+    for (const backdropStock of hostile) {
+      const vars = toCssVars(library({ backdropStock: backdropStock as Theme['backdropStock'] }))
+      expect(vars['--menu-backdrop-image'], String(backdropStock)).toBe('none')
+      // With no photo the grounds are the page itself: every other variable is what a plain page gets.
+      expect(withoutImage(vars), String(backdropStock)).toEqual(withoutImage(toCssVars(DEFAULT_THEME)))
+    }
+  })
+
+  it('shows no library photo while the backdrop is not the library, and keeps the two photo backdrops apart', () => {
+    expect(toCssVars(library({ backdrop: 'plain' }))['--menu-backdrop-image']).toBeUndefined()
+    expect(toCssVars(library({ backdrop: 'grain' }))['--menu-backdrop-image']).toBe(toCssVars({ ...DEFAULT_THEME, backdrop: 'grain' })['--menu-backdrop-image'])
+    // The owner picture backdrop ignores a library id, and the library backdrop ignores an owner picture.
+    expect(toCssVars(library({ backdrop: 'picture' }))['--menu-backdrop-image']).toBe('none')
+    expect(toCssVars(library({ backdropPicture: PHOTO }))['--menu-backdrop-image']).toBe(image('soft'))
   })
 })

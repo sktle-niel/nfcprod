@@ -23,6 +23,7 @@ export const CHOICE_KEYS = [
   'decor',
   'backdrop',
   'backdropPicture',
+  'backdropStock',
   'backdropVeil',
   'backdropFit',
   'backdropPosition',

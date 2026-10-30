@@ -1,5 +1,6 @@
 import { useState, type ComponentType } from 'react'
 import { dashboardCopy } from '@/config/dashboardCopy'
+import type { BusinessType } from '@/entities/business/business'
 import type { Menu } from '@/entities/menu/menu'
 import type { MenuViewBusiness } from '@/shared/menu/MenuView'
 import { SegmentedControl } from '@/shared/ui/SegmentedControl'
@@ -15,7 +16,10 @@ import styles from './Form.module.css'
 
 const text = dashboardCopy.design.look
 
-const PANELS: Record<LookPart, ComponentType<{ form: DesignForm }>> = {
+/** What a part gets: the form, and the kinds of business. Only the part that suits its choices to them (the photo library) reads those. */
+type PartProps = { form: DesignForm; types?: readonly BusinessType[] | undefined }
+
+const PANELS: Record<LookPart, ComponentType<PartProps>> = {
   colors: ColorsPanel,
   cards: CardsPanel,
   headings: HeadingsPanel,
@@ -56,7 +60,7 @@ export function LookTab({ form, preview, menu, firstPart = 'colors' }: Props) {
         onChange={setSection}
         options={LOOK_PARTS.map((value) => ({ value, label: text.sections.options[value] }))}
       />
-      <Part form={form} />
+      <Part form={form} types={preview.types} />
     </div>
   )
 }

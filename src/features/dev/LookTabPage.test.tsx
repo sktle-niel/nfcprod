@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import { dashboardCopy } from '@/config/dashboardCopy'
 import { STYLE_IDS } from '@/entities/theme/theme'
@@ -30,5 +31,11 @@ describe('LookTabPage', () => {
   it('starts from Classic when the address names a style it does not know', () => {
     open('?style=neon')
     expect(screen.getByRole('radio', { name: new RegExp(`^${styleName('classic')}`) })).toBeChecked()
+  })
+
+  it('draws the photo library picker in the Extras part with no sign-in: the page gives it the kinds of business', async () => {
+    open('?part=extras')
+    await userEvent.setup().click(screen.getByRole('radio', { name: 'Photo library' }))
+    expect(screen.getByRole('combobox', { name: 'Kind of business' })).toHaveValue('coffee')
   })
 })

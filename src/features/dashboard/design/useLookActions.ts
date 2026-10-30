@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { dashboardCopy } from '@/config/dashboardCopy'
 import type { Business } from '@/entities/business/business'
 import { isDarkColor } from '@/entities/theme/color'
+import type { StockId } from '@/entities/theme/stockPhotos'
 import { STYLES, styleTheme } from '@/entities/theme/styles'
 import { MODES, STYLE_IDS, withMode, type Mode, type ModeColors, type StyleId, type Theme } from '@/entities/theme/theme'
 import { mergePresets } from '@/presets'
@@ -30,12 +31,13 @@ export function styleOf(theme: Theme): StyleId {
 }
 
 /**
- * `next` with the owner's page photo as it is in `from`: the picture, its strength, its fit and its position. The photo is an
- * asset and its settings go with it, not a choice of a style, so they survive trying styles and going back to one.
+ * `next` with the owner's page photo as it is in `from`: the picture, the library photo, their strength, their fit and their
+ * position. The photo is an asset and its settings go with it, not a choice of a style, so they survive trying styles and
+ * going back to one.
  */
 function withOwnerPhoto(next: Theme, from: Theme): Theme {
-  const { backdropPicture, backdropVeil, backdropFit, backdropPosition } = from
-  return { ...next, backdropPicture, backdropVeil, backdropFit, backdropPosition }
+  const { backdropPicture, backdropStock, backdropVeil, backdropFit, backdropPosition } = from
+  return { ...next, backdropPicture, backdropStock, backdropVeil, backdropFit, backdropPosition }
 }
 
 function samePalette(theme: Theme, palette: Palette): boolean {
@@ -92,6 +94,11 @@ export function useLookActions({ draft, business, busy, theme, setNote }: Contex
     /** A card color, or null for the automatic one. */
     setSurface: (surface: string | null) => theme((current) => ({ ...current, surface }), ['surface']),
     setChoice: <Key extends ChoiceKey>(key: Key, value: Theme[Key]) => theme((current) => ({ ...current, [key]: value })),
+    /** A photo of the library as the page background, in one update; its strength, fit and position stay as they are. */
+    chooseStock: (id: StockId) => theme((current) => ({ ...current, backdrop: 'stock', backdropStock: id })),
+    /** Takes the library photo off the page: no photo, and the page goes back to the texture of the style the look started from. */
+    clearStock: () =>
+      theme((current) => ({ ...current, backdrop: styleTheme(styleOf(current), current.mode).backdrop, backdropStock: null })),
     /** Light or dark: the pair of colors being left is kept, so the next tap brings the owner's own colors back. */
     setMode: (mode: Mode) => {
       const { background, secondary } = draft.theme
@@ -100,10 +107,13 @@ export function useLookActions({ draft, business, busy, theme, setNote }: Contex
       const pair = remembered.current[mode]
       theme((current) => switchedTheme(current, mode, pair), LOOK_COLORS)
     },
-    /** The whole look of a style, in the mode the draft is in. The owner's uploaded page photo is an asset, not a choice: it survives trying styles. */
+    /**
+     * The whole look of a style, in the mode the draft is in. The page photo (uploaded, or from the library) is an asset, not
+     * a choice: it survives trying styles.
+     */
     applyStyle: (id: StyleId) =>
       replace(withOwnerPhoto(styleTheme(id, draft.theme.mode), draft.theme), fill(words.styles.applied, { style: styleName(id) })),
-    /** Back to the style the look started from, every choice and color — the uploaded page photo stays, like on applyStyle. */
+    /** Back to the style the look started from, every choice and color — the page photo stays, like on applyStyle. */
     resetStyle: () => {
       const id = styleOf(draft.theme)
       const next = withOwnerPhoto(styleTheme(id, draft.theme.mode), draft.theme)

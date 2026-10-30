@@ -1,5 +1,6 @@
-import type { CSSProperties } from 'react'
+import { useRef, type CSSProperties } from 'react'
 import { dashboardCopy } from '@/config/dashboardCopy'
+import type { BusinessType } from '@/entities/business/business'
 import { NEW_BACKDROPS, type NewBackdropKind } from '@/entities/theme/backdrop'
 import { toCssVars } from '@/entities/theme/cssVars'
 import { BACKDROPS, BUTTON_STYLES, DECORS, DEFAULT_THEME, FONTS, LAYOUTS, type BackdropKind, type Font } from '@/entities/theme/theme'
@@ -8,6 +9,7 @@ import { Panel } from '@/shared/ui/Panel'
 import { ChoiceRadios } from './ChoiceRadios'
 import { TextureGlyph } from './Glyph'
 import { PagePhotoFields } from './PagePhotoFields'
+import { StockPhotoFields } from './StockPhotoFields'
 import { TextureSwatch } from './TextureSwatch'
 import type { DesignForm } from './useDesignDraft'
 import choice from './ChoiceRadios.module.css'
@@ -31,13 +33,23 @@ function FontSample({ font }: { font: Font }) {
   return <span style={fontStyle(font)}>{text.font.sample}</span>
 }
 
+type Props = {
+  form: DesignForm
+  /** The kinds of business, for the photo library to open on the photos that suit them. */
+  types?: readonly BusinessType[] | undefined
+}
+
 /** The finishing touches: line art, page texture, font, corners and layout. */
-export function ExtrasPanel({ form }: { form: DesignForm }) {
+export function ExtrasPanel({ form, types }: Props) {
   const { theme } = form.draft
+  const stack = useRef<HTMLDivElement>(null)
+
+  // Removing the library photo takes its picker off the page, and the focus with it: it goes back to the choice that opened it.
+  const focusLibraryChoice = () => stack.current?.querySelector<HTMLInputElement>('input[type="radio"][value="stock"]')?.focus()
 
   return (
     <Panel title={text.extrasTitle}>
-      <div className={styles.stack}>
+      <div ref={stack} className={styles.stack}>
         <ChoiceRadios
           legend={text.decor.legend}
           hint={text.decor.hint}
@@ -58,6 +70,7 @@ export function ExtrasPanel({ form }: { form: DesignForm }) {
           }))}
         />
         {theme.backdrop === 'picture' && <PagePhotoFields form={form} />}
+        {theme.backdrop === 'stock' && <StockPhotoFields form={form} types={types} onRemoved={focusLibraryChoice} />}
         <ChoiceRadios
           legend={text.font.legend}
           value={theme.font}

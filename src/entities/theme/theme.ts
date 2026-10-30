@@ -1,4 +1,5 @@
 import { isDarkColor } from './color'
+import type { StockId } from './stockPhotos'
 
 /** Font pairings the app ships, by name (display, body and script together). No other font name ever reaches a style. */
 export const FONTS = ['urbanist', 'instrumentSerif', 'system', 'playfair', 'dmSerif', 'anton', 'fredoka', 'pacifico'] as const
@@ -57,7 +58,8 @@ export type DecorKind = (typeof DECORS)[number]
 /**
  * The texture of the page, in picker order. The first five are drawn by the menu's CSS; the rest are textures drawn from
  * the palette by `backdropLayers` (backdrop.ts) and reach CSS as one variable. 'picture' is the owner's own photo under a
- * veil of the page color (`pictureBackdropImage`), shown only while `backdropPicture` holds a checked address.
+ * veil of the page color (`pictureBackdropImage`), shown only while `backdropPicture` holds a checked address. 'stock' is a
+ * photo of the app's own library (stock.ts) under the same veil, shown only while `backdropStock` holds the id of one of them.
  */
 export const BACKDROPS = [
   'plain',
@@ -79,6 +81,7 @@ export const BACKDROPS = [
   'topo',
   'bloom',
   'picture',
+  'stock',
 ] as const
 export type BackdropKind = (typeof BACKDROPS)[number]
 
@@ -128,6 +131,12 @@ export type Theme = {
    * `pictureSrc`), and `toCssVars` refuses any address that could not sit inside url("...").
    */
   backdropPicture: string | null
+  /**
+   * A photo of the app's library, drawn only while `backdrop` is 'stock': the id of one entry of the photo table
+   * (`STOCK_IDS`), never an address. `stockSrc` builds the address from that entry, so nothing typed reaches CSS or a URL,
+   * and an id the table does not know draws no photo. It shares the veil, the fit and the position below with the owner's photo.
+   */
+  backdropStock: StockId | null
   /** How strongly the photo shows through the veil of the page color over it. */
   backdropVeil: Veil
   /**
@@ -159,6 +168,7 @@ export const DEFAULT_THEME: Theme = {
   decor: 'none',
   backdrop: 'plain',
   backdropPicture: null,
+  backdropStock: null,
   backdropVeil: 'soft',
   backdropFit: 'cover',
   backdropPosition: 'center',

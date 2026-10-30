@@ -24,11 +24,11 @@ async function openExtras(user: UserEvent) {
 }
 
 describe('DesignPage: the page texture picker', () => {
-  it('offers all 18 textures and the photo in picker order, named from the config words, with one line about them', async () => {
+  it('offers every texture and both photo choices in picker order, named from the config words, with one line about them', async () => {
     const { user } = await renderDesign()
     await openExtras(user)
     expect(within(group()).getAllByRole('radio').map((radio) => radio.getAttribute('value'))).toEqual([...BACKDROPS])
-    const names = ['Grain', 'Plaster', 'Marble', 'Linen', 'Weave', 'Terrazzo', 'Waves', 'Scallops', 'Deco fans', 'Gingham', 'Checker', 'Contours', 'Bloom']
+    const names = ['Grain', 'Plaster', 'Marble', 'Linen', 'Weave', 'Terrazzo', 'Waves', 'Scallops', 'Deco fans', 'Gingham', 'Checker', 'Contours', 'Bloom', 'Your photo', 'Photo library']
     for (const name of names) expect(within(group()).getByRole('radio', { name })).toBeInTheDocument()
     expect(group()).toHaveAccessibleDescription('Drawn from your colors, so every texture stays easy to read.')
   })

@@ -1,4 +1,5 @@
 import { useCallback, useState, type RefCallback } from 'react'
+import { stockPhoto } from '@/entities/theme/stock'
 import { styleTheme } from '@/entities/theme/styles'
 import { MODES, STYLE_IDS, type BackdropKind, type Theme } from '@/entities/theme/theme'
 import { isOneOf } from '@/shared/lib/checks'
@@ -33,10 +34,12 @@ type PhotoBackdrop = {
  * The page photo against the screen it is shown on. The layer that draws it is as wide as the screen (the page, or the preview
  * frame); when that is wider than the photo can fill without looking stretched (PHOTO_UPSCALE_MAX), the menu paints the
  * texture of its style instead, and the photo comes back when the screen narrows (a turned tablet). Until the photo's size
- * and the screen's width are known, the photo stands.
+ * and the screen's width are known, the photo stands. The owner's own photo is measured by loading it; a library photo's
+ * width is in the table, so it is known from the first render and nothing is requested for it here.
  */
 export function usePhotoBackdrop(theme: Theme): PhotoBackdrop {
   const src = theme.backdrop === 'picture' ? theme.backdropPicture : null
+  const stock = theme.backdrop === 'stock' ? stockPhoto(theme.backdropStock) : null
   const size = usePictureSize(src)
   const [screen, setScreen] = useState<number | null>(null)
 
@@ -55,7 +58,10 @@ export function usePhotoBackdrop(theme: Theme): PhotoBackdrop {
     return () => observer.disconnect()
   }, [])
 
-  const layer = src !== null
-  const painted = layer && !photoFits(screen, size?.width ?? null) ? { ...theme, backdrop: photoFallback(theme), backdropPicture: null } : theme
+  const layer = src !== null || stock !== null
+  const painted =
+    layer && !photoFits(screen, stock?.width ?? size?.width ?? null)
+      ? { ...theme, backdrop: photoFallback(theme), backdropPicture: null, backdropStock: null }
+      : theme
   return { theme: painted, layer, layerRef }
 }

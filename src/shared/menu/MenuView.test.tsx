@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { copy } from '@/config/copy'
 import type { Menu, Product } from '@/entities/menu/menu'
+import { STOCK_PHOTOS } from '@/entities/theme/stockPhotos'
 import { DEFAULT_THEME } from '@/entities/theme/theme'
 import { MenuPreviewFrame } from './MenuPreviewFrame'
 import { MenuView, type MenuViewBusiness } from './MenuView'
@@ -388,6 +389,34 @@ describe('MenuView and the page photo', () => {
     expect(root()?.firstElementChild?.getAttribute('aria-hidden')).toBeNull()
     rerender(<MenuView business={business()} menu={menu()} />)
     expect(root()?.firstElementChild?.getAttribute('aria-hidden')).toBeNull()
+  })
+
+  it('draws a library photo on the same layer, from the path of its table entry, and lays it as the theme says', () => {
+    const photo = STOCK_PHOTOS[0]
+    const STOCK = { ...DEFAULT_THEME, backdrop: 'stock' as const, backdropStock: photo.id, backdropFit: 'contain' as const, backdropPosition: 'bottom' as const }
+    const { container } = render(<MenuView business={business({ theme: STOCK })} menu={menu()} />)
+    const root = container.querySelector<HTMLElement>('[data-menu-backdrop]')
+    expect(root).toHaveAttribute('data-menu-backdrop', 'stock')
+    expect(root).toHaveAttribute('data-menu-backdrop-fit', 'contain')
+    expect(root).toHaveAttribute('data-menu-backdrop-position', 'bottom')
+    const layer = root?.firstElementChild
+    expect(layer?.getAttribute('aria-hidden')).toBe('true')
+    expect(layer?.textContent).toBe('')
+    expect(root?.style.getPropertyValue('--menu-backdrop-image')).toContain(`url("/stock/${photo.file}.jpg")`)
+  })
+
+  it('draws no layer for the library backdrop without a photo, and pins the variable to none', () => {
+    const STOCK = { ...DEFAULT_THEME, backdrop: 'stock' as const, backdropStock: STOCK_PHOTOS[0].id }
+    const { container, rerender } = render(<MenuView business={business({ theme: { ...STOCK, backdropStock: null } })} menu={menu()} />)
+    const root = () => container.querySelector<HTMLElement>('[data-menu-backdrop]')
+    expect(root()).toHaveAttribute('data-menu-backdrop', 'stock')
+    expect(root()?.firstElementChild?.getAttribute('aria-hidden')).toBeNull()
+    expect(root()?.style.getPropertyValue('--menu-backdrop-image')).toBe('none')
+    // An id the table does not have is no photo either, whatever it says.
+    const forged = { ...STOCK, backdropStock: '../x' } as unknown as typeof STOCK
+    rerender(<MenuView business={business({ theme: forged })} menu={menu()} />)
+    expect(root()?.firstElementChild?.getAttribute('aria-hidden')).toBeNull()
+    expect(root()?.style.getPropertyValue('--menu-backdrop-image')).toBe('none')
   })
 })
 

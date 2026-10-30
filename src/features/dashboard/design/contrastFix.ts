@@ -1,4 +1,4 @@
-import { photoGrounds } from '@/entities/theme/backdrop'
+import { hasPagePhoto, photoGrounds } from '@/entities/theme/backdrop'
 import { contrastRatio, mixHex, readableOn, WHITE } from '@/entities/theme/color'
 import { DEFAULT_THEME, VEILS, type Theme } from '@/entities/theme/theme'
 import { ACCENT_CONTRAST_MIN, TEXT_CONTRAST_MIN, type ThemeIssue } from '@/entities/theme/validate'
@@ -9,9 +9,12 @@ const BLACK = '#000000'
 /** One color of the theme to change, and what to change it to. */
 export type ContrastFix = { key: 'secondary' | 'primary'; color: string }
 
-/** Every ground the page text must read on: the page, and under a photo backdrop its two worst veiled grounds (the same ones `themeIssues` warns about). */
+/**
+ * Every ground the page text must read on: the page, and under a photo backdrop (the owner's picture or a library photo) its
+ * two worst veiled grounds (the same ones `themeIssues` warns about).
+ */
 function textGrounds(theme: Theme): string[] {
-  if (theme.backdrop !== 'picture' || theme.backdropPicture === null) return [theme.background]
+  if (!hasPagePhoto(theme)) return [theme.background]
   const veil = isOneOf(VEILS, theme.backdropVeil) ? theme.backdropVeil : DEFAULT_THEME.backdropVeil
   return [theme.background, ...photoGrounds(theme.background, veil)]
 }

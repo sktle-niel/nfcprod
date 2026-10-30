@@ -31,6 +31,10 @@ Queue, decided 2026-10-30. Each item is its own small pull request, in this orde
 7. Marketing builds (`/m/demo`, `?ref=`, a short FAQ, a contact link) and the Privacy Policy and Terms pages (the text is the owner's to supply).
 8. The backend (section 4), after the owner settles the open questions of `PROJECT_FLOW.md` section 10: the domain, hosting, where pictures live, and how long delivery details are kept.
 
+### Design track (decided 2026-10-30)
+
+Modern, photo-forward menu templates, from the owner's references (a dark glass-card app, a light photo-row app, a bold cafe website, a printed coffee list, a soft sand look for shops that are not cafes, and a dark round-photo card). Small pull requests, in this order: (1) the photo library for the page background (engine, files, picker), in progress; (2) sample product photos and a gallery with real pictures; (3) a lazy-card pattern and a photo-row card; (4) the glass card and the Night Glass template; (5) the round-photo card; (6) billboard and wash headers; (7) drip, ribbon and checker decor; (8) photo category chips and a banner spotlight; (9) a rail layout; (10) register the eight templates (13 to 21 styles). Photos come from Pexels (free to use); Pinterest is for ideas only.
+
 ### The product detail sheet and the add-on picker
 
 The last open item of Phase 1 (`PROJECT_FLOW.md` section 8). Nothing of it is written yet. The plan:

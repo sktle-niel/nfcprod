@@ -140,7 +140,7 @@
   background-repeat: no-repeat;
 }
 
-/* The owner's photo under its veil, on a layer of its own under the content: one screen tall, and it stays put while the menu
+/* The page photo under its veil, on a layer of its own under the content: one screen tall, and it stays put while the menu
    scrolls over it (sticky to the nearest box that scrolls: the page, or the preview frame), so the photo is drawn at the size of
    the screen and never stretched over the whole length of the menu. The root keeps the page color under it. Two hints come
    from the frame around the menu: --frame-screen, the height of the screen the menu is shown on (when none is given, 100vh:
@@ -163,6 +163,11 @@
 }
 
 .root[data-menu-backdrop='picture'] > .photo {
+  background-image: var(--menu-backdrop-image);
+}
+
+/* The library photo takes the same layer, fit and position; only the variable differs (a path of our own, from toCssVars). */
+.root[data-menu-backdrop='stock'] > .photo {
   background-image: var(--menu-backdrop-image);
 }
 

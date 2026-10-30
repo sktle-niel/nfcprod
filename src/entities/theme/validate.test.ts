@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { deepFreeze } from '@/shared/lib/freeze'
-import { BACKDROPS, CARDS, DECORS, DEFAULT_THEME, FONTS, HEADERS, PHOTOS, STYLE_IDS, TITLES, type Theme } from './theme'
+import { STOCK_PHOTOS } from './stockPhotos'
+import { BACKDROPS, CARDS, DECORS, DEFAULT_THEME, FONTS, HEADERS, PHOTOS, STYLE_IDS, TITLES, VEILS, type Theme } from './theme'
 import { themeIssues, validateTheme } from './validate'
 
 // A theme as it was saved before the style choices existed: the old keys only.
@@ -206,5 +207,54 @@ describe('the photo backdrop fields', () => {
     // Without the photo, or on another backdrop, the strength alone warns about nothing.
     expect(themeIssues({ ...photo, backdropPicture: null, backdropVeil: 'strong' as const })).toEqual([])
     expect(themeIssues({ ...base, backdropVeil: 'strong' as const })).toEqual([])
+  })
+})
+
+describe('the library photo field', () => {
+  const PHOTO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+  const ID = STOCK_PHOTOS[0].id
+
+  it('keeps an id the library has', () => {
+    const good = validateTheme({ ...DEFAULT_THEME, backdrop: 'stock', backdropStock: ID })
+    expect(good).toEqual({ ok: true, value: { ...DEFAULT_THEME, backdrop: 'stock', backdropStock: ID } })
+  })
+
+  it.each<[string, unknown]>([
+    ['an id the library does not have', 'no-such-photo'],
+    ['a path', `../${ID}`],
+    ['an id with a space after it', `${ID} `],
+    ['a prototype key', '__proto__'],
+    ['a number', 42],
+    ['a list holding an id', [ID]],
+    ['an object', { id: ID }],
+  ])('reads %s as no photo, and still accepts the theme', (_name, value) => {
+    expect(validateTheme({ ...DEFAULT_THEME, backdrop: 'stock', backdropStock: value })).toEqual({
+      ok: true,
+      value: { ...DEFAULT_THEME, backdrop: 'stock', backdropStock: null },
+    })
+  })
+
+  it('loads a theme saved before the library as no photo', () => {
+    const older = Object.fromEntries(Object.entries(DEFAULT_THEME).filter(([key]) => key !== 'backdropStock'))
+    const result = validateTheme(older)
+    expect(result.ok && result.value.backdropStock).toBeNull()
+    expect(result.ok && result.value).toEqual(DEFAULT_THEME)
+  })
+
+  it('allows the library backdrop with no photo: it draws none', () => {
+    expect(validateTheme({ ...DEFAULT_THEME, backdrop: 'stock' })).toEqual({ ok: true, value: { ...DEFAULT_THEME, backdrop: 'stock' } })
+  })
+
+  it('warns about the owner text color for a library photo exactly as for the owner photo', () => {
+    const base = { ...DEFAULT_THEME, primary: '#0b5fff', secondary: '#595959', background: '#f2f2f2' }
+    const library = { ...base, backdrop: 'stock' as const, backdropStock: ID }
+    const owned = { ...base, backdrop: 'picture' as const, backdropPicture: PHOTO }
+    expect(themeIssues({ ...library, backdropVeil: 'faint' })).toEqual([])
+    expect(themeIssues({ ...library, backdropVeil: 'strong' })).toEqual(['textContrast'])
+    for (const backdropVeil of VEILS) expect(themeIssues({ ...library, backdropVeil }), backdropVeil).toEqual(themeIssues({ ...owned, backdropVeil }))
+    // No photo to draw, or another backdrop: the strength alone warns about nothing.
+    expect(themeIssues({ ...library, backdropStock: null, backdropVeil: 'strong' })).toEqual([])
+    expect(themeIssues({ ...library, backdropStock: 'no-such-photo' as unknown as Theme['backdropStock'], backdropVeil: 'strong' })).toEqual([])
+    expect(themeIssues({ ...base, backdropStock: ID, backdropVeil: 'strong' })).toEqual([])
   })
 })

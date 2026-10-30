@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { contrastRatio, readableOn } from '@/entities/theme/color'
+import { STOCK_PHOTOS } from '@/entities/theme/stockPhotos'
 import { DEFAULT_THEME, type Theme } from '@/entities/theme/theme'
 import { ACCENT_CONTRAST_MIN, TEXT_CONTRAST_MIN, themeIssues } from '@/entities/theme/validate'
 import { contrastFix } from './contrastFix'
@@ -65,6 +66,23 @@ describe('contrastFix', () => {
 
   it('offers no fix when no text color can read over the photo on a mid-tone page, and the warning stands', () => {
     const start = theme({ secondary: '#000000', background: '#808080', backdrop: 'picture', backdropPicture: PHOTO, backdropVeil: 'strong' })
+    expect(themeIssues(start)).toContain('textContrast')
+    expect(contrastFix('textContrast', start)).toBeNull()
+  })
+
+  it('treats a library photo like the owner photo: the same warning, and the same fix, which must read on the veiled grounds too', () => {
+    // The ink reads on this grey page (6:1) but not on the darker ground a strong veil can put under it, so only black does.
+    const owned = theme({ primary: '#1a1a1a', secondary: '#19202b', background: '#9e9e9e', backdrop: 'picture', backdropPicture: PHOTO, backdropVeil: 'strong' })
+    const library = { ...owned, backdrop: 'stock' as const, backdropPicture: null, backdropStock: STOCK_PHOTOS[0].id }
+    expect(themeIssues({ ...library, backdrop: 'plain' })).toEqual([])
+    expect(themeIssues(library)).toEqual(['textContrast'])
+    expect(contrastFix('textContrast', library)).toEqual({ key: 'secondary', color: '#000000' })
+    expect(contrastFix('textContrast', library)).toEqual(contrastFix('textContrast', owned))
+    expect(themeIssues(applied('textContrast', library))).toEqual([])
+  })
+
+  it('offers no fix for a library photo either when no text color can read over it on a mid-tone page', () => {
+    const start = theme({ secondary: '#000000', background: '#808080', backdrop: 'stock', backdropStock: STOCK_PHOTOS[0].id, backdropVeil: 'strong' })
     expect(themeIssues(start)).toContain('textContrast')
     expect(contrastFix('textContrast', start)).toBeNull()
   })

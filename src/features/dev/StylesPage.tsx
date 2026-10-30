@@ -2,6 +2,7 @@ import { useSearchParams } from 'react-router-dom'
 import type { Business } from '@/entities/business/business'
 import type { Menu } from '@/entities/menu/menu'
 import { isHexColor, normalizeHex } from '@/entities/theme/color'
+import { STOCK_IDS } from '@/entities/theme/stockPhotos'
 import { STYLES, styleTheme } from '@/entities/theme/styles'
 import {
   BACKDROPS,
@@ -63,6 +64,7 @@ function withOverrides(theme: Theme, params: URLSearchParams): Theme {
   const surface = params.get('surface')
   const primary = params.get('accent')
   const backdrop = pick(BACKDROPS, 'backdrop', theme.backdrop)
+  const stock = params.get('stock')
   return {
     ...theme,
     card: pick(CARDS, 'card', theme.card),
@@ -73,6 +75,8 @@ function withOverrides(theme: Theme, params: URLSearchParams): Theme {
     backdrop,
     // The photo backdrop needs a photo: the gallery lends a made-up one, so `?backdrop=picture&veil=strong` shows the veil.
     backdropPicture: backdrop === 'picture' ? samplePhoto(0) : theme.backdropPicture,
+    // A library photo is named by its id: `?backdrop=stock&stock=<id>`. An id the library does not have shows no photo.
+    backdropStock: isOneOf(STOCK_IDS, stock) ? stock : theme.backdropStock,
     backdropVeil: pick(VEILS, 'veil', theme.backdropVeil),
     font: pick(FONTS, 'font', theme.font),
     buttonStyle: pick(BUTTON_STYLES, 'buttons', theme.buttonStyle),
@@ -86,8 +90,8 @@ function withOverrides(theme: Theme, params: URLSearchParams): Theme {
 /**
  * Developers only (the route exists in development builds): every style in light and dark, drawn by the real menu renderer on
  * a small sample menu, each in a phone-wide column. `?style=roast` shows one style, `?mode=dark` one mode. Any other choice
- * can be changed on top: `card`, `photo`, `title`, `header`, `decor`, `backdrop` (`picture` borrows a made-up photo; `veil`
- * sets its strength), `font`, `buttons`, `layout`, `spotlight`
+ * can be changed on top: `card`, `photo`, `title`, `header`, `decor`, `backdrop` (`picture` borrows a made-up photo; `stock`
+ * with `stock=<id>` shows a library photo; `veil` sets its strength), `font`, `buttons`, `layout`, `spotlight`
  * (1 or 0), `surface` and `accent` (a `#rrggbb` color, written %23rrggbb in the address). `?width=360` sets the phone width, and
  * `?photos=1` gives every item a made-up photo, to see how each picture shape crops a real one.
  */

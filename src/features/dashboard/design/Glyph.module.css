@@ -124,8 +124,9 @@
   background-color: var(--color-surface);
 }
 
-/* The owner's own photo: a sun over a hill, in the soft ink. */
-.texture[data-texture='picture'] {
+/* A photo, the owner's own or one of the library's: a sun over a hill, in the soft ink. */
+.texture[data-texture='picture'],
+.texture[data-texture='stock'] {
   background-image:
     radial-gradient(circle 3px at 32% 30%, var(--color-ink-soft) 0 97%, transparent 100%),
     linear-gradient(135deg, transparent 54%, var(--color-ink-soft) 54%);

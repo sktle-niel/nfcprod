@@ -2,7 +2,20 @@ import { isOneOf } from '@/shared/lib/checks'
 import { checkImageAddress } from '@/entities/menu/image'
 import { backdropLayers, photoGrounds, pictureBackdropImage } from './backdrop'
 import { contrastRatio, INK, isDarkColor, isHexColor, mixHex, normalizeHex, WHITE } from './color'
-import { BACKDROPS, BUTTON_STYLES, DEFAULT_THEME, FONTS, modeDefaults, MODES, VEILS, type ButtonStyle, type Font, type Theme } from './theme'
+import { stockSrc } from './stock'
+import {
+  BACKDROPS,
+  BUTTON_STYLES,
+  DEFAULT_THEME,
+  FONTS,
+  modeDefaults,
+  MODES,
+  VEILS,
+  type BackdropKind,
+  type ButtonStyle,
+  type Font,
+  type Theme,
+} from './theme'
 import { TEXT_CONTRAST_MIN } from './validate'
 
 // Every value below comes from a fixed map or is a color rebuilt as `#rrggbb`: no text a person typed ever reaches CSS.
@@ -56,6 +69,17 @@ function cssPicture(value: unknown): string | null {
   const address = checkImageAddress(value)
   if (!address.ok || address.value === null) return null
   return /^[A-Za-z0-9:;,/.+=%?&#@_~-]*$/.test(address.value) ? address.value : null
+}
+
+/**
+ * The address of the photo under the page, or null for none. The owner's picture must pass `cssPicture`. A library photo's
+ * address is built from its table entry (`stockSrc`) and from nothing the theme says, so the only text that ever reaches
+ * the url("...") is a path the table holds; an id the table does not know is no photo.
+ */
+function pagePhotoOf(theme: Theme, backdrop: BackdropKind): string | null {
+  if (backdrop === 'picture') return cssPicture(theme.backdropPicture)
+  if (backdrop === 'stock') return stockSrc(theme.backdropStock)
+  return null
 }
 
 /**
@@ -137,8 +161,8 @@ export function toCssVars(theme: Theme): Record<string, string> {
   // A photo backdrop's worst grounds: the page moved toward black and toward white by the veil's share. Any pixel of any
   // photo under the veil lands between those two, so muted text that reads on both reads on the photo.
   const veil = isOneOf(VEILS, theme.backdropVeil) ? theme.backdropVeil : DEFAULT_THEME.backdropVeil
-  const picture = backdrop === 'picture' ? cssPicture(theme.backdropPicture) : null
-  const [photoDark, photoLight] = picture === null ? [background, background] : photoGrounds(background, veil)
+  const photo = pagePhotoOf(theme, backdrop)
+  const [photoDark, photoLight] = photo === null ? [background, background] : photoGrounds(background, veil)
   const vars: Record<string, string> = {
     '--menu-bg': background,
     '--menu-text': text,
@@ -158,10 +182,11 @@ export function toCssVars(theme: Theme): Record<string, string> {
   }
   // Only the drawn textures travel as a variable; the classic five are painted by the menu's own CSS.
   if (layers.image !== null) vars['--menu-backdrop-image'] = layers.image
-  // The photo backdrop travels the same way: the owner's picture under the veil. A refused or absent photo still sets
-  // the variable, to 'none': custom properties inherit, so without its own value a menu nested inside another themed
-  // element (the public page's frame) would paint that ancestor's photo — the exact address this root just refused.
-  if (picture !== null) vars['--menu-backdrop-image'] = pictureBackdropImage(picture, background, veil)
-  else if (backdrop === 'picture') vars['--menu-backdrop-image'] = 'none'
+  // The photo backdrop travels the same way: the owner's picture or a library photo under the veil. A refused or absent
+  // photo still sets the variable, to 'none': custom properties inherit, so without its own value a menu nested inside
+  // another themed element (the public page's frame) would paint that ancestor's photo — the exact address this root just
+  // refused (or, for the library, the photo whose id this root does not know).
+  if (photo !== null) vars['--menu-backdrop-image'] = pictureBackdropImage(photo, background, veil)
+  else if (backdrop === 'picture' || backdrop === 'stock') vars['--menu-backdrop-image'] = 'none'
   return vars
 }
