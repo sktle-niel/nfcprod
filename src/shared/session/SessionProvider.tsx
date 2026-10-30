@@ -12,11 +12,13 @@ export function SessionProvider({ repository, children }: Props) {
 
   useEffect(() => {
     let live = true
-    void repository.current().then((current) => {
+    const settle = (current: Session | null) => {
       if (!live) return
       setSession(current)
       setReady(true)
-    })
+    }
+    // A failed read counts as signed out, so the page asks for a sign-in instead of staying blank for good.
+    void repository.current().then(settle, () => settle(null))
     return () => {
       live = false
     }

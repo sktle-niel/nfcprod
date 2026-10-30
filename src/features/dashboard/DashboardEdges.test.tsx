@@ -116,6 +116,13 @@ async function visit(user: UserEvent, label: string, title: string) {
   await screen.findByRole('heading', { level: 1, name: title })
 }
 
+/** Leaves Design with changes that are not saved: the page asks first, and the owner chooses to lose them. */
+async function leaveAndLose(user: UserEvent, label: string, title: string) {
+  await user.click(sidebar().getByRole('link', { name: label }))
+  await user.click(within(await screen.findByRole('dialog', { name: design.leave.title })).getByRole('button', { name: design.leave.confirm }))
+  await screen.findByRole('heading', { level: 1, name: title })
+}
+
 async function panel(name: string) {
   const section = (await screen.findByRole('heading', { level: 2, name })).closest('section')
   if (!section) throw new Error(`No panel called "${name}"`)
@@ -1134,7 +1141,7 @@ describe('Leaving Design with unsaved changes', () => {
     await typeOver(user, screen.getByLabelText(design.look.primary), '#6b3f1d')
     expect(screen.getByText(design.bar.unsaved)).toBeInTheDocument()
 
-    await visit(user, shell.nav.menu, shell.menuPage.title)
+    await leaveAndLose(user, shell.nav.menu, shell.menuPage.title)
     await visit(user, shell.nav.design, design.title)
 
     expect(screen.getByLabelText(design.details.name)).toHaveValue('Kape Kanto')
@@ -1151,7 +1158,7 @@ describe('Leaving Design with unsaved changes', () => {
   it('discards a new draft after coming back, and leaves the saved business as it was', async () => {
     const { user, owner } = await open(PAGES.design.path)
     await typeOver(user, await screen.findByLabelText(design.details.name), 'Moon Cafe')
-    await visit(user, shell.nav.overview, overview.title)
+    await leaveAndLose(user, shell.nav.overview, overview.title)
     await visit(user, shell.nav.design, design.title)
 
     await typeOver(user, screen.getByLabelText(design.details.name), 'Sun Cafe')

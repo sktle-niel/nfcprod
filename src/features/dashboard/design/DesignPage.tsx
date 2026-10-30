@@ -1,5 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { dashboardCopy } from '@/config/dashboardCopy'
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { Tab, TabList, TabPanel, Tabs } from '@/shared/ui/Tabs'
 import { useOwnedBusiness } from '../dashboardData'
@@ -9,6 +10,7 @@ import { PreviewPanel } from './PreviewPanel'
 import { SaveBar } from './SaveBar'
 import { useDesignDraft, type TabName } from './useDesignDraft'
 import { useFocusFirstError } from './useFocusFirstError'
+import { useLeaveGuard } from './useLeaveGuard'
 import { usePreview } from './usePreview'
 import styles from './DesignPage.module.css'
 
@@ -21,6 +23,8 @@ const text = dashboardCopy.design
 export function DesignPage() {
   const { business, menu, actions } = useOwnedBusiness()
   const form = useDesignDraft(business, actions)
+  // While a save is on its way the changes are being kept, so there is nothing to ask about.
+  const guard = useLeaveGuard(form.dirty && !form.busy)
   const [tab, setTab] = useState<TabName>('details')
   const root = useRef<HTMLDivElement>(null)
   useFocusFirstError(form.focusAt, tab, setTab, root)
@@ -67,6 +71,18 @@ export function DesignPage() {
           </div>
         </Tabs>
       </form>
+      {guard.state === 'blocked' && (
+        <ConfirmDialog
+          danger
+          title={text.leave.title}
+          body={text.leave.body}
+          confirmLabel={text.leave.confirm}
+          cancelLabel={text.leave.stay}
+          closeLabel={text.leave.close}
+          onConfirm={() => guard.proceed()}
+          onCancel={() => guard.reset()}
+        />
+      )}
     </div>
   )
 }

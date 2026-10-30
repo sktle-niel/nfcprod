@@ -9,6 +9,7 @@ import { validateOrder, type FieldError, type FieldName } from '@/entities/order
 import { formatPeso } from '@/shared/lib/money'
 import { plural } from '@/shared/lib/plural'
 import { Field } from '@/shared/ui/Field'
+import { useModalBusy } from '@/shared/ui/modalBusy'
 import { CardPicker } from './CardPicker'
 import { DeliveryFields } from './DeliveryFields'
 import styles from './OrderForm.module.css'
@@ -47,6 +48,8 @@ export function OrderForm({ price, name, repository, locations = publicLocations
   const [errors, setErrors] = useState<Errors>({})
   const [failure, setFailure] = useState<OrderFailure | null>(null)
   const [sending, setSending] = useState(false)
+  // The order call cannot be taken back, so a way out would only hide its answer.
+  useModalBusy(sending)
   const [quantities, setQuantities] = useState<Quantities>({})
   const count = cardTotal(quantities)
 

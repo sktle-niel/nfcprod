@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { accessOf, freeCardsState, isMenuLive, periodEnd, startTrial, type Subscription } from './subscription'
+import { accessOf, freeCardsState, isMenuLive, nextAccessChange, periodEnd, startTrial, type Subscription } from './subscription'
 
 const DAY = 86_400_000
 const START = Date.parse('2026-10-19T02:00:00Z')
@@ -37,6 +37,48 @@ describe('isMenuLive', () => {
     expect(isMenuLive(trial, START)).toBe(true)
     expect(isMenuLive(trial, START + 8 * DAY)).toBe(false)
     expect(isMenuLive({ ...trial, plan: 'month', paidUntil: '2026-11-19T02:00:00.000Z' }, START + 8 * DAY)).toBe(true)
+  })
+})
+
+describe('nextAccessChange', () => {
+  const trial = startTrial(START)
+  const paid: Subscription = { ...trial, plan: 'month', paidUntil: '2026-11-19T02:00:00.000Z' }
+
+  it('is the next day count drop while a trial has days to run', () => {
+    expect(nextAccessChange(trial, START)).toBe(START + DAY)
+  })
+
+  it('is the end of the trial on its last day', () => {
+    expect(nextAccessChange(trial, START + 6 * DAY + 1)).toBe(START + 7 * DAY)
+  })
+
+  it('is null once the trial has ended', () => {
+    expect(nextAccessChange(trial, START + 7 * DAY)).toBeNull()
+  })
+
+  it('is the end of the paid period while a plan is active', () => {
+    const yearly: Subscription = { ...trial, plan: 'year', paidUntil: '2027-10-19T02:00:00.000Z' }
+    expect(nextAccessChange(yearly, START)).toBe(Date.parse('2027-10-19T02:00:00Z'))
+  })
+
+  it('is null once a paid period has lapsed', () => {
+    expect(nextAccessChange(paid, Date.parse('2027-10-20T00:00:00Z'))).toBeNull()
+  })
+
+  it('is always later than the moment asked about, and the access changes right at it', () => {
+    const samples: [Subscription, number][] = [
+      [trial, START],
+      [trial, START + 3 * DAY + 5_000],
+      [trial, START + 6 * DAY + 1],
+      [paid, START],
+      [paid, START + 29 * DAY],
+    ]
+    for (const [subscription, now] of samples) {
+      const change = nextAccessChange(subscription, now)
+      if (change === null) throw new Error(`no change after ${new Date(now).toISOString()}`)
+      expect(change).toBeGreaterThan(now)
+      expect(accessOf(subscription, change - 1)).not.toEqual(accessOf(subscription, change))
+    }
   })
 })
 

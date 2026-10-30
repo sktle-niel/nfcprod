@@ -1,10 +1,24 @@
 import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'node:url'
+import type { Plugin } from 'vite'
 import { defineConfig } from 'vitest/config'
+
+// NFC cards keep their menu link for good. Without VITE_PUBLIC_ORIGIN, the link follows the address the dashboard is
+// open on, so a production build says so. The build still succeeds.
+const warnWithoutPublicOrigin: Plugin = {
+  name: 'warn-without-public-origin',
+  configResolved(config) {
+    if (config.command !== 'build' || config.mode !== 'production') return
+    if (String(config.env.VITE_PUBLIC_ORIGIN ?? '').trim() !== '') return
+    config.logger.warn(
+      'VITE_PUBLIC_ORIGIN is empty: menu links will use the address the dashboard is open on. Set it to the final domain before any NFC card is written.',
+    )
+  },
+}
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), warnWithoutPublicOrigin],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },

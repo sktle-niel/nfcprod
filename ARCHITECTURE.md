@@ -37,7 +37,7 @@ Four surfaces, one codebase:
 - **Platform landing** `/`: anonymous marketing page with pricing and the "Get now" card order form (section 7.8). The owner sign-up and log-in modal opens over any page from the address (`?auth=signup`, `?auth=login`).
 - **Public menu** `/m/:slug`: anonymous, read-only, cached, lightest bundle.
 - **Owner dashboard** `/dashboard/*`: authenticated. A sidebar (a tab bar on phones) with five pages: Overview (status, setup checklist, plan, sample visitor numbers), Menu (items and add-ons), Design (business details, branding and the look, with a live preview), Share (publish, link, QR code, NFC guide) and Account (plan, billing, profile). A new owner first meets the setup wizard at `/dashboard/setup` (name, business types, link). Section 7.10.
-- **Admin** `/admin/*`: platform staff only, strongest controls.
+- **Admin** `/admin/*`: platform staff only, strongest controls. That is the target: today there is no sign-in, the pages show sample data, and anyone who opens the address sees them. Admin sign-in with MFA must exist before a real orders endpoint feeds them (sections 7.7 and 7.8).
 
 Each surface is a separate lazy-loaded route group so the public bundle never carries dashboard or admin code.
 
@@ -54,6 +54,7 @@ src/
     auth/         sign-up and log-in modal
     dashboard/    the owner's area: setup wizard, shell, Overview, Menu (items, add-ons, product editor), Design, Share, Account
     admin/        Overview, Orders, Customers, Pricing (sample data until the backend exists)
+    dev/          development-only pages (/__styles, /__look), left out of production builds
   entities/       domain types and pure logic (Business, Menu, Product, Variant, Modifier, Theme, Order, Account, Pricing)
   shared/
     ui/           design-system components: the app shell (sidebar, tab bar), Button, Switch, Tabs, ConfirmDialog, fields, charts, icons, skeletons
@@ -76,16 +77,17 @@ Dependency rule (one direction only):
 ### 3.2 Principles
 
 - **Data driven UI.** The menu is rendered from a `Business` (theme and details) and its `Menu` (categories, products, add-on groups). No business-specific code anywhere.
-- **Design tokens.** Every color, radius, font, spacing and shadow is a CSS variable. A business theme is just a set of token values applied at the root. This is what makes the background, colors and fonts customizable.
+- **Design tokens.** Colors, radii, font families and shadows are CSS variables; font sizes and spacing are still plain values in the stylesheets. A business theme is just a set of token values applied at the root. This is what makes the background, colors and fonts customizable.
 - **Presets are data.** `presets/*.ts` are plain objects. Hybrid = a pure `mergePresets()` function.
 - **Reuse.** One `ProductCard` that draws the card kind of the menu's look, one `Modal` and `ConfirmDialog`, one `ChipToggle` for tags. The add-on picker and the product detail sheet come with the public page. No per-type copies.
 - **Validate at the edge.** Every external value (API response, URL param, form input, stored value) is checked by a validator before use: hand-written, taking `unknown` and giving back the clean value or the refused fields (`shared/lib/checks.ts`, `entities/**/validate*.ts`). The types are written once, in `entities`. There is no schema library.
 - **State.** Server data through the small `useResource` hook (load, retry, replace) and, in the owner's area, one `DashboardProvider` context. There is no query cache. Local UI state stays local. Global client state only for session and theme. No giant store.
 - **Routing.** Route-level code splitting. Public route first, nothing else loaded.
-- **Performance.** Image sizes and `srcset`, lazy loading below the fold, font subset with `font-display: swap`, skeletons, no layout shift, virtualized lists only if a menu is very large.
+- **Performance.** Image sizes and `srcset`, lazy loading below the fold, font subset with `font-display: swap`, skeletons, no layout shift, virtualized lists only if a menu is very large. Not built yet: `srcset` and a skeleton for the public page (`NEXT_STEPS.md` section 3).
 - **Accessibility.** Semantic HTML, focus states, contrast checks on the generated theme (reject unreadable color pairs), reduced-motion support.
 - **Mobile-first.** 360px baseline, safe-area insets, no hover-only interactions, tap targets at least 44px.
-- **Error handling.** Error boundary per route, friendly offline and 404 states, never show raw errors or stack traces.
+- **Error handling.** One error boundary at the root today (a boundary per route is planned), a friendly 404 and a calm "not available" page, never show raw errors or stack traces. There is no offline state yet. A session read that fails counts as signed out, so a page never stays blank.
+- **Work in progress.** A form that is sending cannot be dismissed (`Modal busy`, `useModalBusy`). The Design page asks before it is left with unsaved changes (`useLeaveGuard`). The dialogs of the Menu page do not ask yet (`NEXT_STEPS.md` section 3).
 
 ### 3.3 Data layer contract (the seam between frontend and backend)
 
@@ -336,8 +338,8 @@ Owners need an account for everything they buy: "Get your card" and "Get now" op
   - The browser goes only to an allow-listed checkout host over `https` (`isCheckoutUrl`, `src/data/billing.ts`). Anything else is refused, so a bad response cannot become an open redirect.
   - **Only the provider's signed webhook turns a plan on.** Verify the signature, ignore repeats (idempotency by event id), and check the amount and currency against our own price. The return page after checkout only shows "processing"; it changes nothing.
   - Every plan change gets an audit entry. No card data or full payment payloads in logs.
-- **After the trial or a paid period:** the menu is paused, never deleted (`isMenuLive`). The public menu shows a "not available" page and the NFC link keeps working, so it comes back as soon as a plan is paid.
-- **Today:** `BillingRepository` (`src/data/billing.ts`) is a mock. Each owner's standing lives in the tab's memory, the trial starts the first time the account page asks, and "checkout" turns the plan on at once without taking any payment. The account page says so.
+- **After the trial or a paid period:** the menu is paused, never deleted (`isMenuLive`). The public menu shows a "not available" page and the NFC link keeps working, so it comes back as soon as a plan is paid. An open dashboard notices the end by itself (`nextAccessChange`, `useTimeAt`).
+- **Today:** `BillingRepository` (`src/data/billing.ts`) is a mock. Each owner's standing lives in the tab's memory, the trial starts the first time the account page asks, and "checkout" turns the plan on at once without taking any payment. The account page says so. There is no checkout return page yet.
 - **CSP:** going to the checkout is a navigation, not a fetch, so `connect-src` does not change. `form-action` stays `'self'`.
 
 ### 7.10 Owner dashboard: the business, the menu and pictures
@@ -350,7 +352,7 @@ What an owner types becomes public on the menu, so it is checked before it is ke
 - **Pictures:** JPEG, PNG or WebP, decided from the file's first bytes and never from its name or declared type; at most 4 MB; no SVG. In demo mode an upload comes back as a base64 data URL (`data:` is already in `img-src`); `checkImageAddress` accepts only none, such a data URL whose bytes match its type, or an https link, and refuses `blob:`. The real flow is a signed upload to our storage, where the server re-encodes, resizes and strips metadata (sections 5 and 8), and `img-src` names the storage origin.
 - **The look:** see section 3.4. Colors, fonts and corners come from fixed maps, and every other choice (card, picture shape, titles, header, line art, backdrop) is one value of a fixed list; nothing typed reaches CSS. The fonts are self-hosted packages, so `font-src 'self'` stays, and the placeholder illustrations are inline SVG, so they ask for nothing.
 - **The link on the cards:** a slug is checked (`isValidSlug`, the blocklist, taken or not) before it is created or changed. Changing it asks first and says plainly that written cards and printed QR codes stop working. The real server keeps a redirect table (section 4) and rate-limits the availability check, because it tells anyone which links are taken.
-- **The address on the cards:** menu links start with `VITE_PUBLIC_ORIGIN` (`menuLink()` in `src/features/dashboard/menuLink.ts`), never with the address the dashboard happens to be open on, because a card keeps its link for good. While it is empty (development) the address of the page is used. When the page is open on another address, the Share page says so next to the link and the QR code. Before launch: set it to the final domain and redirect every other host (previews, the platform's own address) to it, or a card written from one of them breaks.
+- **The address on the cards:** menu links start with `VITE_PUBLIC_ORIGIN` (`menuLink()` in `src/features/dashboard/menuLink.ts`), never with the address the dashboard happens to be open on, because a card keeps its link for good. While it is empty (development) the address of the page is used. A production build warns while it is empty (a plugin in `vite.config.ts`). When the page is open on another address, the Share page says so next to the link and the QR code. Before launch: set it to the final domain and redirect every other host (previews, the platform's own address) to it, or a card written from one of them breaks.
 - **Where pictures come from:** `VITE_STORAGE_ORIGIN` is the one https origin that serves owners' pictures, and the CSP `img-src` names the same origin. A picture from any other host is neither shown (`pictureSrc` in `src/shared/menu`) nor kept (the mock repository refuses it, as the server must). Until a storage exists the demo keeps uploads as checked `data:` addresses.
 - **What becomes public:** a published menu shows the name, tagline, logo, phone, address, hours, social links and the items. The Design page says so next to the fields, and the Share page repeats it before the publish switch. The menu collects nothing from customers.
 - **QR code:** drawn in the browser from the menu link with `uqr` (MIT, no dependencies, pinned to 0.1.3; only `encode` is used, and the SVG is built as React elements, never injected as markup). No QR service is called, so no link leaves the browser. The code stays black on white in both themes. Downloads use blob URLs that are freed afterwards.
@@ -374,7 +376,7 @@ What an owner types becomes public on the menu, so it is checked before it is ke
 ## 9. Maintainability
 
 - TypeScript strict, types written once in `entities` with their validators next to them.
-- Typecheck, oxlint, tests, secret scan and `npm audit` in one `npm run verify`. No formatter yet. The git hooks run it before every commit and every push. The tests run in two workers with a 30 s timeout (`vite.config.ts`), and the dashboard page harness (`src/test/dashboard.tsx`) waits up to 5 s for the data, so a machine with little free memory stays steady; the run still takes about 7 to 16 minutes.
+- Typecheck, oxlint, tests, secret scan and `npm audit` in one `npm run verify`. No formatter yet. The git hooks run it before every commit and every push. The tests run in two workers with a 30 s timeout (`vite.config.ts`), and the dashboard page harness (`src/test/dashboard.tsx`) waits up to 5 s for the data, and `src/test/setup.ts` lets `findBy` and `waitFor` wait up to 10 s, so a machine with little free memory stays steady; the run still takes about 7 to 16 minutes.
 - Tests: pure logic unit tests (theme, presets merge, money, slug, validation), component tests for the menu, a few end-to-end flows (tap link, view menu, pick add-on). Security tests: cross-tenant access, rate limit, input rejection.
 - Conventional commits, small PRs, changelog for releases.
 - Docs updated with the change (`ARCHITECTURE.md`, decision log).
@@ -383,7 +385,7 @@ What an owner types becomes public on the menu, so it is checked before it is ke
 
 ## 10. Build Order (frontend first)
 
-1. Tooling: strict TS, lint, formatter, `verify` script, `.env.example`, `.gitignore` check.
+1. Tooling: strict TS, lint, `verify` script, `.env.example`, `.gitignore` check. No formatter is used (section 9).
 2. Folder structure from section 3.1, router, error boundary, providers.
 3. Design tokens and theme engine (`toCssVars`, contrast guard). Done.
 4. Shared UI kit (Button, Switch, Tabs, Modal and ConfirmDialog, fields, Skeleton, the app shell). Done; Card, Sheet and Toast were not needed.
@@ -458,7 +460,7 @@ Until there is a team: the project owner is the single owner of all of the above
 
 | Topic | Options | Decide by |
 |---|---|---|
-| Backend platform | **Decided: Supabase** (Postgres, Auth, Storage, row-level security). Free plan for development. Move to the paid plan before real clients (free plan pauses after a week of inactivity and has no automated backups, which conflicts with section 11). Keep the `MenuRepository` seam so the platform can still be swapped | Done |
+| Backend platform | **Decided: Supabase** (Postgres, Auth, Storage, row-level security). Free plan for development. Move to the paid plan before real clients (free plan pauses after a week of inactivity and has no automated backups, which conflicts with section 11). Keep the repository seams (`PublicMenuRepository`, `OwnerRepository` and the others) so the platform can still be swapped | Done |
 | Currency | **Decided: Philippine peso only** (stored as integer centavos, `PHP`) | Done |
 | Reseller payment | **Decided: outside the app.** The app only tracks which reseller referred which business | Done |
 | Server state library | Decided: a small custom hook (`useResource`), no TanStack Query for now | Step 5, done |
