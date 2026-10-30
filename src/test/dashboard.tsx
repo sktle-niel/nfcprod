@@ -168,10 +168,17 @@ function provider(prepared: Prepared, children: RouteObject[]): RouteObject[] {
   ]
 }
 
+/**
+ * How long `ready` waits at most for the data. A failing repository never says so (and a refusal is no sign: the first ask
+ * can be refused while the session is still on its way), so a test of one waits all of it. A second was too short on a busy
+ * machine: `ready` went on before the provider had even shown its loading line, and the test read a page not drawn yet.
+ */
+const LOAD_WAIT_MS = 5000
+
 async function ready(prepared: Prepared, router: ReturnType<typeof createMemoryRouter>) {
-  // The lazy routes are in once the router is initialized; then the data arrives; a failing repository never says so, so wait at most a second.
+  // The lazy routes are in once the router is initialized; then the data arrives.
   await waitFor(() => expect(router.state.initialized).toBe(true))
-  await Promise.race([prepared.loaded, new Promise((resolve) => setTimeout(resolve, 1000))])
+  await Promise.race([prepared.loaded, new Promise((resolve) => setTimeout(resolve, LOAD_WAIT_MS))])
   // The skeleton RequireBusiness shows while the business loads.
   await waitFor(() => expect(screen.queryByText(dashboardCopy.shell.loading)).not.toBeInTheDocument())
 }
