@@ -14,9 +14,11 @@ import { contrastRatio } from '@/entities/theme/color'
 import { mergePresets } from '@/presets'
 import { formatPeso } from '@/shared/lib/money'
 import { plural } from '@/shared/lib/plural'
+import { words as daybreakWords } from '@/shared/menu/templates/daybreak/words'
 import { testOwner } from '@/test/auth'
 import { renderDashboardApp } from '@/test/dashboard'
 import { sampleImageFile } from '@/test/ownerFixtures'
+import { previewLogo } from './design/designTestkit'
 
 /*
  * Whole journeys through the owner dashboard: the real shell, the real pages and the real mock repositories, driven the way
@@ -341,10 +343,12 @@ describe('Journey 2: the owner builds the menu', () => {
 
     // The Design page's preview draws the menu as the Menu page left it: sold out, from the lowest size, with its photo and add-ons.
     await visit(user, shell.nav.design, design.title)
-    const drawn = within(previewRegion()).getByRole('heading', { level: 4, name: 'Pumpkin Spice Latte' }).closest('li') as HTMLElement
+    const drawn = (await within(previewRegion()).findByRole('heading', { level: 4, name: 'Pumpkin Spice Latte' })).closest('li') as HTMLElement
     expect(drawn).toHaveTextContent(copy.menu.view.soldOut)
-    expect(drawn).toHaveTextContent(copy.menu.view.from.replace('{price}', formatPeso(15000)))
-    expect(drawn).toHaveTextContent(copy.menu.view.addOnsAvailable)
+    // Daybreak sets the lowest price at the end of the leaders and prints every size under it.
+    expect(drawn).toHaveTextContent(`Tall ${formatPeso(15000)} · Grande ${formatPeso(17000)}`)
+    expect(drawn).toHaveTextContent(`Pumpkin Spice Latte${formatPeso(15000)}`)
+    expect(drawn).toHaveTextContent(daybreakWords.addOns)
     expect(drawn.querySelector('img')).toHaveAttribute('src', latte.image)
     await visit(user, shell.nav.menu, shell.menuPage.title)
     expect(await screen.findByRole('heading', { level: 2, name: 'Seasonal' })).toBeInTheDocument()
@@ -447,7 +451,7 @@ describe('Journey 3: the owner designs the business', () => {
     // The preview is not interactive: the phone is text there, not a link to call (the public page draws the link).
     expect(preview().getByText('+63 917 555 0199')).toBeInTheDocument()
     expect(preview().queryByRole('link')).not.toBeInTheDocument()
-    expect(previewRegion().querySelector('header img')).toHaveAttribute('src', logo.getAttribute('src'))
+    expect(previewLogo()).toHaveAttribute('src', logo.getAttribute('src'))
     expect(previewColors()['--menu-accent']).toBe('#6b3f1d')
     expect(screen.getByText(design.bar.unsaved)).toBeInTheDocument()
     expect(await savedBusiness(owner)).toEqual(before)

@@ -1,10 +1,10 @@
 import { screen, within } from '@testing-library/react'
 import type { UserEvent } from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_THEME, type Theme } from '@/entities/theme/theme'
+import { DEFAULT_THEME, modeDefaults, type Theme } from '@/entities/theme/theme'
 import { previewRegion, renderDesign, saveButton, showPart, spyOnSave } from './designTestkit'
 
-type Part = 'Colors' | 'Cards' | 'Headings' | 'Extras'
+type Part = 'Colors' | 'Extras'
 
 const previewRoot = () => previewRegion().firstElementChild as HTMLElement
 const parts = () => screen.getByRole('group', { name: 'Part of the look to change' })
@@ -18,22 +18,24 @@ describe('DesignPage: the parts of the look', () => {
   it('shows one part at a time, Colors first', async () => {
     const { user } = await renderDesign()
     await openLook(user)
+    expect(within(parts()).getAllByRole('button').map((button) => button.textContent)).toEqual(['Colors', 'Extras'])
     expect(within(parts()).getByRole('button', { name: 'Colors' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByLabelText('Accent color')).toBeInTheDocument()
-    expect(screen.queryByRole('group', { name: 'Card layout' })).not.toBeInTheDocument()
-    await showPart(user, 'Cards')
-    expect(screen.getByRole('group', { name: 'Card layout' })).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Page background' })).not.toBeInTheDocument()
+    await showPart(user, 'Extras')
+    expect(within(parts()).getByRole('button', { name: 'Extras' })).toHaveAttribute('aria-pressed', 'true')
+    for (const legend of ['Page background', 'Font', 'Menu layout']) expect(screen.getByRole('group', { name: legend })).toBeInTheDocument()
     expect(screen.queryByLabelText('Accent color')).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Cards' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Extras' })).toBeInTheDocument()
+    // The cards, headings, line art and corners are not offered while the menu styles are redesigned.
+    for (const name of ['Cards', 'Headings']) expect(within(parts()).queryByRole('button', { name })).not.toBeInTheDocument()
+    for (const legend of ['Card layout', 'Category titles', 'Decoration', 'Corners']) {
+      expect(screen.queryByRole('group', { name: legend })).not.toBeInTheDocument()
+    }
   })
 
   it.each<[Part, string, string, string, string, Partial<Theme>]>([
-    ['Cards', 'Card layout', 'Price list', 'data-menu-card', 'leader', { card: 'leader' }],
-    ['Cards', 'Picture shape', 'Arch', 'data-menu-photo', 'arch', { photo: 'arch' }],
-    ['Headings', 'Category titles', 'Ribbon', 'data-menu-title', 'ribbon', { title: 'ribbon' }],
-    ['Headings', 'Menu header', 'Frame', 'data-menu-header', 'frame', { header: 'frame' }],
-    ['Extras', 'Decoration', 'Leaves', 'data-menu-decor', 'leaves', { decor: 'leaves' }],
-    ['Extras', 'Page texture', 'Dots', 'data-menu-backdrop', 'dots', { backdrop: 'dots' }],
+    ['Extras', 'Page background', 'Your photo', 'data-menu-backdrop', 'picture', { backdrop: 'picture' }],
     ['Extras', 'Menu layout', 'List', 'data-menu-columns', 'one', { layout: 'list' }],
   ])('%s: %s "%s" changes the preview and is saved', async (part, legend, option, attribute, value, saved) => {
     const { user, owner } = await renderDesign()
@@ -44,58 +46,6 @@ describe('DesignPage: the parts of the look', () => {
     await user.click(saveButton())
     await screen.findByText('Your changes are saved.')
     expect((await owner.getBusiness())?.theme).toMatchObject(saved)
-  })
-
-  it('names every card layout and picture shape, with a drawing that screen readers skip', async () => {
-    const { user } = await renderDesign()
-    await openLook(user, 'Cards')
-    const cards = within(screen.getByRole('group', { name: 'Card layout' })).getAllByRole('radio')
-    expect(cards.map((radio) => radio.getAttribute('value'))).toEqual(['row', 'leader', 'tile', 'badge', 'outline', 'soft', 'plate', 'poster'])
-    for (const radio of cards) expect(radio.parentElement?.querySelector('[aria-hidden="true"] span')).not.toBeNull()
-    expect(within(screen.getByRole('group', { name: 'Picture shape' })).getAllByRole('radio')).toHaveLength(4)
-  })
-
-  it('says what a cut-out picture needs, only once Cut-out is chosen', async () => {
-    const { user } = await renderDesign()
-    await openLook(user, 'Cards')
-    const hint = 'Made for PNG or WebP pictures with a transparent background. An ordinary photo shows with rounded corners instead.'
-    expect(screen.queryByText(hint)).not.toBeInTheDocument()
-    await user.click(screen.getByRole('radio', { name: 'Cut-out' }))
-    expect(screen.getByRole('group', { name: 'Picture shape' })).toHaveAccessibleDescription(hint)
-    expect(previewRoot()).toHaveAttribute('data-menu-photo', 'cutout')
-  })
-
-  it('features a best seller with a switch', async () => {
-    const spy = spyOnSave()
-    const { user } = await renderDesign({ wrapOwner: spy.wrap })
-    await openLook(user, 'Cards')
-    const spotlight = screen.getByRole('switch', { name: 'Feature a best seller at the top' })
-    expect(spotlight).toHaveAttribute('aria-checked', 'false')
-    await user.click(spotlight)
-    expect(spotlight).toHaveAttribute('aria-checked', 'true')
-    await user.click(saveButton())
-    await screen.findByText('Your changes are saved.')
-    expect(spy.patches[0]?.theme?.spotlight).toBe(true)
-  })
-
-  it('writes each category title option in its own look, named for screen readers by its label', async () => {
-    const { user } = await renderDesign()
-    await openLook(user, 'Headings')
-    const titles = screen.getByRole('group', { name: 'Category titles' })
-    const names = ['Simple', 'Bullets', 'Script', 'Ribbon', 'Ornament', 'Underline', 'Band']
-    expect(within(titles).getAllByRole('radio').map((radio) => radio.getAttribute('value'))).toEqual(
-      ['plain', 'bullets', 'script', 'ribbon', 'ornament', 'rule', 'stripe'],
-    )
-    for (const name of names) {
-      const radio = within(titles).getByRole('radio', { name })
-      const sample = radio.parentElement!.querySelector<HTMLElement>('[aria-hidden="true"] [data-menu-title]')!
-      expect(sample).toHaveAttribute('data-menu-title', radio.getAttribute('value'))
-      expect(sample).toHaveTextContent(name)
-      expect(sample.style.getPropertyValue('--menu-bg')).toBe('#f8f3ec')
-    }
-    // The samples are pictures: they add no heading to the page.
-    expect(screen.queryByRole('heading', { name: 'Ribbon' })).not.toBeInTheDocument()
-    expect(within(screen.getByRole('group', { name: 'Menu header' })).getAllByRole('radio')).toHaveLength(5)
   })
 })
 
@@ -148,21 +98,22 @@ describe('DesignPage: saving the look', () => {
   it('sends one theme patch with every field, and the repository keeps them all', async () => {
     const spy = spyOnSave()
     const { user, owner } = await renderDesign({ wrapOwner: spy.wrap })
-    await openLook(user, 'Cards')
-    await user.click(screen.getByRole('radio', { name: 'Soft card' }))
-    await user.click(screen.getByRole('radio', { name: 'Circle' }))
-    await showPart(user, 'Headings')
-    await user.click(screen.getByRole('radio', { name: 'Band' }))
-    await user.click(screen.getByRole('radio', { name: 'Big name' }))
+    await openLook(user)
+    await user.clear(screen.getByLabelText('Accent color'))
+    await user.type(screen.getByLabelText('Accent color'), '#2266aa')
+    await user.click(screen.getByRole('button', { name: 'Dark' }))
     await showPart(user, 'Extras')
-    await user.click(screen.getByRole('radio', { name: 'Sparkles' }))
-    await user.click(screen.getByRole('radio', { name: 'Glow' }))
+    await user.click(screen.getByRole('radio', { name: 'Your photo' }))
     await user.click(screen.getByRole('radio', { name: 'Anton' }))
+    await user.click(screen.getByRole('radio', { name: 'List' }))
     await user.click(saveButton())
     await screen.findByText('Your changes are saved.')
+    expect(spy.patches).toHaveLength(1)
     const sent = spy.patches[0]?.theme
     expect(Object.keys(sent ?? {}).sort()).toEqual(Object.keys(DEFAULT_THEME).sort())
-    const expected = { card: 'soft', photo: 'circle', title: 'stripe', header: 'poster', decor: 'sparkles', backdrop: 'glow', font: 'anton' }
+    // Dark moves the page and text colors to the plain dark pair; the owner accent stays.
+    const { background, secondary } = modeDefaults('dark')
+    const expected = { primary: '#2266aa', secondary, background, mode: 'dark', backdrop: 'picture', font: 'anton', layout: 'list' }
     expect(sent).toMatchObject(expected)
     expect((await owner.getBusiness())?.theme).toEqual(sent)
   })

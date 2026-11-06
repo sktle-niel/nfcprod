@@ -44,7 +44,7 @@ describe('switchedTheme', () => {
 describe('the style words', () => {
   it('names every style and says what it is best for, in the business type words', () => {
     for (const id of STYLE_IDS) {
-      expect(styleName(id)).toMatch(/^[A-Z][a-z]+$/)
+      expect(styleName(id)).toMatch(/^[A-Z][a-z]+( [A-Z][a-z]+)?$/)
       expect(bestForLine(id)).toMatch(/^Best for: /)
     }
     expect(bestForLine('classic')).toBe('Best for: any kind of menu')

@@ -1,0 +1,36 @@
+/* The sizes and add-ons of a product. It takes the text color of what holds it; only the labels are quieter, in the muted
+   color made for the ground it sits on. */
+.details {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.details dt {
+  margin: 0;
+  font-weight: 600;
+}
+
+.details dd {
+  margin: 0;
+}
+
+.group {
+  display: grid;
+  gap: 2px;
+}
+
+.onPage dt {
+  color: var(--menu-muted);
+}
+
+.onCard dt {
+  color: var(--menu-card-muted);
+}
+
+/* A price stays whole: a line never breaks between the plus sign and the peso sign. */
+.extra {
+  white-space: nowrap;
+}

@@ -1,0 +1,41 @@
+.masthead {
+  padding: 14px var(--tpl-gutter) 26px;
+  text-align: center;
+}
+
+.logo {
+  display: block;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  overflow: hidden;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: clamp(3rem, 17cqi, 6rem);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.name[data-size='m'] {
+  font-size: clamp(2.5rem, 13cqi, 4.5rem);
+}
+
+.name[data-size='s'] {
+  font-size: clamp(1.875rem, 9.5cqi, 3.25rem);
+}
+
+.tagline {
+  max-width: 34ch;
+  margin: 12px auto 0;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--menu-muted);
+  text-wrap: balance;
+  hanging-punctuation: first last;
+}

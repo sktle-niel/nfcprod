@@ -1,21 +1,17 @@
-import { useId, type CSSProperties } from 'react'
+import { Suspense, useId, type CSSProperties } from 'react'
 import { copy } from '@/config/copy'
 import type { Business, BusinessType } from '@/entities/business/business'
 import type { Menu } from '@/entities/menu/menu'
 import { toCssVars } from '@/entities/theme/cssVars'
-import type { CardKind } from '@/entities/theme/theme'
-import { ProductCard } from './cards/ProductCard'
-import { CategoryNav } from './CategoryNav'
-import { Decor } from './decor/Decor'
+import { isTemplateStyle, type CardKind } from '@/entities/theme/theme'
+import { ClassicPage } from './ClassicPage'
 import { useMenuFonts } from './fonts'
-import { MenuHeader } from './headers/MenuHeader'
 import { lookOf, LookProvider, type Look } from './look'
-import { MenuFooter } from './MenuFooter'
 import { pictureSrc, renderableTheme } from './picture'
 import { placeholderKind } from './photo/placeholders'
 import { spotlightOf, visibleSections } from './sections'
-import { Spotlight } from './Spotlight'
-import { SectionTitle } from './titles/SectionTitle'
+import { TEMPLATES } from './templates'
+import { TemplateBoundary } from './templates/TemplateBoundary'
 import { usePhotoBackdrop } from './usePhotoBackdrop'
 import styles from './MenuView.module.css'
 
@@ -44,7 +40,8 @@ const columnsOf = (look: Look) => {
 /**
  * The one renderer of a business's menu, for the Design preview and the public page. It is painted from the --menu-*
  * variables only, and sized by its own width (container queries), so it fits a phone and a small preview frame alike. How it
- * is drawn (the card, the picture shape, the titles, the header, the line art) comes from the theme's look.
+ * is drawn comes from the theme's look: a page template draws the whole page itself (src/shared/menu/templates), and every other
+ * menu is the Classic page (`ClassicPage`), which also stands in for a template that cannot be loaded.
  */
 export function MenuView({ business, menu, headingLevel = 1, interactive = true }: Props) {
   const uid = useId()
@@ -55,10 +52,11 @@ export function MenuView({ business, menu, headingLevel = 1, interactive = true 
   const look = lookOf(theme)
   useMenuFonts(business.theme)
   const sections = visibleSections(menu)
-  const spotlight = look.spotlight ? spotlightOf(sections) : null
-  const groupIds = new Set(menu.groups.map((group) => group.id))
   const idOf = (index: number) => `${uid}-section-${index}`
   const [categoryTag, productTag] = headingLevel === 1 ? (['h2', 'h3'] as const) : (['h3', 'h4'] as const)
+  // A menu with nothing on it is drawn the Classic way, with its own words, whatever the template: there is no page to lay out.
+  const Template = sections.length > 0 && isTemplateStyle(look.style) ? TEMPLATES[look.style] : null
+  const classic = <ClassicPage business={business} sections={sections} groups={menu.groups} headingLevel={headingLevel} interactive={interactive} idOf={idOf} />
 
   return (
     // The variables are fixed names with checked values (toCssVars), and every data attribute is one of our own list
@@ -67,6 +65,7 @@ export function MenuView({ business, menu, headingLevel = 1, interactive = true 
       <div
         className={styles.root}
         style={toCssVars(theme) as CSSProperties}
+        data-menu-template={Template ? look.style : undefined}
         data-menu-layout={look.layout}
         data-menu-columns={columnsOf(look)}
         data-menu-card={look.card}
@@ -80,50 +79,31 @@ export function MenuView({ business, menu, headingLevel = 1, interactive = true 
       >
         {/* The photo under the page: one screen tall, it stays put while the menu scrolls over it (MenuView.module.css). */}
         {layer && <div ref={layerRef} className={styles.photo} aria-hidden="true" />}
-        <Decor />
-        <div className={styles.content}>
-          <MenuHeader business={business} as={headingLevel === 1 ? 'h1' : 'h2'} />
-          {sections.length === 0 ? (
-            <p className={styles.empty}>{copy.menu.view.empty}</p>
-          ) : (
-            <>
-              <CategoryNav sections={sections} idOf={idOf} interactive={interactive} />
-              {spotlight && (
-                <Spotlight
-                  as={categoryTag}
-                  product={spotlight.product}
-                  photo={pictureSrc(spotlight.product.image)}
-                  placeholder={placeholderKind({ product: spotlight.product.name, category: spotlight.category.name }, business.types)}
+        {Template ? (
+          // Above the photo layer, like the Classic content. The key starts the boundary over when another template is chosen.
+          <div className={styles.content}>
+            <TemplateBoundary key={look.style} fallback={classic} interactive={interactive}>
+              {/* Nothing is laid out yet, so nothing moves when the page comes. The words only appear on a slow download. */}
+              <Suspense fallback={interactive ? <p role="status" className={styles.templateLoading}>{copy.menu.view.template.loading}</p> : null}>
+                <Template
+                  business={business}
+                  sections={sections}
+                  // A template decides for itself whether to feature it, so it is always handed one.
+                  spotlight={spotlightOf(sections)}
+                  groups={menu.groups}
+                  layout={look.layout}
+                  tags={{ name: headingLevel === 1 ? 'h1' : 'h2', category: categoryTag, product: productTag }}
+                  interactive={interactive}
+                  idOf={idOf}
+                  photoOf={(product) => pictureSrc(product.image)}
+                  placeholderOf={(product, category) => placeholderKind({ product: product.name, category: category.name }, business.types)}
                 />
-              )}
-              {sections.map(({ category, products }, index) => (
-                <section
-                  key={category.id}
-                  id={idOf(index)}
-                  className={styles.section}
-                  // A landmark on the public page only: in the Design preview it would add the customer's menu to the owner's landmarks.
-                  aria-labelledby={interactive ? `${idOf(index)}-title` : undefined}
-                >
-                  <SectionTitle as={categoryTag} id={`${idOf(index)}-title`} name={category.name} />
-                  <ul className={styles.products}>
-                    {products.map((product, position) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        as={productTag}
-                        hasAddOns={product.groupIds.some((id) => groupIds.has(id))}
-                        photo={pictureSrc(product.image)}
-                        placeholder={placeholderKind({ product: product.name, category: category.name }, business.types)}
-                        number={position + 1}
-                      />
-                    ))}
-                  </ul>
-                </section>
-              ))}
-            </>
-          )}
-          <MenuFooter business={business} interactive={interactive} />
-        </div>
+              </Suspense>
+            </TemplateBoundary>
+          </div>
+        ) : (
+          classic
+        )}
       </div>
     </LookProvider>
   )

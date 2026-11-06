@@ -5,7 +5,7 @@ import type { Preset } from './types'
 export const milkTeaPreset: Preset = {
   type: 'milkTea',
   categories: ['Classics', 'Fruit Teas', 'Specials'],
-  theme: styleTheme('fresh', 'light'),
+  theme: styleTheme('marmalade', 'light'),
   groups: [
     {
       name: 'Sugar level',

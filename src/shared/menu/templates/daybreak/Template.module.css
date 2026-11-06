@@ -1,0 +1,137 @@
+/* Daybreak: a paper placemat printed in one ink. Painted from the --menu-* variables only. */
+.page {
+  --tpl-inset: 10px;
+  --tpl-gutter: 18px;
+  /* The height of the sticky band: what a section stops below. */
+  --tpl-band: 46px;
+  /* The solid parts of the sheet, the band and the Visit block: full ink by day. At night a block of pale ink would glare, so they
+     stay on the dark paper and only their edges are ruled. */
+  --tpl-solid: var(--menu-text);
+  --tpl-on-solid: var(--menu-bg);
+  --tpl-solid-edge: transparent;
+  /* The fine rules, on the paper and on a solid part. */
+  --tpl-hair: color-mix(in srgb, var(--menu-text) 32%, transparent);
+  --tpl-hair-solid: color-mix(in srgb, var(--tpl-on-solid) 32%, transparent);
+  /* Which color prints the shadows of a picture and which its highlights. The shadows are the ink warmed by the accent: a soft print. */
+  --tpl-shade: color-mix(in srgb, var(--menu-text) 74%, var(--menu-accent));
+  --tpl-light: var(--menu-bg);
+  /* Above the page photo, if the owner put one under the menu. */
+  position: relative;
+  z-index: 1;
+  padding: var(--tpl-inset);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page[data-mode='dark'] {
+  --tpl-solid: var(--menu-bg);
+  --tpl-on-solid: var(--menu-text);
+  --tpl-solid-edge: var(--menu-text);
+  --tpl-shade: color-mix(in srgb, var(--menu-bg) 88%, var(--menu-accent));
+  --tpl-light: var(--menu-text);
+}
+
+.page ::selection {
+  color: var(--menu-bg);
+  background: var(--menu-text);
+}
+
+/* The printed frame: two fine rules with a gap between them. The sheet stands as tall as the screen, with the Visit block at its foot. */
+.sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 2 * var(--tpl-inset));
+  border: 4px double var(--menu-text);
+}
+
+.menu {
+  scroll-margin-top: var(--tpl-band);
+}
+
+.menu:focus {
+  outline: none;
+}
+
+.sections {
+  padding: 0 var(--tpl-gutter);
+}
+
+.section {
+  padding-top: 30px;
+  scroll-margin-top: var(--tpl-band);
+}
+
+.section:focus {
+  outline: none;
+}
+
+.title {
+  margin: 0 0 16px;
+  padding-bottom: 7px;
+  font-family: var(--menu-display);
+  font-size: 1.875rem;
+  font-weight: 400;
+  line-height: 1.1;
+  border-bottom: 3px double var(--menu-text);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+.list {
+  display: grid;
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.none {
+  margin: 32px var(--tpl-gutter);
+  font-size: 1rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.closing {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-top: 44px;
+}
+
+.closing:empty {
+  display: none;
+}
+
+/* Grid: two columns of items side by side, the picture on top. */
+.page[data-layout='grid'] .list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 22px;
+}
+
+/* A wide sheet is laid out like a placemat: the categories in two columns. */
+@container (min-width: 640px) {
+  .page {
+    --tpl-inset: 18px;
+    --tpl-gutter: 36px;
+  }
+
+  .sections {
+    columns: 2;
+    column-gap: 56px;
+    column-rule: 1px solid var(--tpl-hair);
+  }
+
+  .section {
+    break-inside: avoid;
+  }
+
+  .page[data-layout='grid'] .sections {
+    columns: 1;
+  }
+
+  .page[data-layout='grid'] .list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

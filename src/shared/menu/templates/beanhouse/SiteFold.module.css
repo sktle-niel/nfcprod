@@ -1,0 +1,53 @@
+/* The folded top of the bag: a shade deeper than the bag, stitched along its lower edge, resting on the bag with a soft shadow. */
+.fold {
+  position: relative;
+  min-height: 12px;
+  padding-bottom: 7px;
+  background-color: color-mix(in srgb, var(--menu-text) 9%, var(--menu-bg));
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.16);
+}
+
+.fold::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 4px;
+  border-top: 1px dashed color-mix(in srgb, var(--menu-text) 34%, transparent);
+}
+
+.list {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin: 0;
+  padding: 0 var(--tpl-gutter);
+  list-style: none;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--menu-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, currentcolor 45%, transparent);
+  text-underline-offset: 5px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: -4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    text-decoration-color: currentcolor;
+  }
+}

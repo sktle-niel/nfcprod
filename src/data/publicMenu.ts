@@ -1,5 +1,6 @@
 import { isValidSlug } from '@/entities/business/slug'
 import { LIMITS } from '@/entities/menu/menu'
+import { samplePicturePath } from '@/entities/menu/samplePictures'
 import { styleTheme } from '@/entities/theme/styles'
 import { mergePresets } from '@/presets'
 import { matchKey } from '@/shared/lib/checks'
@@ -44,6 +45,17 @@ export function buildSample(sample: SampleBusiness): PublicMenu {
         newId,
       )
     }
+  }
+
+  // An item shows the photo it names, by its product name (unique within a sample). Set here, past the editors: only this seed
+  // carries these paths.
+  const photos = new Map(Object.values(sample.items).flat().map((item) => [item.name, item.photo]))
+  menu = {
+    ...menu,
+    products: menu.products.map((product) => {
+      const photo = photos.get(product.name)
+      return { ...product, image: photo === undefined ? null : samplePicturePath(photo) }
+    }),
   }
 
   return {

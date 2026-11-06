@@ -6,6 +6,7 @@ import { validateProductInput } from '@/entities/menu/validateProduct'
 import { contrastRatio } from '@/entities/theme/color'
 import { toCssVars } from '@/entities/theme/cssVars'
 import { STYLES, styleTheme } from '@/entities/theme/styles'
+import { isTemplateStyle } from '@/entities/theme/theme'
 import { themeIssues, validateTheme } from '@/entities/theme/validate'
 import { PRESETS, presetFor } from '.'
 import { asCategories, groupsPassEditor } from './presets.testkit'
@@ -61,8 +62,9 @@ describe.each(BUSINESS_TYPES)('the %s preset', (type) => {
     const vars = toCssVars(preset.theme)
     const read = (a: string, b: string) => contrastRatio(vars[a] ?? '', vars[b] ?? '')
     expect(read('--menu-muted', '--menu-bg')).toBeGreaterThanOrEqual(4.5)
-    expect(read('--menu-muted', '--menu-surface')).toBeGreaterThanOrEqual(4.5)
-    expect(read('--menu-text', '--menu-surface')).toBeGreaterThanOrEqual(4.5)
+    // A template's surface can be a painted board (Marmalade), so what is drawn on it is the surface's own pair, not the page's.
+    expect(read('--menu-card-muted', '--menu-surface')).toBeGreaterThanOrEqual(4.5)
+    expect(read('--menu-on-surface', '--menu-surface')).toBeGreaterThanOrEqual(4.5)
   })
 
   it('has add-on groups the group editor would accept', () => {
@@ -101,18 +103,20 @@ describe('the presets', () => {
     PRESETS[type].groups.find((group) => group.name === name)?.options.map((option) => option.label) ?? []
 
   it('give fine dining a serif font and a bar the dark mode', () => {
-    expect(['instrumentSerif', 'playfair', 'dmSerif']).toContain(PRESETS.fineDining.theme.font)
+    expect(['instrumentSerif', 'playfair', 'dmSerif', 'sourceSerif']).toContain(PRESETS.fineDining.theme.font)
     expect(PRESETS.bar.theme.mode).toBe('dark')
   })
 
-  it('give each kind of business a style of its own, so the choice shows from the first minute', () => {
+  it('start every kind of business on a page template, and on at least five different ones, so the choice shows from the first minute', () => {
     const styles = BUSINESS_TYPES.map((type) => PRESETS[type].theme.style)
-    expect(new Set(styles).size).toBe(BUSINESS_TYPES.length)
+    for (const style of styles) expect(isTemplateStyle(style), style).toBe(true)
+    // Fine dining and a bar both suit the dark glass template, so the six kinds use five of the six.
+    expect(new Set(styles).size).toBeGreaterThanOrEqual(5)
   })
 
-  it('give each kind of business its own palette', () => {
+  it('give the kinds of business at least five different palettes', () => {
     const palettes = BUSINESS_TYPES.map((type) => PRESETS[type].theme.primary)
-    expect(new Set(palettes).size).toBe(BUSINESS_TYPES.length)
+    expect(new Set(palettes).size).toBeGreaterThanOrEqual(5)
   })
 
   it('give a coffee shop shots, syrups and other milks', () => {

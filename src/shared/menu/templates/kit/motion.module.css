@@ -1,0 +1,59 @@
+/* The motion of the page templates. The values live in shared/theme/tokens.css, so every template sheet can read them:
+
+     --tpl-ease              entering, leaving, press (the app's --ease-out)
+     --tpl-ease-move         on-screen movement: the sticky category mark (the app's --ease-in-out)
+     --tpl-duration-press    140ms  press feedback on a link or button
+     --tpl-duration-small    200ms  hover, a color or mark change
+     --tpl-duration-open     240ms  add-ons opening and closing, the category mark moving
+     --tpl-duration-reveal   420ms  a section easing in as it arrives
+     --tpl-duration-opening  560ms  the one composed moment at page load (with stagger, 700ms at most)
+     --tpl-stagger           60ms   between the steps of that moment
+     --tpl-rise              12px   how far an entrance travels
+
+   Only transform and opacity move here. All of it sits behind prefers-reduced-motion: no-preference, so a person who asked for calm
+   gets none of it; `screen` keeps a page that is being printed whole. Classes below are for elements of a page with `interactive`
+   true: `interactive ? motion.opening : undefined`. The Design preview and the gallery thumbnails stay still. */
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  /* Set by useReveal, never by hand. An attribute, because React rewrites a class it did not expect. */
+  [data-reveal='waiting'] {
+    opacity: 0;
+    transform: translateY(var(--tpl-rise));
+  }
+
+  [data-reveal='arriving'] {
+    transition:
+      opacity var(--tpl-duration-reveal) var(--tpl-ease),
+      transform var(--tpl-duration-reveal) var(--tpl-ease);
+  }
+
+  /* The page-load entrance: name, then tagline, then the rest. Fill backwards only, so nothing is held once it is over.
+     Add .afterOne or .afterTwo beside .opening for the later steps. */
+  .opening {
+    animation: tpl-opening var(--tpl-duration-opening) var(--tpl-ease) backwards;
+  }
+
+  .afterOne {
+    animation-delay: var(--tpl-stagger);
+  }
+
+  .afterTwo {
+    animation-delay: calc(var(--tpl-stagger) * 2);
+  }
+
+  /* Press feedback on a link. A transform needs a box: inline-flex or block, which a 44px target already is. */
+  .press {
+    transition: transform var(--tpl-duration-press) var(--tpl-ease);
+  }
+
+  .press:active {
+    transform: scale(0.98);
+  }
+}
+
+@keyframes tpl-opening {
+  from {
+    opacity: 0;
+    transform: translateY(var(--tpl-rise));
+  }
+}

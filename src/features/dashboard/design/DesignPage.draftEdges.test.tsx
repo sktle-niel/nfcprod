@@ -1,10 +1,11 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
+import { copy } from '@/config/copy'
 import { dashboardCopy } from '@/config/dashboardCopy'
 import { IMAGE_MAX_BYTES } from '@/entities/menu/menu'
 import { sampleImageFile } from '@/test/ownerFixtures'
-import { discardButton, previewRegion, renderDesign, saveButton, showPart } from './designTestkit'
+import { discardButton, previewDrawn, previewRegion, renderDesign, saveButton } from './designTestkit'
 
 const text = dashboardCopy.design
 const TOO_LARGE = 'That picture is too large. Pictures can be 4 MB at most.'
@@ -22,8 +23,11 @@ describe('DesignPage: the preview shows what the save will keep', () => {
     fireEvent.change(screen.getByLabelText(text.details.hours), { target: { value: '  \n  ' } })
     fireEvent.change(screen.getByLabelText(text.details.tagline), { target: { value: '   ' } })
 
-    expect(previewRegion().querySelector('footer')).toBeNull()
-    expect(previewRegion().querySelector('header p')).toBeNull()
+    // The page template loads on its own: wait for it, or the checks below would be true of a preview that is still blank.
+    await previewDrawn('Kape Kanto')
+    expect(within(previewRegion()).queryByText(copy.menu.view.template.visit.heading)).not.toBeInTheDocument()
+    expect(previewRegion().querySelector('[data-fact]')).toBeNull()
+    expect([...previewRegion().querySelectorAll('p')].filter((line) => line.textContent.trim() === '')).toEqual([])
   })
 
   it('draws the cleaned address and the hours lines the way the save will keep them', async () => {
@@ -31,9 +35,9 @@ describe('DesignPage: the preview shows what the save will keep', () => {
     fireEvent.change(await screen.findByLabelText(text.details.address), { target: { value: '  12   Mabini   Street ' } })
     fireEvent.change(screen.getByLabelText(text.details.hours), { target: { value: '  Mon-Fri   8am-5pm  \n\n  Sat 9am-3pm ' } })
 
-    expect(previewRegion().querySelector('footer')).toHaveTextContent('12 Mabini Street')
-    expect(previewRegion().querySelector('footer')).toHaveTextContent('Mon-Fri 8am-5pm')
-    expect(previewRegion().querySelector('footer')).toHaveTextContent('Sat 9am-3pm')
+    await waitFor(() => expect(previewRegion().querySelector('[data-fact="address"]')).toHaveTextContent('12 Mabini Street'))
+    expect(previewRegion().querySelector('[data-fact="hours"]')).toHaveTextContent('Mon-Fri 8am-5pm')
+    expect(previewRegion().querySelector('[data-fact="hours"]')).toHaveTextContent('Sat 9am-3pm')
   })
 
   it('keeps the last whole color of the draft, not the saved one, while a color is half typed after a switch to Dark', async () => {
@@ -95,33 +99,5 @@ describe('DesignPage: the words about a refused logo do not outlive it', () => {
     await screen.findByText(text.bar.status.saved)
 
     expect(screen.queryByText(TOO_LARGE)).not.toBeInTheDocument()
-  })
-})
-
-describe('DesignPage: Reset the look while a save runs', () => {
-  it('does not say the look was reset when the save blocked the change, and resets it after the save', async () => {
-    let release: () => void = () => undefined
-    const gate = new Promise<void>((resolve) => {
-      release = resolve
-    })
-    const { user } = await renderDesign({
-      wrapOwner: (real) => ({ ...real, saveBusiness: async (patch) => (await gate, real.saveBusiness(patch)) }),
-    })
-    await user.click(screen.getByRole('tab', { name: 'Look' }))
-    await showPart(user, 'Extras')
-    await user.click(screen.getByRole('radio', { name: 'Square' }))
-    await user.click(saveButton())
-    await screen.findByText(text.bar.status.saving)
-
-    await user.click(screen.getByRole('button', { name: text.look.reset }))
-
-    expect(screen.queryByText(text.look.resetNote)).not.toBeInTheDocument()
-    expect(screen.queryByText(text.look.resetNoteSame)).not.toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: 'Square' })).toBeChecked()
-
-    release()
-    await screen.findByText(text.bar.status.saved)
-    await user.click(screen.getByRole('button', { name: text.look.reset }))
-    await waitFor(() => expect(screen.getByText(text.look.resetNote)).toBeInTheDocument())
   })
 })

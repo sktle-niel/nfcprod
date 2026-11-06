@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { dashboardCopy } from '@/config/dashboardCopy'
 import { renderDesign, showPart } from './designTestkit'
@@ -54,13 +54,10 @@ describe('DesignPage: form attributes and words', () => {
     expect(screen.getByLabelText('Phone')).toHaveAttribute('inputmode', 'tel')
   })
 
-  it('names the corners choice for what it changes, and writes the font option for the device in plain words', async () => {
+  it('writes the font option for the device in plain words', async () => {
     const { user } = await renderDesign()
     await user.click(screen.getByRole('tab', { name: 'Look' }))
     await showPart(user, 'Extras')
-    const corners = screen.getByRole('group', { name: 'Corners' })
-    expect(corners).toHaveAccessibleDescription(text.look.buttonStyle.hint)
-    expect(within(corners).getAllByText('Best seller')).toHaveLength(3)
     expect(screen.getByRole('radio', { name: 'Device default' })).toBeInTheDocument()
     expect(screen.queryByText('System')).not.toBeInTheDocument()
   })
@@ -135,7 +132,8 @@ describe('DesignPage: room for the sticky save bar', () => {
   it('sets --save-bar-h on the root while the bar is on the page, and removes it with the bar', async () => {
     vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(72)
     await renderDesign()
-    expect(root().getPropertyValue('--save-bar-h')).toBe('72px')
+    // The bar measures itself once it is committed, which on a busy machine can come after the data is in.
+    await waitFor(() => expect(root().getPropertyValue('--save-bar-h')).toBe('72px'))
     cleanup()
     expect(root().getPropertyValue('--save-bar-h')).toBe('')
   })
@@ -149,6 +147,6 @@ describe('DesignPage: room for the sticky save bar', () => {
       return new Proxy(style, { get: (target, key) => (key === 'bottom' ? '80px' : Reflect.get(target, key)) })
     })
     await renderDesign()
-    expect(root().getPropertyValue('--save-bar-h')).toBe('152px')
+    await waitFor(() => expect(root().getPropertyValue('--save-bar-h')).toBe('152px'))
   })
 })

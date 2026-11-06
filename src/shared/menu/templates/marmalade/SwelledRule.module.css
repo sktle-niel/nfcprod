@@ -1,0 +1,5 @@
+.rule {
+  display: block;
+  height: 6px;
+  fill: var(--tpl-gilt);
+}

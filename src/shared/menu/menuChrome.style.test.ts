@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { backdropLayers, BACKDROP_TILES, NEW_BACKDROPS, PICTURE_SHARES } from '@/entities/theme/backdrop'
 import { contrastRatio, mixHex } from '@/entities/theme/color'
 import { toCssVars } from '@/entities/theme/cssVars'
+import { stockSrc } from '@/entities/theme/stock'
+import { STOCK_PHOTOS } from '@/entities/theme/stockPhotos'
 import { styleTheme } from '@/entities/theme/styles'
-import { BACKDROPS, MODES, PHOTO_FITS, PHOTO_POSITIONS, STYLE_IDS, TITLES, VEILS } from '@/entities/theme/theme'
+import { BACKDROPS, MODES, PHOTO_FITS, PHOTO_POSITIONS, STYLE_IDS, TITLES, VEILS, type Theme } from '@/entities/theme/theme'
 import { TEXT_CONTRAST_MIN } from '@/entities/theme/validate'
 import { readCss, rulesOf, type CssRule } from '@/test/css'
 
@@ -15,8 +17,9 @@ import { readCss, rulesOf, type CssRule } from '@/test/css'
 const VIEW = 'src/shared/menu/MenuView.module.css'
 const backdropSelector = (backdrop: string) => `.root[data-menu-backdrop='${backdrop}']`
 
-/** The classic five: drawn by the menu's own CSS, with no texture variable. The photo backdrop has a variable of its own. */
-const CLASSIC_BACKDROPS = BACKDROPS.filter((name) => !(NEW_BACKDROPS as readonly string[]).includes(name) && name !== 'picture')
+/** The classic five: drawn by the menu's own CSS, with no texture variable. The two photo backdrops have a variable of their own. */
+const PHOTO_BACKDROPS = ['picture', 'stock']
+const CLASSIC_BACKDROPS = BACKDROPS.filter((name) => !(NEW_BACKDROPS as readonly string[]).includes(name) && !PHOTO_BACKDROPS.includes(name))
 
 async function rules(path: string): Promise<CssRule[]> {
   return rulesOf(await readCss(path))
@@ -178,7 +181,7 @@ describe('the drawn backdrops', () => {
 })
 
 /*
- * The photo backdrop: the owner's picture under a flat veil of the page color. The veil leaves at most
+ * The photo backdrops: the owner's picture or a library photo under a flat veil of the page color. The veil leaves at most
  * PICTURE_SHARES[veil] of any pixel showing, so the worst grounds under the page text are the page moved toward black
  * and toward white by that share. The audit holds the text pair to 4.5:1 there for every style, mode and veil.
  */
@@ -187,13 +190,15 @@ describe('the photo backdrop', () => {
 
   it('is drawn on a sticky layer one screen tall under the content, covering it once under the flat veil, and the root paints no photo itself', async () => {
     const all = await rules(VIEW)
-    // The root keeps the page color; the only rule on the picture backdrop hands the variable to the layer.
-    expect(all.filter((rule) => rule.selector.includes(backdropSelector('picture'))).map((rule) => rule.selector)).toEqual([
-      `${backdropSelector('picture')} > .photo`,
-    ])
-    expect(all.find((rule) => rule.selector === `${backdropSelector('picture')} > .photo`)?.declarations).toEqual({
-      'background-image': 'var(--menu-backdrop-image)',
-    })
+    // The root keeps the page color; the only rule on a photo backdrop (the owner's picture, a library photo) hands the variable to the layer.
+    for (const backdrop of PHOTO_BACKDROPS) {
+      expect(all.filter((rule) => rule.selector.includes(backdropSelector(backdrop))).map((rule) => rule.selector), backdrop).toEqual([
+        `${backdropSelector(backdrop)} > .photo`,
+      ])
+      expect(all.find((rule) => rule.selector === `${backdropSelector(backdrop)} > .photo`)?.declarations, backdrop).toEqual({
+        'background-image': 'var(--menu-backdrop-image)',
+      })
+    }
     const layer = all.find((rule) => rule.selector === '.photo')?.declarations
     expect(layer?.['position']).toBe('sticky')
     expect(layer?.['top']).toBe('0')
@@ -229,13 +234,19 @@ describe('the photo backdrop', () => {
     }
   })
 
-  it('keeps the page text pair at 4.5:1 on the photo worst grounds, for every style, mode and veil', () => {
+  const STOCK_ID = STOCK_PHOTOS[0].id
+  const PHOTO_THEMES: [string, Partial<Theme>, string][] = [
+    ['the owner picture', { backdrop: 'picture', backdropPicture: PHOTO }, `url("${PHOTO}")`],
+    ['a library photo', { backdrop: 'stock', backdropStock: STOCK_ID }, `url("${stockSrc(STOCK_ID)}")`],
+  ]
+
+  it.each(PHOTO_THEMES)('keeps the page text pair at 4.5:1 on the worst grounds of %s, for every style, mode and veil', (_name, patch, image) => {
     const failures: string[] = []
     for (const id of STYLE_IDS) {
       for (const mode of MODES) {
         for (const veil of VEILS) {
-          const vars = toCssVars({ ...styleTheme(id, mode), backdrop: 'picture', backdropPicture: PHOTO, backdropVeil: veil })
-          expect(vars['--menu-backdrop-image'], `${id} ${mode} ${veil}`).toContain(`url("${PHOTO}")`)
+          const vars = toCssVars({ ...styleTheme(id, mode), ...patch, backdropVeil: veil })
+          expect(vars['--menu-backdrop-image'], `${id} ${mode} ${veil}`).toContain(image)
           const page = vars['--menu-bg'] ?? ''
           const share = PICTURE_SHARES[veil]
           const grounds = [mixHex(page, '#000000', share), mixHex(page, '#ffffff', share)]
@@ -256,6 +267,12 @@ describe('the photo backdrop', () => {
     expect(toCssVars({ ...theme, backdropPicture: null })['--menu-backdrop-image']).toBe('none')
     expect(toCssVars({ ...theme, backdropPicture: 'https://images.example.com/a(1).png' })['--menu-backdrop-image']).toBe('none')
     expect(toCssVars({ ...theme, backdropPicture: 'javascript:alert(1)' })['--menu-backdrop-image']).toBe('none')
+  })
+
+  it("sets the variable to 'none' for a library photo the table does not know, so a nested root can never inherit a photo", () => {
+    const theme = { ...styleTheme('classic', 'light'), backdrop: 'stock' as const }
+    expect(toCssVars({ ...theme, backdropStock: null })['--menu-backdrop-image']).toBe('none')
+    expect(toCssVars({ ...theme, backdropStock: '../x' as unknown as Theme['backdropStock'] })['--menu-backdrop-image']).toBe('none')
   })
 })
 

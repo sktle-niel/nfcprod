@@ -1,0 +1,73 @@
+.masthead {
+  padding: 26px var(--tpl-gutter) 36px;
+  text-align: center;
+}
+
+.logo {
+  --logo-size: 64px;
+  --logo-radius: 0;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: 3.75rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.name[data-size='m'] {
+  font-size: 2.875rem;
+}
+
+.name[data-size='s'] {
+  font-size: 2.125rem;
+  line-height: 1.08;
+}
+
+.tagline {
+  margin: 10px 0 0;
+  font-size: 1.25rem;
+  font-style: italic;
+  line-height: 1.25;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.rule {
+  display: block;
+  margin-top: 22px;
+}
+
+/* The rule is drawn out from its lozenge, last of the opening. Only this one element, once. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  .rule[data-draw] > svg {
+    animation: draw var(--tpl-duration-opening) var(--tpl-ease) calc(var(--tpl-stagger) * 2) backwards;
+  }
+}
+
+@keyframes draw {
+  from {
+    opacity: 0;
+    transform: scaleX(0.4);
+  }
+}
+
+@container (min-width: 640px) {
+  .masthead {
+    padding-top: 44px;
+  }
+
+  .name {
+    font-size: 4.75rem;
+  }
+
+  .name[data-size='m'] {
+    font-size: 3.75rem;
+  }
+}

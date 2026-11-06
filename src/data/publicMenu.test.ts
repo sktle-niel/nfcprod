@@ -3,6 +3,7 @@ import { BUSINESS_TYPES } from '@/entities/business/business'
 import { isValidSlug } from '@/entities/business/slug'
 import { validateBusinessPatch } from '@/entities/business/validate'
 import { PRODUCT_TAGS } from '@/entities/menu/menu'
+import { samplePicture } from '@/entities/menu/samplePictures'
 import { validateCategoryInput, validateGroupInput } from '@/entities/menu/validate'
 import { validateProductInput } from '@/entities/menu/validateProduct'
 import { styleTheme } from '@/entities/theme/styles'
@@ -32,11 +33,11 @@ describe('the public menu repository (demo)', () => {
       ),
     )
     expect(looks).toEqual({
-      'cafe-luna': 'atelier dark',
-      'kapehan-ni-ana': 'diner dark',
-      'la-bella': 'gourmet dark',
-      'bean-there': 'retro dark',
-      'tea-hub': 'fresh light',
+      'cafe-luna': 'lightbox light',
+      'kapehan-ni-ana': 'daybreak light',
+      'la-bella': 'sandstone light',
+      'bean-there': 'drip light',
+      'tea-hub': 'marmalade light',
     })
   })
 
@@ -56,10 +57,12 @@ describe('the public menu repository (demo)', () => {
       for (const category of menu.categories) expect(validateCategoryInput(category, menu.categories).ok).toBe(true)
       for (const group of menu.groups) expect(validateGroupInput(group, menu.groups).ok).toBe(true)
       for (const product of menu.products) {
-        const checked = validateProductInput(product, menu)
+        // The picture is the one thing the editors would refuse: a sample's photo is a path of the demo's own files, which only
+        // this seed may carry (`samplePicture`). Everything else about the product must pass. An item with no fitting photo has none.
+        const { image, ...rest } = product
+        const checked = validateProductInput({ ...rest, image: null }, menu)
         expect(checked.ok, product.name).toBe(true)
-        // Plain data: the renderer draws an illustration, so no sample brings a picture.
-        expect(product.image).toBeNull()
+        if (image !== null) expect(samplePicture(image), product.name).not.toBeNull()
       }
       const ids = [...menu.categories, ...menu.products, ...menu.groups].map((item) => item.id)
       expect(new Set(ids).size).toBe(ids.length)
@@ -85,6 +88,34 @@ describe('the public menu repository (demo)', () => {
       expect(visibleSections(menu)).toHaveLength(menu.categories.length)
     },
   )
+
+  it('shows a photo only on the dish it fits, and each photo once per menu', () => {
+    const imagesOf = (slug: string) => {
+      const sample = SAMPLE_BUSINESSES.find((candidate) => candidate.slug === slug)
+      if (!sample) throw new Error(`no sample ${slug}`)
+      return new Map(buildSample(sample).menu.products.map((product) => [product.name, product.image]))
+    }
+
+    expect(imagesOf('kapehan-ni-ana').get('Sinigang na Baboy')).toBe('/sample/bowl-3.jpg')
+    expect(imagesOf('la-bella').get('Tiramisu')).toBe('/sample/slice-3.jpg')
+    expect(imagesOf('la-bella').get('Pan-roasted Sea Bass')).toBe('/sample/plate-6.jpg')
+    for (const name of ['Bicol Express', 'Halo-halo']) {
+      expect(imagesOf('kapehan-ni-ana').get(name), name).toBeNull()
+    }
+
+    for (const { slug, items } of SAMPLE_BUSINESSES) {
+      const names = Object.values(items).flat().map((item) => item.name)
+      expect(new Set(names).size, slug).toBe(names.length)
+      const shown = [...imagesOf(slug).values()].filter((image) => image !== null)
+      expect(new Set(shown).size, slug).toBe(shown.length)
+    }
+  })
+
+  it('refuses an item that names a photo the library does not have', () => {
+    const [first] = SAMPLE_BUSINESSES
+    if (!first) throw new Error('no samples')
+    expect(() => buildSample({ ...first, items: { Hot: [{ name: 'X', description: '', price: 1, photo: 'cup-9' }] } })).toThrow(RangeError)
+  })
 
   it('uses the sizes and add-ons of the presets where a sample asks for them', async () => {
     const luna = await repository.get('cafe-luna')
@@ -134,7 +165,7 @@ describe('the public menu repository (demo)', () => {
     first.menu.categories.length = 0
     const second = await repository.get('bean-there')
     expect(second?.business.name).toBe('Bean There')
-    expect(second?.business.theme.primary).toBe(styleTheme('retro', 'dark').primary)
+    expect(second?.business.theme.primary).toBe(styleTheme('drip', 'light').primary)
     expect(second?.menu.products[0]?.name).not.toBe('Changed')
     expect(second?.menu.categories.length).toBeGreaterThan(0)
     expect(second).not.toBe(first)

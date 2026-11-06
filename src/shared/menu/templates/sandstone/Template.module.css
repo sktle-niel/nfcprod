@@ -1,0 +1,37 @@
+/* Sandstone: a printed carte. Painted from the --menu-* variables only. */
+.page {
+  --tpl-gutter: 20px;
+  /* The width of the set type, as on a card held in the hand. */
+  --tpl-measure: 100%;
+  /* Above the page photo, if the owner put one under the menu. */
+  position: relative;
+  z-index: 1;
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  /* Instrument Serif has one weight: a browser's fake bold would smear it. A face with a real bold keeps it. */
+  font-synthesis-weight: none;
+}
+
+.page ::selection {
+  color: var(--menu-bg);
+  background: var(--menu-text);
+}
+
+.menu:focus {
+  outline: none;
+}
+
+.close {
+  margin-top: 72px;
+  padding: 0 var(--tpl-gutter);
+}
+
+@container (min-width: 640px) {
+  .page {
+    --tpl-gutter: 32px;
+    --tpl-measure: 560px;
+  }
+
+  .page[data-layout='grid'] {
+    --tpl-measure: 680px;
+  }
+}

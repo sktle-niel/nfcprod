@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { STOCK_PHOTOS } from '@/entities/theme/stockPhotos'
 import { styleTheme } from '@/entities/theme/styles'
 import { DEFAULT_THEME, type Theme } from '@/entities/theme/theme'
 import { PHOTO_UPSCALE_MAX, photoFallback, photoFits, usePhotoBackdrop } from './usePhotoBackdrop'
@@ -117,5 +118,78 @@ describe('usePhotoBackdrop', () => {
     expect(first.result.current.theme).toBe(texture)
     expect(second.result.current.layer).toBe(false)
     expect(second.result.current.theme).toBe(noPhoto)
+  })
+})
+
+describe('usePhotoBackdrop with a library photo', () => {
+  const photo = STOCK_PHOTOS[0]
+  const roastWithStock = (patch: Partial<Theme> = {}): Theme => ({ ...styleTheme('roast', 'light'), backdrop: 'stock', backdropStock: photo.id, ...patch })
+  // The widest screen the photo may fill, from the width the table gives it.
+  const WIDEST = Math.floor(photo.width * PHOTO_UPSCALE_MAX)
+
+  it('keeps the photo on a screen it can fill, paints the style texture on a wider one, and brings the photo back', async () => {
+    vi.stubGlobal('ResizeObserver', FakeResizeObserver)
+    const theme = roastWithStock()
+    const { result } = renderHook(() => usePhotoBackdrop(theme))
+    // The width is known from the first render, so the photo stands without waiting for anything.
+    expect(result.current.layer).toBe(true)
+    expect(result.current.theme).toBe(theme)
+    const node = document.createElement('div')
+    const cleanup = result.current.layerRef(node)
+    await act(async () => {})
+    expect(observed).toEqual([node])
+    screenIs(WIDEST)
+    expect(result.current.theme).toBe(theme)
+    screenIs(WIDEST + 1)
+    // Neither the owner picture nor the library photo stays: the style's own texture stands in for both.
+    expect(result.current.theme).toEqual({ ...theme, backdrop: 'grain', backdropPicture: null, backdropStock: null })
+    expect(result.current.layer).toBe(true)
+    screenIs(390)
+    expect(result.current.theme).toBe(theme)
+    if (typeof cleanup === 'function') cleanup()
+    expect(resize).toBeNull()
+  })
+
+  it('measures once, without a ResizeObserver, from the layer itself', async () => {
+    vi.stubGlobal('ResizeObserver', undefined)
+    const { result } = renderHook(() => usePhotoBackdrop(roastWithStock()))
+    const node = document.createElement('div')
+    vi.spyOn(node, 'getBoundingClientRect').mockReturnValue({ width: WIDEST + 1 } as DOMRect)
+    act(() => {
+      result.current.layerRef(node)
+    })
+    expect(result.current.theme.backdrop).toBe('grain')
+  })
+
+  it('requests no image to measure the photo, where the owner picture is requested', async () => {
+    const requested: string[] = []
+    class RecordingImage {
+      set src(address: string) {
+        requested.push(address)
+      }
+    }
+    vi.stubGlobal('Image', RecordingImage)
+    vi.stubGlobal('ResizeObserver', FakeResizeObserver)
+    renderHook(() => usePhotoBackdrop(roastWithPhoto()))
+    await act(async () => {})
+    expect(requested).toEqual([PHOTO])
+    renderHook(() => usePhotoBackdrop(roastWithStock()))
+    await act(async () => {})
+    expect(requested).toEqual([PHOTO])
+  })
+
+  it('has no layer for the library backdrop without a photo it knows, and changes nothing', async () => {
+    vi.stubGlobal('ResizeObserver', FakeResizeObserver)
+    const themes: Record<string, Theme> = {
+      'no photo chosen': roastWithStock({ backdropStock: null }),
+      'an id the table does not have': roastWithStock({ backdropStock: 'no-such-photo' as unknown as Theme['backdropStock'] }),
+      'another backdrop': roastWithStock({ backdrop: 'grain' }),
+    }
+    for (const [name, theme] of Object.entries(themes)) {
+      const { result } = renderHook(() => usePhotoBackdrop(theme))
+      await act(async () => {})
+      expect(result.current.layer, name).toBe(false)
+      expect(result.current.theme, name).toBe(theme)
+    }
   })
 })

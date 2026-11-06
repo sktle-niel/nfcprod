@@ -65,6 +65,17 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 
+  /* The menu page templates' motion, documented in shared/menu/templates/kit/motion.module.css. */
+  --tpl-ease: var(--ease-out);
+  --tpl-ease-move: var(--ease-in-out);
+  --tpl-duration-press: 140ms;
+  --tpl-duration-small: 200ms;
+  --tpl-duration-open: 240ms;
+  --tpl-duration-reveal: 420ms;
+  --tpl-duration-opening: 560ms;
+  --tpl-stagger: 60ms;
+  --tpl-rise: 12px;
+
   --container: 1160px;
   --gutter: clamp(16px, 4vw, 40px);
 

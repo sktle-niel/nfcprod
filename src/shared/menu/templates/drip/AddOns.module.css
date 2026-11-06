@@ -1,0 +1,83 @@
+/* A plain link in the run of the small print, in its quiet ink. It is small to the eye, and 44px tall to the thumb. */
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 0;
+  color: var(--menu-muted);
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button.toggle::after {
+  content: '';
+  position: absolute;
+  inset: -13px -6px;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: 2px;
+}
+
+.toggle[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+/* Height through the grid row, so the panel opens to whatever it holds. */
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+
+.panel[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+.fold {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.panel[data-open] .fold {
+  opacity: 1;
+}
+
+/* The small print of an add-on sits close under its link. */
+.fold > * {
+  margin-block: 4px 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toggle svg {
+    transition: transform var(--tpl-duration-open) var(--tpl-ease);
+  }
+
+  .panel {
+    /* Closing: it stays visible until the fold has shut. */
+    transition:
+      grid-template-rows var(--tpl-duration-open) var(--tpl-ease),
+      visibility 0s linear var(--tpl-duration-open);
+  }
+
+  .panel[data-open] {
+    transition:
+      grid-template-rows var(--tpl-duration-open) var(--tpl-ease),
+      visibility 0s;
+  }
+
+  .fold {
+    transition: opacity var(--tpl-duration-open) var(--tpl-ease);
+  }
+}

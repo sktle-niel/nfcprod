@@ -1,0 +1,53 @@
+.masthead {
+  padding: 20px var(--tpl-gutter) 34px;
+  text-align: center;
+}
+
+/* With no words at the top, the lamp still needs its room. */
+.masthead:first-child {
+  padding-top: 52px;
+}
+
+.logo {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.logo img {
+  display: block;
+  width: auto;
+  max-width: 120px;
+  height: 52px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+/* Gilded: the lettering warmed by the lamp. A sign writer's serif, set at its own weight and in the case the owner wrote. */
+.name {
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: clamp(3rem, 15cqw, 5.25rem);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: 0.005em;
+  color: var(--tpl-lit);
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.name[data-size='m'] {
+  font-size: clamp(2.375rem, 12cqw, 4.25rem);
+}
+
+.name[data-size='s'] {
+  font-size: clamp(1.875rem, 9.5cqw, 3.25rem);
+}
+
+.tagline {
+  max-width: 30em;
+  margin: 12px auto 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--menu-muted);
+  text-wrap: balance;
+}

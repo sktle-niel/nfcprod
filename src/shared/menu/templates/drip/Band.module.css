@@ -1,0 +1,72 @@
+/* The opening of the sheet: the one chocolate band, the shop's name inside it. */
+.plate {
+  /* Above the edge, which pours out from behind it. */
+  position: relative;
+  z-index: 1;
+  padding: 2px var(--tpl-gutter) 16px;
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+  --logo-size: 48px;
+  --logo-radius: 4px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding-top: 6px;
+}
+
+.words {
+  min-width: 0;
+  text-align: center;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--menu-script);
+  font-size: 2.625rem;
+  font-weight: 500;
+  line-height: 1.05;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+.name[data-size='m'] {
+  font-size: 2.125rem;
+}
+
+.name[data-size='s'] {
+  font-size: 1.75rem;
+}
+
+.tagline {
+  margin: 6px 0 0;
+  color: var(--menu-card-muted);
+  font-family: var(--menu-display);
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+/* The poured edge is the band's own color, one pixel under it so no hairline shows between them. */
+.edge {
+  display: block;
+  width: 100%;
+  margin-top: -1px;
+  fill: var(--menu-surface);
+}
+
+/* One slow pour as the page opens, from behind the band. Screen only: a printed page has its edge in place. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  .edge[data-pours] {
+    animation: pour var(--tpl-duration-opening) var(--tpl-ease) var(--tpl-stagger) backwards;
+  }
+}
+
+@keyframes pour {
+  from {
+    transform: translateY(-100%);
+  }
+}

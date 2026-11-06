@@ -1,3 +1,4 @@
+import { presetPhoto } from '@/presets/samplePhotos'
 import { describe, expect, it } from 'vitest'
 import { BUSINESS_TYPES, type BusinessPatch, type BusinessType, type NewBusinessInput } from '@/entities/business/business'
 import { isValidSlug } from '@/entities/business/slug'
@@ -5,6 +6,7 @@ import { validateBusinessPatch, validateNewBusiness } from '@/entities/business/
 import { IMAGE_MAX_BYTES, type CategoryInput, type Menu, type Product, type ProductInput, type ProductTag } from '@/entities/menu/menu'
 import { validateCategoryInput, validateGroupInput } from '@/entities/menu/validate'
 import { validateProductInput } from '@/entities/menu/validateProduct'
+import { STOCK_PHOTOS } from '@/entities/theme/stockPhotos'
 import { mergePresets, PRESETS } from '@/presets'
 import { TEST_PASSWORD, testOwner } from '@/test/auth'
 import { sampleBusiness, sampleImageFile, sampleMenu } from '@/test/ownerFixtures'
@@ -148,7 +150,7 @@ describe('createBusiness', () => {
         price: sample.price,
         tags: sample.tags,
         available: true,
-        image: null,
+        image: presetPhoto(sample.name),
         groupIds: [],
       })
     }
@@ -386,6 +388,17 @@ describe('the business', () => {
     expect(await owner.getBusiness()).toEqual(business)
   })
 
+  it('keeps a library photo as it is, with no storage rule to meet, and saves an id the library does not have as no photo', async () => {
+    const { owner } = await withCoffee()
+    const business = await owner.getBusiness()
+    if (business === null) throw new Error('the seeded business exists')
+    const theme = { ...business.theme, backdrop: 'stock' as const, backdropStock: STOCK_PHOTOS[0].id }
+    expect((await owner.saveBusiness({ theme })).theme).toEqual(theme)
+    expect((await owner.getBusiness())?.theme).toEqual(theme)
+    const forged = { ...theme, backdropStock: 'https://tracker.example.com/bg.jpg' as unknown as typeof theme.backdropStock }
+    expect((await owner.saveBusiness({ theme: forged })).theme).toEqual({ ...theme, backdropStock: null })
+  })
+
   it('puts the menu on its link and takes it off', async () => {
     const { owner } = await withCoffee()
     expect((await owner.setPublished(true)).published).toBe(true)
@@ -420,7 +433,7 @@ describe('categories', () => {
     const { owner, iced } = await withCoffee()
     const moved = await owner.moveCategory(iced, -1)
     expect(names(moved.categories)).toEqual(['Iced', 'Hot', 'Blended', 'Pastries'])
-    expect(names(moved.products)).toEqual(['Iced Caramel Macchiato', 'Americano', 'Spanish Latte', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(moved.products)).toEqual(['Iced Caramel Macchiato', 'Americano', 'Spanish Latte', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(await owner.moveCategory(iced, -1)).toEqual(moved)
     expect(await owner.moveCategory('gone', 1)).toEqual(moved)
     expect(await owner.getMenu()).toEqual(moved)
@@ -430,7 +443,7 @@ describe('categories', () => {
     const { owner, hot } = await withCoffee()
     const menu = await owner.deleteCategory(hot)
     expect(names(menu.categories)).toEqual(['Iced', 'Blended', 'Pastries'])
-    expect(names(menu.products)).toEqual(['Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(menu.products)).toEqual(['Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(await owner.deleteCategory(hot)).toEqual(menu)
   })
 })
@@ -443,7 +456,7 @@ describe('products', () => {
       { label: 'S', price: 13500 },
     ]
     const menu = await owner.saveProduct(productInput({ categoryId: hot, price: 0, variants, tags: ['new'] }))
-    expect(names(menu.products)).toEqual(['Americano', 'Spanish Latte', 'Flat White', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(menu.products)).toEqual(['Americano', 'Spanish Latte', 'Flat White', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(productNamed(menu, 'Flat White')).toEqual({
       id: expect.stringMatching(MADE_ID),
       categoryId: hot,
@@ -486,7 +499,7 @@ describe('products', () => {
   it('moves a product to the end of its new category when its category changes', async () => {
     const { owner, menu, iced } = await withCoffee()
     const moved = await owner.saveProduct({ ...productNamed(menu, 'Americano'), categoryId: iced })
-    expect(names(moved.products)).toEqual(['Spanish Latte', 'Iced Caramel Macchiato', 'Americano', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(moved.products)).toEqual(['Spanish Latte', 'Iced Caramel Macchiato', 'Americano', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(productNamed(moved, 'Americano').categoryId).toBe(iced)
   })
 
@@ -494,7 +507,7 @@ describe('products', () => {
     const { owner, menu } = await withCoffee()
     const latte = productNamed(menu, 'Spanish Latte').id
     const moved = await owner.moveProduct(latte, -1)
-    expect(names(moved.products)).toEqual(['Spanish Latte', 'Americano', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(moved.products)).toEqual(['Spanish Latte', 'Americano', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(await owner.moveProduct(latte, -1)).toEqual(moved)
     expect(await owner.moveProduct(productNamed(menu, 'Iced Caramel Macchiato').id, -1)).toEqual(moved)
     expect(await owner.moveProduct('gone', 1)).toEqual(moved)
@@ -557,7 +570,7 @@ describe('products', () => {
     const { owner, menu } = await withCoffee()
     const latte = productNamed(menu, 'Spanish Latte').id
     const after = await owner.deleteProduct(latte)
-    expect(names(after.products)).toEqual(['Americano', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(after.products)).toEqual(['Americano', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(await owner.deleteProduct(latte)).toEqual(after)
   })
 })

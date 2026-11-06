@@ -1,0 +1,101 @@
+.root {
+  margin: 0 var(--tpl-gutter);
+  padding: 52px 0 max(36px, env(safe-area-inset-bottom));
+}
+
+.root:focus {
+  outline: none;
+}
+
+.heading {
+  margin: 0;
+  padding-bottom: 9px;
+  font-family: var(--menu-display);
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.1;
+  border-bottom: 1px solid var(--tpl-paint);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+/* A row of the board: what it is on the left, the answer in the price column on the right. */
+.fact {
+  display: grid;
+  grid-template-columns: 5em minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--menu-line);
+}
+
+.fact:last-child {
+  border-bottom: 0;
+}
+
+.label {
+  grid-row: 1 / span 2;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--menu-muted);
+}
+
+.value {
+  grid-column: 2;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.45;
+  text-align: right;
+  text-wrap: balance;
+}
+
+.link {
+  grid-column: 2;
+  justify-self: end;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration-color: var(--tpl-paint);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+}
+
+[data-fact='phone'] .link {
+  margin: -11px 0;
+  font-variant-numeric: lining-nums;
+}
+
+[data-fact='address'] .link {
+  margin-bottom: -11px;
+}
+
+.social {
+  grid-column: 2;
+  justify-content: flex-end;
+  gap: 0 20px;
+  margin: -11px 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    text-decoration-color: currentcolor;
+  }
+}
+
+@container (min-width: 600px) {
+  .root {
+    padding-top: 64px;
+  }
+
+  .heading {
+    font-size: 2.5rem;
+  }
+
+  .fact {
+    grid-template-columns: 8em minmax(0, 1fr);
+  }
+}

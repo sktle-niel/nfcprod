@@ -5,7 +5,7 @@ import type { Preset } from './types'
 export const coffeePreset: Preset = {
   type: 'coffee',
   categories: ['Hot', 'Iced', 'Blended', 'Pastries'],
-  theme: styleTheme('atelier', 'dark'),
+  theme: styleTheme('beanhouse', 'light'),
   groups: [
     {
       name: 'Extra shot',
@@ -70,6 +70,14 @@ export const coffeePreset: Preset = {
       description: 'Soft brioche with butter, sugar and grated cheese.',
       price: 8500,
       tags: ['vegetarian'],
+      sized: false,
+    },
+    {
+      category: 'Pastries',
+      name: 'Butter Croissant',
+      description: 'Flaky layers, baked every morning.',
+      price: 9500,
+      tags: [],
       sized: false,
     },
   ],

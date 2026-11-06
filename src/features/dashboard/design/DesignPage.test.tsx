@@ -32,7 +32,7 @@ describe('DesignPage: the page', () => {
     expect(screen.getByLabelText('Tagline')).toHaveValue('')
     expect(screen.getByLabelText('Phone')).toHaveValue('')
     expect(screen.getByLabelText('Opening hours')).toHaveValue('')
-    expect(within(previewRegion()).getByRole('heading', { name: 'Kape Kanto' })).toBeInTheDocument()
+    expect(await within(previewRegion()).findByRole('heading', { name: 'Kape Kanto' })).toBeInTheDocument()
   })
 
   it('counts the characters of the tagline as the owner types', async () => {
@@ -208,7 +208,7 @@ describe('DesignPage: the preview shows the unsaved draft', () => {
     const { user } = await renderDesign()
     await user.type(screen.getByLabelText('Business name'), ' Two')
     await user.click(discardButton())
-    expect(within(previewRegion()).getByRole('heading', { name: 'Kape Kanto' })).toBeInTheDocument()
+    expect(await within(previewRegion()).findByRole('heading', { name: 'Kape Kanto' })).toBeInTheDocument()
   })
 
   it('folds on a phone and opens from a button that says what it does', async () => {

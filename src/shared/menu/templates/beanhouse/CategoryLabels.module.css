@@ -1,0 +1,81 @@
+/* The strip is the bag itself, so what scrolls under it goes behind the paper. */
+.strip {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--menu-bg);
+  border-bottom: 1px solid color-mix(in srgb, var(--menu-text) 24%, transparent);
+}
+
+.list {
+  display: flex;
+  gap: 22px;
+  margin: 0;
+  padding: 0 var(--tpl-gutter);
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.list > li {
+  flex: none;
+}
+
+.link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--menu-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* The mark under the category being read: it draws itself in as the reader arrives. */
+.link::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 7px;
+  border-top: 2px solid var(--menu-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.link[data-selected] {
+  color: var(--menu-text);
+}
+
+.link[data-selected]::after {
+  transform: scaleX(1);
+}
+
+.label {
+  font-family: var(--menu-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .link::after {
+    transition: transform var(--tpl-duration-open) var(--tpl-ease-move);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    color: var(--menu-text);
+  }
+}

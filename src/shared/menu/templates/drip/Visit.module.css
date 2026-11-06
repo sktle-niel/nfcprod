@@ -1,0 +1,124 @@
+/* The close of the sheet: the same chocolate as the band, the shop's facts set as lines of the list, a label and its value on fine rules. */
+.root {
+  margin-top: 40px;
+  padding: 26px var(--tpl-gutter) calc(36px + env(safe-area-inset-bottom));
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+}
+
+/* The band runs to the very end of the page, over the padding the menu keeps under every page. */
+.close {
+  margin-bottom: -24px;
+}
+
+/* The link hands focus to the section: that is not a control, so it gets no ring. */
+.root:focus {
+  outline: none;
+}
+
+.heading,
+.facts {
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.heading {
+  margin-bottom: 10px;
+  color: var(--menu-on-surface);
+  font-family: var(--menu-script);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  border-bottom: 1px solid var(--menu-card-line);
+}
+
+.fact {
+  display: grid;
+  grid-template-columns: 4.75rem minmax(0, 1fr);
+  align-content: start;
+  column-gap: 12px;
+  padding-block: 11px;
+  border-top: 1px solid var(--menu-card-line);
+  font-size: var(--tpl-size);
+  line-height: 1.4;
+}
+
+.fact > * {
+  grid-column: 2;
+}
+
+.fact > p:first-child {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+}
+
+.label {
+  margin: 0;
+  color: var(--menu-card-muted);
+  font-size: var(--tpl-small);
+  font-weight: 500;
+  line-height: calc(var(--tpl-size) * 1.4);
+}
+
+.value {
+  font-family: var(--menu-display);
+  text-wrap: balance;
+}
+
+/* A link keeps its 44px target without standing that far from its neighbors. */
+.link {
+  justify-self: start;
+  margin-block: -11px;
+  font-family: var(--menu-display);
+  font-weight: 400;
+  text-decoration-color: var(--menu-card-muted);
+  text-decoration-thickness: 1px;
+  touch-action: manipulation;
+}
+
+.value + .link {
+  margin-top: -6px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+/* The accent would sink into the chocolate. */
+.link:focus-visible {
+  outline: 2px solid var(--menu-on-surface);
+  outline-offset: 2px;
+}
+
+.social {
+  gap: 0 18px;
+}
+
+@container (min-width: 560px) {
+  [data-layout='grid'] .heading,
+  [data-layout='grid'] .facts {
+    max-width: none;
+  }
+
+  [data-layout='grid'] .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 36px;
+  }
+
+  /* A column of the list is too narrow for a label beside a line of hours: the label stands over it. */
+  [data-layout='grid'] .fact {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-layout='grid'] .fact > p:first-child {
+    grid-row: auto;
+  }
+}

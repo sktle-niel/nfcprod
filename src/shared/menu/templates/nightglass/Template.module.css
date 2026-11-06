@@ -1,0 +1,129 @@
+/* Night Glass: a lettered board in a thin wooden frame, under one lamp. Painted from the --menu-* variables only. */
+.page {
+  --tpl-gutter: 16px;
+  --tpl-frame: 5px;
+  /* The frame: the accent let down into the board reads as old wood. By day, dark wood against the pale paint. */
+  --tpl-wood: color-mix(in srgb, var(--menu-accent) 30%, var(--menu-bg));
+  /* The painted lines under the headers. */
+  --tpl-paint: color-mix(in srgb, var(--menu-accent) 72%, transparent);
+  /* The color of a lit word: the lettering warmed by the lamp. */
+  --tpl-lit: color-mix(in srgb, var(--menu-accent) 45%, var(--menu-text));
+  /* How much of the board lies over a hung print. */
+  --tpl-veil: 14%;
+  /* Above the page photo, if the owner put one under the menu. */
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  /* The frame closes the page: it takes up the bottom padding of the menu's root, which would leave bare board below the frame. */
+  margin-bottom: -24px;
+  border: var(--tpl-frame) solid var(--tpl-wood);
+  /* The owner can pick a face with one weight (Anton): set as it is, never smeared into a false bold. */
+  font-synthesis-weight: none;
+}
+
+.page[data-mode='light'] {
+  --tpl-wood: color-mix(in srgb, var(--menu-text) 74%, var(--menu-accent));
+  --tpl-paint: color-mix(in srgb, var(--menu-accent) 80%, var(--menu-text));
+  --tpl-lit: color-mix(in srgb, var(--menu-accent) 30%, var(--menu-text));
+  --tpl-veil: 0%;
+}
+
+.page ::selection {
+  color: var(--menu-on-fill);
+  background: var(--menu-fill);
+}
+
+.board {
+  position: relative;
+}
+
+/* The lamp: a short brass shade on the top rail of the frame. */
+.board::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 5;
+  width: 72px;
+  height: 7px;
+  margin-left: -36px;
+  background: linear-gradient(to bottom, var(--tpl-wood), color-mix(in srgb, var(--menu-accent) 70%, var(--menu-text)));
+  clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+}
+
+/* Its light, strongest under the shade and dying away down the board. It lies over everything, the rail too, and screens: dark
+   paint lifts while the lettering stays as it is, as under a real lamp. */
+.board::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 4;
+  height: 340px;
+  background: radial-gradient(ellipse 80% 100% at 50% 0, color-mix(in srgb, var(--menu-accent) 24%, transparent), color-mix(in srgb, var(--menu-accent) 9%, transparent) 48%, transparent 100%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* By day there is no lamp: the pale paint takes a little window light from one side, gone before the rail. */
+.page[data-mode='light'] .board {
+  background: radial-gradient(ellipse 90% 240px at 10% 0, color-mix(in srgb, var(--menu-surface) 48%, transparent), transparent 100%);
+}
+
+.page[data-mode='light'] .board::before,
+.page[data-mode='light'] .board::after {
+  display: none;
+}
+
+.menu:focus {
+  outline: none;
+}
+
+.sections {
+  padding: 0 var(--tpl-gutter);
+}
+
+/* A shop with nothing to visit: the last item still needs room above the frame. */
+.menu:last-child .sections {
+  padding-bottom: max(36px, env(safe-area-inset-bottom));
+}
+
+/* A tap reads as a tap here: the press class answers it, not the browser's gray flash. */
+.page a,
+.page button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* The one composed moment: the lamp comes up as the name settles. Screen only, on the page only, never in the preview. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  .page[data-live] .board::after {
+    animation: lamp-up var(--tpl-duration-opening) var(--tpl-ease) backwards;
+  }
+}
+
+@keyframes lamp-up {
+  from {
+    opacity: 0;
+  }
+}
+
+@container (max-width: 359px) {
+  .page {
+    --tpl-gutter: 13px;
+    --tpl-frame: 4px;
+  }
+}
+
+@container (min-width: 600px) {
+  .page {
+    --tpl-gutter: 36px;
+    --tpl-frame: 7px;
+  }
+
+  /* Grid on a wide board: the categories stand in two panels. */
+  [data-layout='grid'] .sections {
+    column-count: 2;
+    column-gap: 44px;
+    column-rule: 1px solid var(--tpl-paint);
+  }
+}

@@ -1,0 +1,32 @@
+/* Marmalade: the wall of an old shop. The root's own --menu-bg is the wall; the two painted boards are in Frame.module.css. */
+.page {
+  /* Gilt for the ground it sits on: on the wall it is the owner's accent, and the boards lift it (Frame.module.css). */
+  --tpl-gilt: var(--menu-accent);
+  /* Above the page photo, if the owner put one under the menu. */
+  position: relative;
+  z-index: 1;
+}
+
+.page ::selection {
+  color: var(--menu-on-fill);
+  background: var(--menu-fill);
+}
+
+.boards {
+  display: grid;
+  gap: 48px;
+  padding: 36px 20px 0;
+}
+
+@container (min-width: 600px) {
+  .boards {
+    gap: 64px;
+    max-width: 680px;
+    margin-inline: auto;
+    padding: 48px 32px 0;
+  }
+
+  [data-layout='grid'] .boards {
+    max-width: 800px;
+  }
+}

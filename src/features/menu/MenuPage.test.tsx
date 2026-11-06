@@ -63,22 +63,26 @@ describe('the public menu page', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Spanish Latte' })).toBeInTheDocument()
     // Links are live on the public page.
     expect(screen.getByRole('link', { name: '0917 555 0142' })).toHaveAttribute('href', 'tel:09175550142')
-    expect(screen.getByText(copy.menu.view.soldOut)).toBeInTheDocument()
+    // Daybreak lists every category on the page, so the one sold-out item of the sample is on it with no click.
+    expect(screen.getAllByText(copy.menu.view.soldOut)).toHaveLength(1)
     await waitFor(() => expect(document.title).toBe('Cafe Luna'))
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
-  it('draws the menu in the style its business chose', async () => {
+  it('draws every menu in the plain look, whatever style its business chose', async () => {
     const { container, unmount } = renderAt('/m/tea-hub', samples)
     await screen.findByRole('heading', { level: 1, name: 'Tea Hub' })
     const root = container.querySelector('[data-menu-card]')
-    expect(root).toHaveAttribute('data-menu-card', 'tile')
-    expect(root).toHaveAttribute('data-menu-photo', 'circle')
+    expect(root).toHaveAttribute('data-menu-card', 'row')
+    expect(root).toHaveAttribute('data-menu-photo', 'rounded')
+    expect(root).toHaveAttribute('data-menu-header', 'plain')
     unmount()
 
     const dining = renderAt('/m/la-bella', samples)
     await screen.findByRole('heading', { level: 1, name: 'La Bella' })
-    expect(dining.container.querySelector('[data-menu-card]')).toHaveAttribute('data-menu-card', 'plate')
+    const diningRoot = dining.container.querySelector('[data-menu-card]')
+    expect(diningRoot).toHaveAttribute('data-menu-card', 'row')
+    expect(diningRoot).toHaveAttribute('data-menu-decor', 'none')
   })
 
   it('puts the menu in a page of its own colors, set from the checked theme variables only', async () => {

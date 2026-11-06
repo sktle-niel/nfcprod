@@ -1,0 +1,110 @@
+/*
+ * The Visit section is the second sign: the same painted board at the foot of the page, closing what the fascia opened. The classes
+ * go to the kit's section, whose own rules weigh nothing.
+ */
+.root {
+  --tpl-frame-y: 12px;
+  --tpl-frame-x: 10px;
+  margin-top: 56px;
+  /* The board runs to the end of the page, over the space the menu root keeps under it. */
+  margin-bottom: -24px;
+  padding: 50px 38px 52px;
+  text-align: center;
+}
+
+.root:focus {
+  outline: none;
+}
+
+.heading {
+  margin: 0;
+  color: var(--tpl-gilt);
+  font-family: var(--menu-display);
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+/* The sign's swelled rule, for a heading the kit draws. */
+.heading::after {
+  content: '';
+  display: block;
+  width: 130px;
+  height: 6px;
+  margin: 16px auto 0;
+  background: var(--tpl-gilt);
+  clip-path: polygon(0 50%, 50% 0, 100% 50%, 50% 100%);
+}
+
+.facts {
+  display: grid;
+  gap: 30px;
+  margin-top: 32px;
+}
+
+.fact {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 4px;
+}
+
+.label {
+  margin: 0;
+  color: var(--tpl-gilt);
+  font-family: var(--menu-display);
+  font-size: 1.125rem;
+  line-height: 1.3;
+}
+
+.value {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  text-wrap: balance;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--tpl-gilt);
+  text-underline-offset: 5px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--tpl-paint);
+  outline-offset: 2px;
+}
+
+.social {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@container (min-width: 600px) {
+  .root {
+    --tpl-frame-y: 16px;
+    --tpl-frame-x: 16px;
+    margin-top: 72px;
+    padding: 64px 56px 66px;
+  }
+
+  .facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 34px 40px;
+  }
+}

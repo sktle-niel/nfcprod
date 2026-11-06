@@ -1,7 +1,21 @@
 import { isDarkColor } from './color'
+import type { StockId } from './stockPhotos'
 
 /** Font pairings the app ships, by name (display, body and script together). No other font name ever reaches a style. */
-export const FONTS = ['urbanist', 'instrumentSerif', 'system', 'playfair', 'dmSerif', 'anton', 'fredoka', 'pacifico'] as const
+export const FONTS = [
+  'urbanist',
+  'instrumentSerif',
+  'system',
+  'playfair',
+  'dmSerif',
+  'anton',
+  'fredoka',
+  'pacifico',
+  'inter',
+  'poppins',
+  'mulish',
+  'sourceSerif',
+] as const
 export type Font = (typeof FONTS)[number]
 
 /** The corner of the menu's buttons and chips. */
@@ -15,6 +29,13 @@ export type Layout = (typeof LAYOUTS)[number]
 /** Light or dark menu. Switching it (`withMode`) moves the page and text colors when the page does not suit the new mode. */
 export const MODES = ['light', 'dark'] as const
 export type Mode = (typeof MODES)[number]
+
+/**
+ * The page templates: each draws a whole menu page of its own (src/shared/menu/templates), in the owner's colors, font and
+ * menu layout. They replace the older styles, which are retired: a menu saved in one of those is drawn Classic.
+ */
+export const TEMPLATE_STYLE_IDS = ['daybreak', 'beanhouse', 'marmalade', 'sandstone', 'drip', 'nightglass', 'lightbox'] as const
+export type TemplateStyleId = (typeof TEMPLATE_STYLE_IDS)[number]
 
 /** The ready-made looks an owner starts from. Each one sets every choice below (`styleTheme` in styles.ts). */
 export const STYLE_IDS = [
@@ -31,8 +52,16 @@ export const STYLE_IDS = [
   'diner',
   'noir',
   'catalog',
+  ...TEMPLATE_STYLE_IDS,
 ] as const
 export type StyleId = (typeof STYLE_IDS)[number]
+
+/** The looks the Design page offers: the plain Classic page, and the templates. */
+export const GALLERY_STYLE_IDS = TEMPLATE_STYLE_IDS
+
+/** Whether `style` is one of the page templates (a value that is not on the list is not). */
+export const isTemplateStyle = (style: unknown): style is TemplateStyleId =>
+  (TEMPLATE_STYLE_IDS as readonly unknown[]).includes(style)
 
 /** How one product is drawn. */
 export const CARDS = ['row', 'leader', 'tile', 'badge', 'outline', 'soft', 'plate', 'poster'] as const
@@ -57,7 +86,8 @@ export type DecorKind = (typeof DECORS)[number]
 /**
  * The texture of the page, in picker order. The first five are drawn by the menu's CSS; the rest are textures drawn from
  * the palette by `backdropLayers` (backdrop.ts) and reach CSS as one variable. 'picture' is the owner's own photo under a
- * veil of the page color (`pictureBackdropImage`), shown only while `backdropPicture` holds a checked address.
+ * veil of the page color (`pictureBackdropImage`), shown only while `backdropPicture` holds a checked address. 'stock' is a
+ * photo of the app's own library (stock.ts) under the same veil, shown only while `backdropStock` holds the id of one of them.
  */
 export const BACKDROPS = [
   'plain',
@@ -79,6 +109,7 @@ export const BACKDROPS = [
   'topo',
   'bloom',
   'picture',
+  'stock',
 ] as const
 export type BackdropKind = (typeof BACKDROPS)[number]
 
@@ -128,6 +159,12 @@ export type Theme = {
    * `pictureSrc`), and `toCssVars` refuses any address that could not sit inside url("...").
    */
   backdropPicture: string | null
+  /**
+   * A photo of the app's library, drawn only while `backdrop` is 'stock': the id of one entry of the photo table
+   * (`STOCK_IDS`), never an address. `stockSrc` builds the address from that entry, so nothing typed reaches CSS or a URL,
+   * and an id the table does not know draws no photo. It shares the veil, the fit and the position below with the owner's photo.
+   */
+  backdropStock: StockId | null
   /** How strongly the photo shows through the veil of the page color over it. */
   backdropVeil: Veil
   /**
@@ -159,6 +196,7 @@ export const DEFAULT_THEME: Theme = {
   decor: 'none',
   backdrop: 'plain',
   backdropPicture: null,
+  backdropStock: null,
   backdropVeil: 'soft',
   backdropFit: 'cover',
   backdropPosition: 'center',

@@ -1,21 +1,14 @@
-import type { BusinessType } from '@/entities/business/business'
 import { DEFAULT_THEME, type Mode, type StyleId, type Theme } from './theme'
+import type { StyleDef } from './styleDef'
+import { STYLE as BEANHOUSE } from './templates/beanhouse'
+import { STYLE as DAYBREAK } from './templates/daybreak'
+import { STYLE as DRIP } from './templates/drip'
+import { STYLE as LIGHTBOX } from './templates/lightbox'
+import { STYLE as MARMALADE } from './templates/marmalade'
+import { STYLE as NIGHTGLASS } from './templates/nightglass'
+import { STYLE as SANDSTONE } from './templates/sandstone'
 
-/** The colors a style has in one mode. `surface` null is the automatic card color. */
-type Palette = Pick<Theme, 'primary' | 'secondary' | 'background' | 'surface'>
-
-/** Everything a style sets besides colors and the mode: how the menu is drawn. The page photo and how it is laid are the owner's. */
-type Choices = Omit<Theme, keyof Palette | 'mode' | 'style' | 'backdropPicture' | 'backdropVeil' | 'backdropFit' | 'backdropPosition'>
-
-export type StyleDef = {
-  id: StyleId
-  /** The kinds of business it suits. The picker says so in words (the design copy). */
-  bestFor: readonly BusinessType[]
-  /** The mode its look was made for. The other mode has a palette of the same family. */
-  native: Mode
-  choices: Choices
-  palettes: Record<Mode, Palette>
-}
+export type { StyleDef } from './styleDef'
 
 const auto = null
 
@@ -299,18 +292,27 @@ export const STYLES: Record<StyleId, StyleDef> = {
       dark: { primary: '#8cc4ae', secondary: '#eef1f2', background: '#14181a', surface: auto },
     },
   },
+  daybreak: DAYBREAK,
+  beanhouse: BEANHOUSE,
+  marmalade: MARMALADE,
+  sandstone: SANDSTONE,
+  drip: DRIP,
+  nightglass: NIGHTGLASS,
+  lightbox: LIGHTBOX,
 }
 
 /** The whole theme of a style in a mode: its choices, its palette for that mode, and the style itself. */
 export function styleTheme(id: StyleId, mode: Mode): Theme {
   const style = STYLES[id]
-  // A ready-made style never carries an owner photo: the picture, its veil and how it is laid are the owner's own choices.
+  // A ready-made style never carries an owner photo: the picture, the library photo, their veil and how they are laid are the
+  // owner's own choices.
   return {
     ...style.choices,
     ...style.palettes[mode],
     style: id,
     mode,
     backdropPicture: null,
+    backdropStock: null,
     backdropVeil: 'soft',
     backdropFit: 'cover',
     backdropPosition: 'center',

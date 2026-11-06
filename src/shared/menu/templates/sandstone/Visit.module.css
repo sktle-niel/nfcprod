@@ -1,0 +1,85 @@
+.root {
+  max-width: var(--tpl-measure);
+  margin-inline: auto;
+  padding: 20px var(--tpl-gutter) 0;
+  text-align: center;
+  scroll-margin-top: 28px;
+}
+
+.root:focus {
+  outline: none;
+}
+
+.heading {
+  margin: 0 0 32px;
+  font-family: var(--menu-display);
+  font-size: 2.25rem;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+/* A flex row, not the kit's two columns: three facts leave the third on the center line, not stranded on the left. */
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px 32px;
+}
+
+.fact {
+  flex: 1 1 14rem;
+  max-width: 20rem;
+}
+
+.label {
+  margin: 0 0 6px;
+  font-family: var(--menu-display);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--menu-muted);
+}
+
+.value {
+  margin: 0;
+  font-size: 1.1875rem;
+  line-height: 1.35;
+  font-variant-numeric: lining-nums;
+  text-wrap: balance;
+}
+
+/* The target stays 44px; only the room it takes shrinks, so a link sits as close to its label as a line of text does. */
+.link {
+  justify-content: center;
+  margin-block: -8px;
+  font-size: 1.1875rem;
+  font-style: italic;
+  font-weight: 400;
+  text-decoration-color: var(--menu-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The italic figures of this face run together: a number to dial stands upright, with a little air. */
+[data-fact='phone'] .link {
+  font-style: normal;
+  font-variant-numeric: lining-nums;
+  letter-spacing: 0.03em;
+}
+
+.value + .link {
+  margin-top: 0;
+}
+
+.social {
+  justify-content: center;
+}
+
+@media (hover: hover) {
+  .link:hover {
+    text-decoration-thickness: 2px;
+  }
+}

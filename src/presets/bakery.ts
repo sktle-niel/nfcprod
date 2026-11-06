@@ -5,7 +5,7 @@ import type { Preset } from './types'
 export const bakeryPreset: Preset = {
   type: 'bakery',
   categories: ['Breads', 'Cakes', 'Pastries', 'Drinks'],
-  theme: styleTheme('blush', 'light'),
+  theme: styleTheme('sandstone', 'light'),
   groups: [
     {
       name: 'Cake extras',

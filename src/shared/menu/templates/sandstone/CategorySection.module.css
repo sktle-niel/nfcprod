@@ -1,0 +1,80 @@
+.section {
+  max-width: var(--tpl-measure);
+  margin-inline: auto;
+  padding: 52px var(--tpl-gutter) 0;
+  /* The sticky contents line must not cover the title a link scrolls to. */
+  scroll-margin-top: 22px;
+}
+
+.section:focus {
+  outline: none;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 30px;
+}
+
+.rule {
+  flex: 1 1 12px;
+  min-width: 12px;
+  height: 1px;
+  background: color-mix(in srgb, var(--menu-accent) 55%, transparent);
+}
+
+.title {
+  flex: 0 1 auto;
+  min-width: 0;
+  /* Spacing also falls after the last letter: the smaller right margin pulls the word back to the optical center. */
+  margin: 0 calc(6px - 0.2em) 0 6px;
+  font-family: var(--menu-display);
+  font-size: 1.1875rem;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0.2em;
+  text-align: center;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.items {
+  display: grid;
+  gap: 34px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Grid: two columns of type. Flex, not a grid, so an odd last item sits on the center line as a compositor would set it. */
+[data-layout='grid'] .items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 34px 20px;
+}
+
+[data-layout='grid'] .items > li {
+  flex: 0 0 calc(50% - 10px);
+  min-width: 0;
+}
+
+[data-layout='grid'] .items > li[data-plate] {
+  flex-basis: 100%;
+}
+
+@container (min-width: 640px) {
+  .section {
+    padding-top: 68px;
+  }
+
+  [data-layout='grid'] .items {
+    column-gap: 40px;
+  }
+
+  [data-layout='grid'] .items > li {
+    flex-basis: calc(50% - 20px);
+  }
+}

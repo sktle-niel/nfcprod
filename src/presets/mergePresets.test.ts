@@ -33,7 +33,7 @@ describe('mergePresets', () => {
     merged.groups[0]?.options.push({ label: 'Triple', price: 1 })
     merged.samples[0]?.tags.push('new')
     expect(coffee.categories).not.toContain('Extra')
-    expect(coffee.theme.primary).toBe(styleTheme('atelier', 'dark').primary)
+    expect(coffee.theme.primary).toBe(styleTheme('beanhouse', 'light').primary)
     expect(coffee.groups[0]?.options).toHaveLength(2)
     expect(coffee.samples[0]?.tags).toEqual([])
     expect(mergePresets([]).theme).not.toBe(DEFAULT_THEME)

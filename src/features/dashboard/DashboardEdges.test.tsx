@@ -17,6 +17,7 @@ import { testOwner } from '@/test/auth'
 import { loadSampleMenu, NOW, renderDashboardApp, type DashboardHarness, type DashboardOptions } from '@/test/dashboard'
 import { DashboardFrame, WentTo } from '@/test/DashboardFrame'
 import { sampleBusiness, sampleImageFile } from '@/test/ownerFixtures'
+import { previewDrawn, previewLogo } from './design/designTestkit'
 
 /*
  * Edge flows of the owner dashboard: what happens when the repository fails, when the session ends in the middle of a save,
@@ -1494,11 +1495,11 @@ describe('A business with very little filled in', () => {
     await visit(user, shell.nav.design, design.title)
 
     const preview = within(previewRegion())
-    expect(preview.getByText('+63 917 555 0142')).toBeInTheDocument()
+    expect(await preview.findByText('+63 917 555 0142')).toBeInTheDocument()
     expect(preview.queryByText(copy.menu.view.footer.hours)).not.toBeInTheDocument()
     expect(preview.queryByText(copy.menu.view.footer.address)).not.toBeInTheDocument()
     expect(preview.queryByText(copy.menu.view.footer.social)).not.toBeInTheDocument()
-    expect(previewRegion().querySelector('header img')).toBeNull()
+    expect(previewLogo()).toBeNull()
     expect(screen.getByLabelText(design.details.hours)).toHaveValue('')
   })
 
@@ -1517,8 +1518,10 @@ describe('A business with very little filled in', () => {
 
     await visit(user, shell.nav.design, design.title)
 
-    expect(previewRegion().querySelector('header img')).toHaveAttribute('src', logo)
-    expect(previewRegion().querySelector('footer')).toBeNull()
+    await previewDrawn('Kape Kanto')
+    expect(previewLogo()).toHaveAttribute('src', logo)
+    expect(previewRegion().querySelector('[data-fact]')).toBeNull()
+    expect(within(previewRegion()).queryByText(copy.menu.view.template.visit.heading)).not.toBeInTheDocument()
     expect(screen.getByRole('img', { name: design.details.logo.alt })).toHaveAttribute('src', logo)
     expect(screen.getByRole('button', { name: design.details.logo.replace })).toBeInTheDocument()
   })
@@ -1533,7 +1536,7 @@ describe('A business with very little filled in', () => {
     await screen.findByLabelText(design.details.address)
 
     const preview = within(previewRegion())
-    expect(preview.getByText('12 Mabini Street, Lahug')).toBeInTheDocument()
+    expect(await preview.findByText('12 Mabini Street, Lahug')).toBeInTheDocument()
     expect(preview.queryByText(copy.menu.view.footer.hours)).not.toBeInTheDocument()
     await visit(user, shell.nav.overview, overview.title)
     expect((await panel(checklist.title)).getByRole('link', { name: `${checklist.steps.details} ${checklist.done}` })).toBeInTheDocument()
@@ -1545,7 +1548,9 @@ describe('A business with very little filled in', () => {
     await user.type(await screen.findByLabelText(design.details.address), '   ')
     await user.type(screen.getByLabelText(design.details.hours), '  ')
 
-    expect(previewRegion().querySelector('footer')).toBeNull()
+    await previewDrawn('Kape Kanto')
+    expect(previewRegion().querySelector('[data-fact]')).toBeNull()
+    expect(within(previewRegion()).queryByText(copy.menu.view.template.visit.heading)).not.toBeInTheDocument()
   })
 
   it('keeps every page usable for a business with no items, no details and no logo, and saves nothing by itself', async () => {

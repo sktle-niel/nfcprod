@@ -1,0 +1,113 @@
+/* How to visit: the closing panel of the gallery, a set of plain lines, each with its label in the margin. */
+.root {
+  --tpl-closing-muted: color-mix(in srgb, var(--tpl-on-closing) 72%, var(--tpl-closing));
+  --tpl-closing-line: color-mix(in srgb, var(--tpl-on-closing) 18%, transparent);
+  /* The brass, moved toward the words so an underline shows on the closing panel in both modes. */
+  --tpl-closing-accent: color-mix(in srgb, var(--menu-accent) 55%, var(--tpl-on-closing));
+  padding: 44px var(--tpl-rail) calc(52px + env(safe-area-inset-bottom));
+  color: var(--tpl-on-closing);
+  background: var(--tpl-closing);
+}
+
+.root:focus {
+  outline: none;
+}
+
+/* With a page photo the closing lines sit on it, in the page text made for it. */
+[data-menu-backdrop='picture'] .root,
+[data-menu-backdrop='stock'] .root {
+  --tpl-on-closing: var(--menu-text);
+  --tpl-closing-muted: var(--menu-muted);
+  --tpl-closing-accent: var(--menu-accent);
+  background: none;
+}
+
+.heading {
+  margin: 0 0 20px;
+  font-family: var(--menu-display);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.facts {
+  display: block;
+  border-bottom: 1px solid var(--tpl-closing-line);
+}
+
+.fact {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: start;
+  padding: 14px 0;
+  border-top: 1px solid var(--tpl-closing-line);
+}
+
+.fact > * {
+  grid-column: 2;
+}
+
+.fact > .label {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  margin: 0;
+  padding-top: 2px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--tpl-closing-muted);
+}
+
+/* A line that ends in a 44px link has that much air of its own, so the lines keep one rhythm. */
+[data-fact='address'],
+[data-fact='phone'],
+[data-fact='social'] {
+  padding-bottom: 3px;
+}
+
+[data-fact='phone'],
+[data-fact='social'] {
+  padding-top: 3px;
+}
+
+[data-fact='phone'] > .label,
+[data-fact='social'] > .label {
+  padding-top: 12px;
+}
+
+.value {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.link {
+  justify-self: start;
+  font-size: 1rem;
+  font-weight: 500;
+  font-variant-numeric: lining-nums tabular-nums;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--tpl-closing-accent);
+  text-underline-offset: 4px;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--tpl-closing-accent);
+  outline-offset: 2px;
+}
+
+.social {
+  gap: 0 20px;
+}
+
+@container (min-width: 640px) {
+  .root {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    column-gap: 24px;
+  }
+}

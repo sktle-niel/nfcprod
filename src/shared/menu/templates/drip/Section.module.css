@@ -1,0 +1,58 @@
+/* A category: a fine script title on a fine rule, the size heads at its end, then the list. */
+.section {
+  /* A price column, in rem and not ch: the column heads above it are set smaller and must share its width. */
+  --tpl-col: calc(var(--tpl-chars) * var(--tpl-char));
+  padding-top: 26px;
+  scroll-margin-top: 45px;
+}
+
+/* The link to a category hands focus to its section: that is not a control, so it gets no ring. */
+.section:focus {
+  outline: none;
+}
+
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: var(--tpl-gap);
+  border-bottom: 1px solid color-mix(in srgb, var(--menu-text) 60%, var(--menu-bg));
+}
+
+.head[data-columns] {
+  grid-template-columns: minmax(0, 1fr) repeat(var(--tpl-cols), var(--tpl-col));
+}
+
+.title {
+  margin: 0;
+  color: var(--menu-text);
+  font-family: var(--menu-script);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+.label {
+  color: var(--menu-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.shared {
+  margin: 6px 0 0;
+  font-size: var(--tpl-small);
+  line-height: 1.35;
+}
+
+.rows {
+  display: grid;
+  gap: var(--tpl-row-gap);
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}

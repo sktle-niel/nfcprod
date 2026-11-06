@@ -1,0 +1,258 @@
+.row {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The name and the price stand on the same line, the last one of a name that wraps. */
+.head {
+  display: flex;
+  align-items: last baseline;
+  gap: 7px;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.row[data-photo] .body {
+  grid-template-columns: minmax(0, 1fr) 80px;
+}
+
+.text {
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  flex: 0 1 auto;
+  min-width: 0;
+  font-family: var(--menu-display);
+  font-size: 1.1875rem;
+  font-weight: 400;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+/* The dots from the name to the price. */
+.leader {
+  flex: 1 1 14px;
+  min-width: 14px;
+  border-bottom: 1px dotted var(--menu-text);
+  transform: translateY(-3px);
+}
+
+.price {
+  flex: none;
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+
+.description {
+  margin: 3px 0 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--menu-muted);
+  text-wrap: pretty;
+}
+
+.sizes {
+  margin: 3px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.soldOut {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  margin: 4px 0 0;
+  padding: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  list-style: none;
+}
+
+.tags > li {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.star {
+  font-size: 0.75rem;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  margin-bottom: -10px;
+  padding: 0;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--menu-text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.chevron {
+  flex: none;
+}
+
+.more[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+.more:focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: 2px;
+}
+
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+
+.panel[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+.panelBody {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panelBody > * {
+  margin-top: 10px;
+}
+
+/*
+ * One ink: the picture is turned gray and then printed in the two tones of the sheet, so a dim phone photo and a bright one come out
+ * alike. The darker of the page and ink colors takes the shadows, the lighter the highlights; --tpl-shade and --tpl-light are set
+ * on the page for light and dark.
+ */
+.photo {
+  position: relative;
+  display: block;
+  margin-top: 6px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--menu-bg);
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.1) brightness(1.06);
+}
+
+.photo::before,
+.photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.photo::before {
+  background: var(--tpl-shade);
+  mix-blend-mode: screen;
+}
+
+.photo::after {
+  background: var(--tpl-light);
+  mix-blend-mode: multiply;
+}
+
+[data-sold-out] .photo img {
+  opacity: 0.45;
+}
+
+/* Motion, for a person who has not asked for calm. Add-ons open by height (visibility follows, so a closed panel leaves the screen
+   reader only once it has closed); a picture fades in as it decodes, on the public page only. */
+@media (prefers-reduced-motion: no-preference) {
+  .panel {
+    transition:
+      grid-template-rows var(--tpl-duration-open) var(--tpl-ease),
+      visibility 0s linear var(--tpl-duration-open);
+  }
+
+  .panel[data-open] {
+    transition:
+      grid-template-rows var(--tpl-duration-open) var(--tpl-ease),
+      visibility 0s;
+  }
+
+  .chevron {
+    transition: transform var(--tpl-duration-small) var(--tpl-ease);
+  }
+
+  .fades {
+    opacity: 0;
+    transition: opacity var(--tpl-duration-reveal) var(--tpl-ease);
+  }
+
+  .fades[data-decoded] {
+    opacity: 1;
+  }
+}
+
+@container (max-width: 359px) {
+  .row[data-photo] .body {
+    grid-template-columns: minmax(0, 1fr) 68px;
+  }
+}
+
+/* Grid: a narrow column has no room for leaders, so the price goes under the name, and the picture stands on top. */
+[data-layout='grid'] .head {
+  display: block;
+}
+
+[data-layout='grid'] .body {
+  display: contents;
+}
+
+[data-layout='grid'] .photo {
+  order: -1;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+[data-layout='grid'] .name {
+  overflow-wrap: break-word;
+}
+
+[data-layout='grid'] .leader {
+  display: none;
+}
+
+[data-layout='grid'] .price {
+  display: block;
+  margin-top: 1px;
+}

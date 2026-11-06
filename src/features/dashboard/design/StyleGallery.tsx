@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import { dashboardCopy } from '@/config/dashboardCopy'
 import type { Menu } from '@/entities/menu/menu'
-import { STYLE_IDS, type Mode, type StyleId } from '@/entities/theme/theme'
+import { GALLERY_STYLE_IDS, type Mode, type StyleId } from '@/entities/theme/theme'
 import { bestForLine, styleName } from './styleWords'
 import { StyleThumb } from './StyleThumb'
 import type { ThumbBusiness } from './thumbs'
@@ -17,7 +17,7 @@ type Props = {
 }
 
 /**
- * The thirteen styles as one radio group, each with a small live picture of the owner's menu in that style. Native radios:
+ * The looks on offer as one radio group, each with a small live picture of the owner's menu in that style. Native radios:
  * the arrow keys move through the styles and a screen reader says the name, then what it is best for.
  */
 export function StyleGallery({ value, mode, business, menu, onChange }: Props) {
@@ -29,7 +29,7 @@ export function StyleGallery({ value, mode, business, menu, onChange }: Props) {
         {text.intro}
       </p>
       <div className={styles.grid}>
-        {STYLE_IDS.map((id) => (
+        {GALLERY_STYLE_IDS.map((id) => (
           <label key={id} className={styles.option}>
             <input
               type="radio"

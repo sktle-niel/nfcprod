@@ -1,0 +1,36 @@
+/* A slim line of two links at the head of the band: small, underlined, and 44px tall to the thumb. */
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--menu-on-surface);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  text-decoration: underline;
+  text-decoration-color: var(--menu-card-muted);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+/* The accent would sink into the chocolate. */
+.link:focus-visible {
+  outline: 2px solid var(--menu-on-surface);
+  outline-offset: -4px;
+}

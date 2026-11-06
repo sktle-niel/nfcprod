@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { STYLE_IDS } from '@/entities/theme/theme'
+import { GALLERY_STYLE_IDS } from '@/entities/theme/theme'
 import { StylesPage } from './StylesPage'
 
 const open = (search = '') =>
@@ -14,9 +14,10 @@ const open = (search = '') =>
 describe('StylesPage', () => {
   it('shows every style in light and dark, each in a figure of its own', () => {
     open()
-    expect(screen.getAllByRole('figure')).toHaveLength(STYLE_IDS.length * 2)
-    expect(screen.getByText('classic / light (native)')).toBeInTheDocument()
-    expect(screen.getByText('roast / dark (native)')).toBeInTheDocument()
+    expect(screen.getAllByRole('figure')).toHaveLength(GALLERY_STYLE_IDS.length * 2)
+    expect(screen.getByText('daybreak / light (native)')).toBeInTheDocument()
+    expect(screen.getByText('nightglass / dark (native)')).toBeInTheDocument()
+    expect(screen.getByText('lightbox / light (native)')).toBeInTheDocument()
   })
 
   it('shows one style or one mode when asked', () => {
@@ -27,12 +28,12 @@ describe('StylesPage', () => {
 
   it('shows one mode of every style when asked', () => {
     open('?mode=dark')
-    expect(screen.getAllByRole('figure')).toHaveLength(STYLE_IDS.length)
+    expect(screen.getAllByRole('figure')).toHaveLength(GALLERY_STYLE_IDS.length)
   })
 
   it('ignores a style or a mode it does not know', () => {
     open('?style=neon&mode=sepia')
-    expect(screen.getAllByRole('figure')).toHaveLength(STYLE_IDS.length * 2)
+    expect(screen.getAllByRole('figure')).toHaveLength(GALLERY_STYLE_IDS.length * 2)
   })
 })
 
@@ -50,5 +51,11 @@ describe('StylesPage overrides', () => {
     const root = document.querySelector<HTMLElement>('[data-menu-card]')
     expect(root?.style.getPropertyValue('--menu-surface')).toBe('#f3e6d3')
     expect(root?.style.getPropertyValue('--menu-accent')).toBe('#2f80ed')
+  })
+
+  it('takes the photos off a demo menu too when asked', () => {
+    const { container } = open('?menu=cafe-luna&style=classic&mode=light&bare=1&photos=0')
+    expect(container.querySelector('[data-menu-card]')).toBeInTheDocument()
+    expect(container.querySelector('img')).not.toBeInTheDocument()
   })
 })

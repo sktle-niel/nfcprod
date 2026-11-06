@@ -5,7 +5,7 @@ import type { Preset } from './types'
 export const barPreset: Preset = {
   type: 'bar',
   categories: ['Cocktails', 'Beer', 'Wine', 'Pulutan'],
-  theme: styleTheme('noir', 'dark'),
+  theme: styleTheme('nightglass', 'dark'),
   groups: [
     {
       name: 'Mixers',
