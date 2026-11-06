@@ -1,0 +1,121 @@
+/* One line of the list in two tones of ink: the name and the prices in the full chocolate, everything around them in the quiet one. */
+.row {
+  min-width: 0;
+  margin: 0;
+  color: var(--menu-text);
+}
+
+.line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  /* When a long name takes two lines, the leader and the prices stay on the last. */
+  align-items: baseline;
+  align-items: last baseline;
+  column-gap: var(--tpl-gap);
+  font-size: var(--tpl-size);
+}
+
+.line[data-columns] {
+  grid-template-columns: minmax(0, 1fr) repeat(var(--tpl-cols), var(--tpl-col));
+}
+
+.lead {
+  display: flex;
+  align-items: baseline;
+  align-items: last baseline;
+  min-width: 0;
+}
+
+.name {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: 1em;
+  font-weight: 600;
+  /* The owner's pairing may be a face with one weight: it keeps its own shapes, not a smeared bold. */
+  font-synthesis-weight: none;
+  line-height: 1.3;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+/* A fine line from the name to the price, a little above the baseline. */
+.leader {
+  flex: 1 1 12px;
+  min-width: 12px;
+  height: 0;
+  margin-left: 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--menu-text) 28%, var(--menu-bg));
+  transform: translateY(-0.28em);
+}
+
+.price {
+  margin: 0;
+  font-family: var(--menu-display);
+  font-weight: 400;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1.3;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* A size for the ear: the eye has the column head. */
+.spoken {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* It takes the place of all the prices, however many columns that is. */
+.soldOut {
+  grid-column: span var(--tpl-cols, 1);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: right;
+  white-space: nowrap;
+}
+
+[data-sold-out] .name {
+  color: var(--menu-muted);
+}
+
+/* The small paragraph under the line: its parts run on inline. */
+.more {
+  color: var(--menu-muted);
+  font-size: var(--tpl-small);
+  line-height: 1.4;
+}
+
+.more:empty {
+  display: none;
+}
+
+.tags {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  display: inline;
+  margin-right: 0.5em;
+  color: var(--menu-text);
+  font-weight: 600;
+}
+
+.description,
+.sizes {
+  display: inline;
+  margin: 0 0.5em 0 0;
+  text-wrap: pretty;
+}
+
+.sizes {
+  font-variant-numeric: tabular-nums;
+}

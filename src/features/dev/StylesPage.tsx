@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom'
 import type { Business } from '@/entities/business/business'
 import type { Menu } from '@/entities/menu/menu'
+import { SAMPLE_KINDS, samplePictureFor } from '@/entities/menu/samplePictures'
 import { isHexColor, normalizeHex } from '@/entities/theme/color'
 import { STOCK_IDS } from '@/entities/theme/stockPhotos'
 import { STYLES, styleTheme } from '@/entities/theme/styles'
@@ -10,6 +11,7 @@ import {
   CARDS,
   DECORS,
   FONTS,
+  GALLERY_STYLE_IDS,
   HEADERS,
   LAYOUTS,
   MODES,
@@ -23,6 +25,8 @@ import {
 } from '@/entities/theme/theme'
 import { mergePresets } from '@/presets'
 import { startMenu } from '@/data/ownerMenu'
+import { buildSample } from '@/data/publicMenu'
+import { SAMPLE_BUSINESSES } from '@/data/publicSamples'
 import { isOneOf } from '@/shared/lib/checks'
 import { MenuView, type MenuViewBusiness } from '@/shared/menu/MenuView'
 import { samplePhoto } from './samplePhotos'
@@ -93,18 +97,42 @@ function withOverrides(theme: Theme, params: URLSearchParams): Theme {
  * can be changed on top: `card`, `photo`, `title`, `header`, `decor`, `backdrop` (`picture` borrows a made-up photo; `stock`
  * with `stock=<id>` shows a library photo; `veil` sets its strength), `font`, `buttons`, `layout`, `spotlight`
  * (1 or 0), `surface` and `accent` (a `#rrggbb` color, written %23rrggbb in the address). `?width=360` sets the phone width, and
- * `?photos=1` gives every item a made-up photo, to see how each picture shape crops a real one.
+ * `?photos=1` gives every item a made-up photo, to see how each picture shape crops a real one, and `?photos=0` none. By default
+ * the items show the demo's real sample photos. `?bare=1` draws only the menu, as wide as `?width=`. `?menu=cafe-luna` (or another demo slug) shows that business's own menu and details.
  */
 export function StylesPage() {
   const [params] = useSearchParams()
   const only = params.get('style')
   const mode = params.get('mode')
-  const ids: readonly StyleId[] = isOneOf(STYLE_IDS, only) ? [only] : STYLE_IDS
+  const ids: readonly StyleId[] = isOneOf(STYLE_IDS, only) ? [only] : GALLERY_STYLE_IDS
   const modes: readonly Mode[] = isOneOf(MODES, mode) ? [mode] : MODES
   const asked = Number(params.get('width'))
   const width = Number.isInteger(asked) && asked >= 280 && asked <= 900 ? asked : 390
-  const menu = sampleMenu()
-  if (params.get('photos') === '1') menu.products = menu.products.map((product, index) => ({ ...product, image: samplePhoto(index) }))
+  const slug = params.get('menu')
+  const built = buildSample(SAMPLE_BUSINESSES.find((candidate) => candidate.slug === slug) ?? SAMPLE_BUSINESSES[0] as (typeof SAMPLE_BUSINESSES)[number])
+  const own = SAMPLE_BUSINESSES.some((candidate) => candidate.slug === slug)
+  const menu = own ? built.menu : sampleMenu()
+  const photos = params.get('photos')
+  if (photos === '1') menu.products = menu.products.map((product, index) => ({ ...product, image: samplePhoto(index) }))
+  else if (photos === '0') menu.products = menu.products.map((product) => ({ ...product, image: null }))
+  else if (!own) {
+    menu.products = menu.products.map((product, index) => ({
+      ...product,
+      image: samplePictureFor(SAMPLE_KINDS[index % SAMPLE_KINDS.length] ?? 'cup', Math.floor(index / SAMPLE_KINDS.length)),
+    }))
+  }
+  const businessFor = (theme: Theme): MenuViewBusiness => (own ? { ...built.business, theme } : businessIn(theme))
+
+  // `?bare=1`: just the menu, as wide as the phone, so a screenshot of the window is a screenshot of the menu.
+  if (params.get('bare') === '1') {
+    const [id = 'classic'] = ids
+    const [themeMode = 'light'] = modes
+    return (
+      <div style={{ width, minHeight: '100vh' }}>
+        <MenuView business={businessFor(withOverrides(styleTheme(id, themeMode), params))} menu={menu} headingLevel={1} interactive />
+      </div>
+    )
+  }
 
   return (
     <main className={styles.page}>
@@ -118,7 +146,7 @@ export function StylesPage() {
                 {STYLES[id].native === themeMode ? ' (native)' : ''}
               </figcaption>
               <div className={styles.phone} style={{ width }}>
-                <MenuView business={businessIn(withOverrides(styleTheme(id, themeMode), params))} menu={menu} headingLevel={2} interactive={false} />
+                <MenuView business={businessFor(withOverrides(styleTheme(id, themeMode), params))} menu={menu} headingLevel={2} interactive={false} />
               </div>
             </figure>
           )),

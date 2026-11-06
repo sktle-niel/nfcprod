@@ -1,0 +1,198 @@
+/* Beanhouse: a kraft bag. The ground is --menu-bg, the ink --menu-text, the labels --menu-surface. */
+.page {
+  --tpl-gutter: 16px;
+  /* The foot of the bag, printed in reverse. On a dark bag the panel is a dark paper instead of a bright block. */
+  --tpl-foot: var(--menu-text);
+  --tpl-foot-ink: var(--menu-bg);
+  /* Above the page photo, if the owner put one under the menu. */
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.page[data-mode='dark'] {
+  --tpl-foot: var(--menu-surface);
+  --tpl-foot-ink: var(--menu-on-surface);
+}
+
+.page ::selection {
+  color: var(--menu-bg);
+  background: var(--menu-text);
+}
+
+.page a,
+.page button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* On a short menu the foot of the bag still stands at the foot of the screen. */
+.menu {
+  flex: 1;
+}
+
+.menu:focus,
+.section:focus {
+  outline: none;
+}
+
+.sections {
+  padding: 0 var(--tpl-gutter) 40px;
+}
+
+.section {
+  padding-top: 28px;
+  scroll-margin-top: 45px;
+}
+
+/* The name of the category, printed on the bag, with a hairline running on to the edge of the label. */
+.title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 20px;
+  font-family: var(--menu-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.title::after {
+  content: '';
+  flex: 1 1 16px;
+  border-top: 1px solid color-mix(in srgb, var(--menu-text) 32%, transparent);
+}
+
+/* One sheet of cream paper pasted on the bag, straight, its deckled ends over the top and the bottom. */
+.label {
+  position: relative;
+  padding: 2px 18px;
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
+}
+
+.list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The foot of the bag. The page around this one ends with 24px of padding of its own: the foot runs on over it, to the end of the screen. */
+.visit {
+  margin-bottom: -24px;
+  padding: 48px var(--tpl-gutter) calc(76px + env(safe-area-inset-bottom));
+  color: var(--tpl-foot-ink);
+  text-align: center;
+  background: var(--tpl-foot);
+}
+
+.visit:focus {
+  outline: none;
+}
+
+.visitHeading {
+  margin: 0 0 28px;
+  font-family: var(--menu-display);
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.visitFacts {
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.visitFact {
+  padding-block: 18px;
+  border-top: 1px solid color-mix(in srgb, currentcolor 22%, transparent);
+}
+
+.visitLabel {
+  margin: 0 0 6px;
+  color: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.82;
+}
+
+.visitValue {
+  font-size: 1rem;
+  line-height: 1.55;
+  font-variant-numeric: lining-nums tabular-nums;
+  text-wrap: pretty;
+}
+
+/* Still 44px tall: the links reach into the space around them, so a fact with a link is no taller than one with none. */
+.visitLink {
+  justify-content: center;
+  margin-block: -6px;
+  font-size: 1rem;
+  font-weight: 500;
+  font-variant-numeric: lining-nums tabular-nums;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.visitValue + .visitLink {
+  margin-top: 0;
+}
+
+/* The accent may be as dark as the panel, so here the ring takes the color of the words. */
+.visitLink:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
+}
+
+.visitSocial {
+  justify-content: center;
+  column-gap: 22px;
+}
+
+/* Grid: two columns on the label. */
+.page[data-layout='grid'] .list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20px;
+}
+
+@container (max-width: 359px) {
+  .page {
+    --tpl-gutter: 12px;
+  }
+
+  .label {
+    padding-inline: 14px;
+  }
+}
+
+@container (min-width: 640px) {
+  .page {
+    --tpl-gutter: 40px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .label {
+    padding: 6px 28px;
+  }
+
+  .visitFacts {
+    max-width: 40rem;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .visitLink:hover {
+    text-decoration-thickness: 2px;
+  }
+}

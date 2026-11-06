@@ -96,13 +96,13 @@ export const designCopy = {
     /** The ready-made looks at the top of the tab. */
     styles: {
       title: 'Menu style',
-      intro: 'Start from a ready-made look. You can change every part of it below.',
+      intro: 'Start from a ready-made look, then make it yours with the colors, font, layout and page background below.',
       legend: 'Choose a menu style',
       /** `{types}` is a list of business kinds from the setup words, such as "Coffee shop · Bakery". */
       bestFor: 'Best for: {types}',
       bestForAll: 'Best for: any kind of menu',
       /** `{style}` is a style name. */
-      applied: '{style} style applied. You can change every part below.',
+      applied: '{style} style applied. Change the colors, font, layout and page background below.',
       resetStyle: 'Reset to the {style} style',
       resetStyleNote: 'Look reset to the {style} style. Save to keep it.',
       resetStyleNoteSame: 'Look reset to the {style} style. It is the same as what is saved.',
@@ -120,6 +120,13 @@ export const designCopy = {
         diner: 'Diner',
         noir: 'Noir',
         catalog: 'Catalog',
+        daybreak: 'Daybreak',
+        beanhouse: 'Beanhouse',
+        marmalade: 'Marmalade',
+        sandstone: 'Sandstone',
+        drip: 'Drip',
+        nightglass: 'Night Glass',
+        lightbox: 'Lightbox',
       },
       descriptions: {
         classic: 'Clean rows with a small picture. Fits any menu.',
@@ -135,12 +142,19 @@ export const designCopy = {
         diner: 'Bold type, bright colors and round price badges.',
         noir: 'A dark price list with gold lines, for the evening.',
         catalog: 'A tidy grid of pictures for shops and price lists.',
+        daybreak: 'A paper placemat printed in one ink, photos included.',
+        beanhouse: 'A kraft paper bag with your name on a rubber stamp.',
+        marmalade: 'A hand-painted shop sign, loud and cheerful.',
+        sandstone: 'A printed carte on sand paper, in one ink and a serif voice.',
+        drip: 'A dense coffeehouse price list that needs no photos.',
+        nightglass: 'A lettered wall board for the back of a bar.',
+        lightbox: 'A backlit picture menu: every dish shown big.',
       },
     },
     /** The parts of the look, shown one at a time. */
     sections: {
       label: 'Part of the look to change',
-      options: { colors: 'Colors', cards: 'Cards', headings: 'Headings', extras: 'Extras' },
+      options: { colors: 'Colors', extras: 'Extras' },
     },
     cardsTitle: 'Cards',
     card: {
@@ -189,8 +203,8 @@ export const designCopy = {
       options: { none: 'None', coffee: 'Coffee', leaves: 'Leaves', dining: 'Dining', bakery: 'Bakery', bar: 'Bar', sparkles: 'Sparkles' },
     },
     backdrop: {
-      legend: 'Page texture',
-      hint: 'Drawn from your colors, so every texture stays easy to read.',
+      legend: 'Page background',
+      hint: 'The plain page color, or a photo behind your menu.',
       options: {
         plain: 'Plain',
         paper: 'Paper',
@@ -247,7 +261,7 @@ export const designCopy = {
       },
       fit: {
         legend: 'Photo fit',
-        hint: 'How the photo fills the screen. It stays put while the menu scrolls. On a screen wider than the photo can fill, the menu shows the texture of your style instead, so the photo never looks blurred or stretched.',
+        hint: 'How the photo fills the screen. It stays put while the menu scrolls. On a screen wider than the photo can fill, the menu shows your page color instead, so the photo never looks blurred or stretched.',
         options: { cover: 'Fill the screen', contain: 'Fit inside', stretch: 'Stretch' },
       },
       position: {
@@ -268,6 +282,10 @@ export const designCopy = {
         anton: 'Anton',
         fredoka: 'Fredoka',
         pacifico: 'Pacifico',
+        inter: 'Inter',
+        poppins: 'Poppins',
+        mulish: 'Mulish',
+        sourceSerif: 'Source Serif',
       },
     },
     buttonStyle: {
@@ -278,7 +296,7 @@ export const designCopy = {
     },
     layout: {
       legend: 'Menu layout',
-      hint: 'Grid puts Row, Tile and Badge cards side by side. Poster goes two across on a wide screen; the other cards always show one under the other.',
+      hint: 'Grid puts your items side by side when the menu is wide enough. List shows them one under the other.',
       options: { grid: 'Grid', list: 'List' },
     },
     mode: {

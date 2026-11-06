@@ -1,0 +1,81 @@
+/* The rail. It stays at the top of the screen while the menu is read; the wall color hides what scrolls under it. */
+.rail {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--menu-bg);
+  border-bottom: 1px solid var(--menu-line);
+}
+
+.list {
+  /* The side padding of a tab, a plain number: the mark runs under the word, not the whole target. */
+  --tpl-tab-inset: 13;
+  position: relative;
+  display: flex;
+  justify-content: safe center;
+  gap: 2px;
+  margin: 0;
+  padding: 0 6px;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.list > li {
+  flex: none;
+}
+
+/* One 1px bar, placed and stretched: both are transforms, so moving it never touches layout. */
+.list::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: 2px;
+  background: var(--tpl-gilt);
+  transform-origin: left center;
+  transform: translateX(calc((var(--tpl-mark-x, 0) + var(--tpl-tab-inset)) * 1px)) scaleX(calc(var(--tpl-mark-width, 0) - 2 * var(--tpl-tab-inset)));
+}
+
+/* Which tab is marked changes as the reader moves: the mark says so by travelling there. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  .list[data-moved]::after {
+    transition: transform var(--tpl-duration-open) var(--tpl-ease-move);
+  }
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 calc(var(--tpl-tab-inset) * 1px);
+  color: var(--menu-muted);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab[data-selected] {
+  color: var(--menu-text);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tab:hover {
+    color: var(--menu-text);
+  }
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--menu-text);
+  outline-offset: -4px;
+}

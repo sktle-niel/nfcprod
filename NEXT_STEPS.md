@@ -2,7 +2,7 @@
 
 Working notes for picking the project up again, on this machine or another. Product flow, roadmap and decisions live in `PROJECT_FLOW.md`, the design in `ARCHITECTURE.md`, the working rules in `CLAUDE.md`. Update this file when a step here is done or a new one comes up.
 
-Last updated: 2026-10-30.
+Last updated: 2026-11-05.
 
 ## 1. State
 
@@ -33,7 +33,17 @@ Queue, decided 2026-10-30. Each item is its own small pull request, in this orde
 
 ### Design track (decided 2026-10-30)
 
-Modern, photo-forward menu templates, from the owner's references (a dark glass-card app, a light photo-row app, a bold cafe website, a printed coffee list, a soft sand look for shops that are not cafes, and a dark round-photo card). Small pull requests, in this order: (1) the photo library for the page background (engine, files, picker), in progress; (2) sample product photos and a gallery with real pictures; (3) a lazy-card pattern and a photo-row card; (4) the glass card and the Night Glass template; (5) the round-photo card; (6) billboard and wash headers; (7) drip, ribbon and checker decor; (8) photo category chips and a banner spotlight; (9) a rail layout; (10) register the eight templates (13 to 21 styles). Photos come from Pexels (free to use); Pinterest is for ideas only.
+**New businesses now start with real photos on the preset's example items (`src/presets/samplePhotos.ts`), and `/m/cafe-luna` uses Lightbox.
+
+**Superseded (2026-11-05):** the templates are built and rebuilt as printed menus (placemat, kraft bag, painted sign, carte, price list, wall board), plus Lightbox, a picture menu led by big photos, so the plan below is closed. The photo library shipped as planned. Classic and the older styles are retired and draw as Daybreak (`plainTheme`).
+
+Done with that round, for all seven: the shared Visit section at the end of the page, the Menu and Visit links, the one set of motion rules, and a new look for each template (`ARCHITECTURE.md` section 3.4, decision log of 2026-11-05).
+
+Not yet checked on a real phone: the Beanhouse paper and stamp filters on a cheap device, and Safari. Six demo dishes have no photo: Ginataang Gulay, Bicol Express, Sago't Gulaman, Halo-halo, Tasting with Wine Pairing, Taro Cheesecake Milk Tea.
+
+Small follow-ups: `useReadingSection` is nearly the same in five template folders and belongs in the kit, and the kit's `useScrollSpy` goes stale after a jump back up; `validate.ts` refuses an unknown style instead of reading it as Classic. The product detail sheet below was planned for the old cards, so check it against the templates, which already open sizes and add-ons in place.
+
+The plan before that: modern, photo-forward menu templates, from the owner's references (a dark glass-card app, a light photo-row app, a bold cafe website, a printed coffee list, a soft sand look for shops that are not cafes, and a dark round-photo card). Small pull requests, in this order: (1) the photo library for the page background (engine, files, picker), in progress; (2) sample product photos and a gallery with real pictures; (3) a lazy-card pattern and a photo-row card; (4) the glass card and the Night Glass template; (5) the round-photo card; (6) billboard and wash headers; (7) drip, ribbon and checker decor; (8) photo category chips and a banner spotlight; (9) a rail layout; (10) register the eight templates (13 to 21 styles). Photos come from Pexels (free to use); Pinterest is for ideas only.
 
 ### The product detail sheet and the add-on picker
 

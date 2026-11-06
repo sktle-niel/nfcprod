@@ -1,0 +1,71 @@
+/* A plain, readable Visit section for a template to restyle. Every rule but the hours sits in :where(), which weighs nothing, so a
+   template's class wins whichever stylesheet loads first. Painted from --menu-* only; text takes the color of what holds it. */
+:where(.root) {
+  padding: 32px 16px;
+}
+
+:where(.heading) {
+  margin: 0 0 16px;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+:where(.facts) {
+  display: grid;
+  gap: 20px;
+}
+
+@container (min-width: 600px) {
+  :where(.facts) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 32px;
+  }
+}
+
+:where(.fact) {
+  min-width: 0;
+}
+
+:where(.label) {
+  margin: 0 0 4px;
+  color: var(--menu-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+:where(.value) {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Always: the line breaks are the owner's. */
+.hours {
+  white-space: pre-line;
+}
+
+:where(.link) {
+  display: inline-flex;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: inherit;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+:where(.link):focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: 2px;
+}
+
+:where(.social) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

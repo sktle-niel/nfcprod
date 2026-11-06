@@ -14,8 +14,12 @@ import {
 } from '@/shared/lib/checks'
 import type { Validated } from '@/shared/lib/validation'
 import { checkImageAddress } from './image'
+import { samplePicture } from './samplePictures'
 import { LIMITS, PRODUCT_TAGS, type Category, type ModifierGroup, type ProductInput, type ProductTag } from './menu'
 import { checkPricedItems, readId, withId } from './validate'
+
+/** A product's picture: an uploaded address, or one of our own sample photos by its exact path (a new menu starts with those). */
+const checkProductImage = (value: unknown) => (samplePicture(value) === null ? checkImageAddress(value) : pass(value as string))
 
 export type ProductField = 'name' | 'description' | 'categoryId' | 'price' | 'variants' | 'tags' | 'groupIds' | 'image'
 
@@ -77,7 +81,7 @@ export function validateProductInput(
       variants,
       tags: checkTags(readField(input, 'tags')),
       groupIds: checkGroupIds(readField(input, 'groupIds'), context.groups),
-      image: checkImageAddress(readField(input, 'image')),
+      image: checkProductImage(readField(input, 'image')),
     })
     if (!result.ok) return result
     const available = readField(input, 'available') !== false

@@ -11,7 +11,7 @@ import { discardButton, previewRegion, renderDesign, saveButton, seedBusiness, s
 /** The saved sample business's page color: what the veil over the photo is made from until the owner edits it. */
 const PAGE = '#f8f3ec'
 
-const textures = () => screen.getByRole('group', { name: 'Page texture' })
+const backgrounds = () => screen.getByRole('group', { name: 'Page background' })
 const kind = () => screen.getByRole('combobox', { name: 'Kind of business' })
 const photos = () => screen.getByRole('radiogroup', { name: 'Photos to choose from' })
 const photoRadio = (alt: string) => within(photos()).getByRole('radio', { name: alt })
@@ -36,7 +36,7 @@ async function openExtras(user: UserEvent) {
 
 async function openLibrary(user: UserEvent) {
   await openExtras(user)
-  await user.click(within(textures()).getByRole('radio', { name: 'Photo library' }))
+  await user.click(within(backgrounds()).getByRole('radio', { name: 'Photo library' }))
 }
 
 describe('DesignPage: the photo library picker', () => {
@@ -46,7 +46,7 @@ describe('DesignPage: the photo library picker', () => {
     expect(screen.queryByRole('combobox', { name: 'Kind of business' })).not.toBeInTheDocument()
     for (const name of ['Photo strength', 'Photo fit', 'Photo position']) expect(screen.queryByRole('group', { name })).not.toBeInTheDocument()
 
-    await user.click(within(textures()).getByRole('radio', { name: 'Photo library' }))
+    await user.click(within(backgrounds()).getByRole('radio', { name: 'Photo library' }))
     const picker = screen.getByRole('group', { name: 'Page photo' })
     expect(picker).toHaveAccessibleDescription(/Choose a photo for the background of your menu/)
     expect(within(picker).getByRole('combobox', { name: 'Kind of business' })).toBeInTheDocument()
@@ -59,7 +59,7 @@ describe('DesignPage: the photo library picker', () => {
     expect(backdrop()).toHaveAttribute('data-menu-backdrop', 'stock')
     expect(paint()).toBe('none')
 
-    await user.click(within(textures()).getByRole('radio', { name: 'Your photo' }))
+    await user.click(within(backgrounds()).getByRole('radio', { name: 'Your photo' }))
     expect(screen.queryByRole('combobox', { name: 'Kind of business' })).not.toBeInTheDocument()
     expect(screen.getByText('No photo yet')).toBeInTheDocument()
   })
@@ -179,22 +179,22 @@ describe('DesignPage: the photo library picker', () => {
     expect(photoRadio(one.alt)).not.toBeChecked()
   })
 
-  it('takes the photo off: the texture of the style comes back, the credit and the button go, and the focus stays on the page', async () => {
+  it('takes the photo off: the page goes back to its saved background, the credit and the button go, and the focus stays on the page', async () => {
     const { user } = await renderDesign({ seed: seedBusiness({ theme: styleTheme('roast', 'light') }) })
     await openLibrary(user)
     await user.click(photoRadio(photoAt('coffee', 0).alt))
     expect(saveButton()).toBeEnabled()
 
     await user.click(screen.getByRole('button', { name: 'Remove the photo' }))
-    // Roast is saved on Grain: that is the texture the page goes back to, and it is what is saved again.
-    expect(within(textures()).getByRole('radio', { name: 'Grain' })).toBeChecked()
-    expect(backdrop()).toHaveAttribute('data-menu-backdrop', 'grain')
+    // Roast is saved on a Grain texture: that is what the page goes back to, and it is what is saved again. The menu draws it plain.
+    expect(within(backgrounds()).getByRole('radio', { name: 'Plain' })).toBeChecked()
+    expect(backdrop()).toHaveAttribute('data-menu-backdrop', 'plain')
     expect(screen.queryByText(/^Photo by /)).not.toBeInTheDocument()
     expect(removeButton()).not.toBeInTheDocument()
     expect(screen.queryByRole('combobox', { name: 'Kind of business' })).not.toBeInTheDocument()
     expect(saveButton()).toBeDisabled()
     // The button left the page: the focus went back to the choice that opened the picker.
-    expect(within(textures()).getByRole('radio', { name: 'Photo library' })).toHaveFocus()
+    expect(within(backgrounds()).getByRole('radio', { name: 'Photo library' })).toHaveFocus()
   })
 
   it('lays the library photo like the owner photo, and keeps its strength, fit and position from one photo to the next', async () => {
@@ -240,7 +240,7 @@ describe('DesignPage: the photo library picker', () => {
     await openLibrary(user)
     await user.click(photoRadio(photoAt('coffee', 2).alt))
     await user.click(discardButton())
-    expect(within(textures()).getByRole('radio', { name: 'Plain' })).toBeChecked()
+    expect(within(backgrounds()).getByRole('radio', { name: 'Plain' })).toBeChecked()
     expect(screen.queryByText(/^Photo by /)).not.toBeInTheDocument()
     expect(screen.queryByRole('combobox', { name: 'Kind of business' })).not.toBeInTheDocument()
     expect(saveButton()).toBeDisabled()

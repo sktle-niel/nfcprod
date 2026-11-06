@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react'
 import type { UserEvent } from '@testing-library/user-event'
 import type { BusinessPatch } from '@/entities/business/business'
 import type { OwnerRepository } from '@/data/ownerRepository'
+import logoStyles from '@/shared/menu/headers/HeaderLogo.module.css'
 import { renderDashboardPage, type DashboardOptions } from '@/test/dashboard'
 import { DesignPage } from './DesignPage'
 
@@ -36,8 +37,14 @@ export function renderDesign(options: DashboardOptions = {}) {
 /** The preview window onto the menu. */
 export const previewRegion = () => screen.getByRole('region', { name: 'Menu preview' })
 
-/** Shows one part of the Look tab: Colors, Cards, Headings or Extras. */
-export async function showPart(user: UserEvent, name: 'Colors' | 'Cards' | 'Headings' | 'Extras') {
+/** The logo drawn in the preview, or null: one part on every page, whatever a template calls its top. */
+export const previewLogo = () => previewRegion().querySelector(`.${logoStyles.logo as string}`)
+
+/** Waits for the page template, a chunk of its own, to draw the business: before that the preview is empty, and any "not drawn" holds. */
+export const previewDrawn = (name: string) => within(previewRegion()).findByRole('heading', { name })
+
+/** Shows one part of the Look tab: Colors or Extras. */
+export async function showPart(user: UserEvent, name: 'Colors' | 'Extras') {
   await user.click(within(screen.getByRole('group', { name: 'Part of the look to change' })).getByRole('button', { name }))
 }
 

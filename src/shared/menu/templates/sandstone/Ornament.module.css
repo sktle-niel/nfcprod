@@ -1,0 +1,14 @@
+.ornament {
+  display: block;
+  width: 150px;
+  height: 12px;
+  margin-inline: auto;
+  fill: var(--menu-accent);
+}
+
+.lozenge {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  fill: var(--menu-accent);
+}

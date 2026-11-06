@@ -1,0 +1,292 @@
+/* A lit panel on the wall: square corners, no shadow. The photo runs to its edges; the words sit on the panel. */
+.panel {
+  min-width: 0;
+  color: var(--menu-text);
+  background: var(--tpl-panel);
+}
+
+/* The photo in its own color, the box sized before it arrives. The wall shows until it does. */
+.photo {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--tpl-frame);
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* A sold-out panel has its light off. */
+[data-sold-out] .photo img {
+  opacity: 0.4;
+}
+
+/* Set by usePictureFade only while a picture is on its way. */
+.photo img[data-arriving] {
+  opacity: 0;
+}
+
+.strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 16px;
+  align-items: start;
+  padding: 0 14px;
+}
+
+.words {
+  padding: 14px 0 12px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: 1.4375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* The price mark: a brass line that comes down from the photo with the price under it, the way a label hangs. */
+.price {
+  padding-top: 13px;
+  border-top: 2px solid var(--menu-accent);
+  font-family: var(--menu-display);
+  font-size: 1.4375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+
+.sizes {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.soldOut {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 1px 8px;
+  border: 1px solid currentcolor;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.body {
+  padding: 0 14px 16px;
+}
+
+.description {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--menu-muted);
+  text-wrap: pretty;
+  hanging-punctuation: first;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin: 8px 0 0;
+  padding: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  list-style: none;
+}
+
+.tags > li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.star {
+  font-size: 0.75rem;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  margin-bottom: -12px;
+  padding: 0;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--menu-text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--menu-accent);
+  text-underline-offset: 4px;
+}
+
+.more:focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: 2px;
+}
+
+.more[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+/* The add-ons open by height. Shut, they are out of the reading order too. */
+.addOns {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+
+.addOns[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+.addOnsInner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.addOnsInner > * {
+  padding-top: 18px;
+}
+
+/* No photo: the panel is type. The name is the picture. */
+.panel:not([data-photo]) .name {
+  font-size: 1.75rem;
+  line-height: 1.15;
+}
+
+.panel:not([data-photo]) .words {
+  padding: 18px 0 14px;
+}
+
+.panel:not([data-photo]) .price {
+  padding-top: 17px;
+  line-height: 1.15;
+}
+
+/* Grid: a narrow panel, the photo square, the price under the name. Rows of the list line the words of neighbors up. */
+[data-layout='grid'] .panel {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+}
+
+[data-layout='grid'] .photo {
+  aspect-ratio: 1;
+}
+
+[data-layout='grid'] .strip {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+  padding: 0 10px;
+}
+
+[data-layout='grid'] .words {
+  padding: 10px 0 8px;
+}
+
+[data-layout='grid'] .name {
+  font-size: 1.125rem;
+  line-height: 1.22;
+  overflow-wrap: break-word;
+}
+
+[data-layout='grid'] .price {
+  justify-self: start;
+  padding-top: 5px;
+  border-top-width: 1px;
+  font-size: 1.125rem;
+}
+
+[data-layout='grid'] .sizes {
+  font-size: 0.8125rem;
+}
+
+[data-layout='grid'] .body {
+  padding: 8px 10px 12px;
+}
+
+[data-layout='grid'] .description {
+  font-size: 0.875rem;
+}
+
+[data-layout='grid'] .panel:not([data-photo]) .strip {
+  grid-row: 1 / span 2;
+}
+
+[data-layout='grid'] .panel:not([data-photo]) .words {
+  padding: 14px 0 10px;
+}
+
+[data-layout='grid'] .panel:not([data-photo]) .name {
+  font-size: clamp(1.25rem, 6.2cqi, 1.625rem);
+  line-height: 1.14;
+}
+
+[data-layout='grid'] .panel:not([data-photo]) .price {
+  padding-top: 5px;
+}
+
+/* A wide list: the photo and its words side by side, so a whole dish fits on the screen. */
+@container (min-width: 640px) {
+  [data-layout='list'] .panel[data-photo] {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    grid-template-rows: auto 1fr;
+  }
+
+  [data-layout='list'] .panel[data-photo] .photo {
+    grid-row: 1 / span 2;
+  }
+
+  [data-layout='list'] .panel[data-photo] .strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-layout='list'] .panel[data-photo] .price {
+    justify-self: start;
+    margin-bottom: 8px;
+    padding-top: 6px;
+    border-top-width: 1px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .photo img {
+    transition: opacity var(--tpl-duration-reveal) var(--tpl-ease);
+  }
+
+  .addOns {
+    transition:
+      grid-template-rows var(--tpl-duration-open) var(--tpl-ease),
+      visibility 0s linear var(--tpl-duration-open);
+  }
+
+  .addOns[data-open] {
+    transition:
+      grid-template-rows var(--tpl-duration-open) var(--tpl-ease),
+      visibility 0s;
+  }
+
+  .chevron {
+    transition: transform var(--tpl-duration-small) var(--tpl-ease);
+  }
+}

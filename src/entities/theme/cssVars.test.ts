@@ -11,9 +11,13 @@ const SANS = 'var(--font-sans)'
 const SERIF = 'var(--font-serif)'
 const SYSTEM = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif'
 const PACIFICO = "Pacifico, 'Brush Script MT', cursive"
+const INTER = "'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+const POPPINS = "Poppins, 'Segoe UI', system-ui, sans-serif"
+const MULISH = "'Mulish Variable', 'Segoe UI', system-ui, sans-serif"
+const SOURCE_SERIF = "'Source Serif 4 Variable', Georgia, 'Times New Roman', serif"
 // The three font variables of each pairing, in the order of FONTS.
 const FONT_ROLES = {
-  '--menu-font': [SANS, SERIF, SYSTEM, SANS, SANS, SANS, SANS, SANS],
+  '--menu-font': [SANS, SERIF, SYSTEM, SANS, SANS, SANS, SANS, SANS, INTER, POPPINS, MULISH, INTER],
   '--menu-display': [
     SANS,
     SERIF,
@@ -23,6 +27,10 @@ const FONT_ROLES = {
     "Anton, 'Arial Narrow', Impact, sans-serif",
     "'Fredoka Variable', 'Trebuchet MS', system-ui, sans-serif",
     PACIFICO,
+    INTER,
+    POPPINS,
+    MULISH,
+    SOURCE_SERIF,
   ],
   '--menu-script': FONTS.map(() => PACIFICO),
 } as const
@@ -131,7 +139,8 @@ describe('toCssVars', () => {
     for (const theme of IN_BOTH_MODES) {
       const vars = toCssVars(theme)
       expect(contrastRatio(vars['--menu-text'] ?? '', vars['--menu-bg'] ?? '')).toBeGreaterThanOrEqual(4.5)
-      expect(contrastRatio(vars['--menu-text'] ?? '', vars['--menu-surface'] ?? '')).toBeGreaterThanOrEqual(4.5)
+      // A chosen card color may be as dark as the words of the page (Drip): the card has its own words.
+      expect(contrastRatio(vars['--menu-on-surface'] ?? '', vars['--menu-surface'] ?? '')).toBeGreaterThanOrEqual(4.5)
     }
   })
 
@@ -276,7 +285,7 @@ describe('toCssVars', () => {
       const vars = toCssVars(theme)
       const muted = vars['--menu-muted'] ?? ''
       expect(contrastRatio(muted, vars['--menu-bg'] ?? '')).toBeGreaterThanOrEqual(4.5)
-      expect(contrastRatio(muted, vars['--menu-surface'] ?? '')).toBeGreaterThanOrEqual(4.5)
+      expect(contrastRatio(vars['--menu-card-muted'] ?? '', vars['--menu-surface'] ?? '')).toBeGreaterThanOrEqual(4.5)
     }
   })
 

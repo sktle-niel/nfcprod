@@ -1,12 +1,16 @@
 import { isTrustedPicture } from '@/config/pictures'
 import { checkImageAddress } from '@/entities/menu/image'
+import { samplePicture } from '@/entities/menu/samplePictures'
 import type { Theme } from '@/entities/theme/theme'
 
 /**
  * The address to draw a picture from, or null to draw none. The renderer does not trust its input: the address must be a
- * clean one (`checkImageAddress`) and one the page may show (`isTrustedPicture`).
+ * clean one (`checkImageAddress`) and one the page may show (`isTrustedPicture`). The one exception is a photo of the demo's
+ * own sample menus, which must be exactly the path of one of our files (`samplePicture`).
  */
 export function pictureSrc(value: unknown): string | null {
+  const sample = samplePicture(value)
+  if (sample !== null) return sample
   const address = checkImageAddress(value)
   return address.ok && address.value !== null && isTrustedPicture(address.value) ? address.value : null
 }

@@ -36,17 +36,28 @@ describe('the library photo in the look actions', () => {
     expect(result.current.dirty).toBe(true)
   })
 
-  it('keeps the photo while a style is applied or reset: the style takes the texture, the photo waits', () => {
+  it('keeps the photo on the page while a style is applied or reset', () => {
     const { result } = draftWith(DEFAULT_THEME)
     act(() => result.current.setChoice('backdropVeil', 'faint'))
     act(() => result.current.chooseStock(ID))
     act(() => result.current.applyStyle('roast'))
-    expect(result.current.draft.theme).toEqual({ ...styleTheme('roast', 'light'), backdropStock: ID, backdropVeil: 'faint' })
-    expect(result.current.draft.theme.backdrop).toBe('grain')
-    act(() => result.current.applyStyle('noir'))
-    expect(result.current.draft.theme).toMatchObject({ style: 'noir', backdrop: 'deco', backdropStock: ID, backdropVeil: 'faint' })
+    expect(result.current.draft.theme).toEqual({ ...styleTheme('roast', 'light'), backdrop: 'stock', backdropStock: ID, backdropVeil: 'faint' })
+    act(() => result.current.applyStyle('drip'))
+    expect(result.current.draft.theme).toMatchObject({ style: 'drip', backdrop: 'stock', backdropStock: ID, backdropVeil: 'faint' })
     act(() => result.current.resetStyle())
-    expect(result.current.draft.theme).toMatchObject({ style: 'noir', backdrop: 'deco', backdropStock: ID, backdropVeil: 'faint' })
+    expect(result.current.draft.theme).toMatchObject({ style: 'drip', backdrop: 'stock', backdropStock: ID, backdropVeil: 'faint' })
+  })
+
+  it('takes the look of the style when the page shows no photo', () => {
+    const { result } = draftWith(DEFAULT_THEME)
+    act(() => result.current.applyStyle('roast'))
+    expect(result.current.draft.theme.backdrop).toBe('grain')
+  })
+
+  it('resets a retired style to Daybreak, the look the menu is drawn in', () => {
+    const { result } = draftWith(styleTheme('noir', 'dark'))
+    act(() => result.current.resetStyle())
+    expect(result.current.draft.theme).toEqual(styleTheme('daybreak', 'dark'))
   })
 
   it('takes the photo away and puts the page back on the texture of the style the look started from', () => {

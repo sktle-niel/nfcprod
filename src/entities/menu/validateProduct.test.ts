@@ -146,7 +146,8 @@ describe('validateProductInput', () => {
     const jpeg = `data:image/jpeg;base64,${btoa(String.fromCharCode(0xff, 0xd8, 0xff, 0xe0, 0, 0x10))}`
     expect(validateProductInput({ ...latte, image: jpeg }, context).ok).toBe(true)
     expect(validateProductInput({ ...latte, image: 'https://cdn.example.com/latte.webp' }, context).ok).toBe(true)
-    for (const image of ['', 'javascript:alert(1)', 'http://cdn.example.com/a.png', 'data:image/svg+xml;base64,PHN2Zz4=', 5]) {
+    expect(validateProductInput({ ...latte, image: '/sample/cup-2.jpg' }, context).ok).toBe(true)
+    for (const image of ['/sample/nope.jpg', '/sample/cup-2.jpg?x=1', '/sample/../cup-2.jpg', '', 'javascript:alert(1)', 'http://cdn.example.com/a.png', 'data:image/svg+xml;base64,PHN2Zz4=', 5]) {
       expect(errorsOf({ ...latte, image })).toEqual({ image: 'invalid' })
     }
   })

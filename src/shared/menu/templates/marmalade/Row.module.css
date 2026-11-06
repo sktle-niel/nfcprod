@@ -1,0 +1,258 @@
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  align-content: start;
+}
+
+.row[data-photo] {
+  grid-template-columns: 84px minmax(0, 1fr);
+}
+
+/* A small picture in a fine gilt frame, as one hangs in a shop: square and true. Its box holds the place while it loads. */
+.photo {
+  display: block;
+  aspect-ratio: 1;
+  padding: 3px;
+  border: 1px solid var(--tpl-gilt);
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+.row[data-sold-out] .photo img {
+  opacity: 0.55;
+  filter: grayscale(1);
+}
+
+/* Set only while a picture is on its way (Row.tsx). Its box is already sized, so nothing shifts when it fades in. */
+.row .photo img[data-waiting] {
+  opacity: 0;
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  .photo img {
+    transition: opacity var(--tpl-duration-reveal) var(--tpl-ease);
+  }
+}
+
+.text {
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 14px;
+}
+
+.name {
+  min-width: 0;
+  margin: 0;
+  font-family: var(--menu-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.22;
+  letter-spacing: 0.005em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.price {
+  flex: none;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+
+/* The prices of a product with sizes, side by side on their own line under the name, against the right edge. */
+.head[data-sizes] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.sizes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 2px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.size {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.sizeLabel {
+  max-width: 7em;
+  color: var(--menu-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+/* Said in words, on a fine painted line: the picture is what goes quiet. */
+.soldOut {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 1px 7px;
+  border: 1px solid var(--menu-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.description {
+  margin: 5px 0 0;
+  color: var(--menu-muted);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 7px 0 0;
+  padding: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  list-style: none;
+}
+
+.tags > li[data-tag='bestSeller'] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--menu-accent);
+  text-underline-offset: 4px;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  margin-bottom: -12px;
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--menu-accent);
+  text-underline-offset: 4px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.more:focus-visible {
+  outline: 2px solid var(--menu-text);
+  outline-offset: 2px;
+}
+
+.more svg {
+  width: 14px;
+  height: 14px;
+}
+
+.more[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+/* Height through the grid row, so the panel opens to the size of what it holds. Closed, it is out of reach as well as out of sight. */
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+
+.panel[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+.panelBody {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panelBody > * {
+  margin-top: 14px;
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  .panel {
+    transition:
+      grid-template-rows var(--tpl-duration-open) var(--tpl-ease),
+      visibility var(--tpl-duration-open);
+  }
+
+  .more svg {
+    transition: transform var(--tpl-duration-open) var(--tpl-ease);
+  }
+}
+
+/* Grid: the picture fills its column, the name under it, and the price under the name, still at the right. */
+[data-layout='grid'] .row[data-photo] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+[data-layout='grid'] .head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+}
+
+[data-layout='grid'] .head > .price {
+  justify-self: end;
+}
+
+/* The narrowest phones: a smaller picture and tighter prices, so three sizes still sit on one line. */
+@container (max-width: 359px) {
+  .row[data-photo] {
+    grid-template-columns: 70px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .sizes {
+    gap: 2px 8px;
+  }
+
+  .size {
+    gap: 3px;
+  }
+
+  .size > .price {
+    font-size: 1rem;
+  }
+}
+
+@container (min-width: 600px) {
+  .row[data-photo] {
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  /* There is room: the prices of the sizes stay on the name's line, as a single price does. */
+  [data-layout='list'] .head[data-sizes] {
+    display: flex;
+  }
+}

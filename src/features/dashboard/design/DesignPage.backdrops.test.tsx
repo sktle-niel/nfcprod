@@ -1,36 +1,38 @@
 import { screen, within } from '@testing-library/react'
 import type { UserEvent } from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
-import { backdropLayers, NEW_BACKDROPS } from '@/entities/theme/backdrop'
-import { BACKDROPS, DEFAULT_THEME } from '@/entities/theme/theme'
+import { DEFAULT_THEME } from '@/entities/theme/theme'
 import { previewRegion, renderDesign, saveButton, seedBusiness, showPart } from './designTestkit'
 
-/** The saved sample business's palette: what the swatches must be painted from until the owner edits a color. */
-const SAVED = { background: '#f8f3ec', text: '#2b1d14', accent: '#8b5a2b' }
-
-const group = () => screen.getByRole('group', { name: 'Page texture' })
-
-/** The swatch inside the same option card as the radio of `kind`. */
-function swatchOf(kind: string): HTMLElement | null {
-  const radio = within(group())
-    .getAllByRole('radio')
-    .find((candidate) => candidate.getAttribute('value') === kind)
-  return radio?.parentElement?.querySelector<HTMLElement>(`[data-texture='${kind}']`) ?? null
-}
+const group = () => screen.getByRole('group', { name: 'Page background' })
 
 async function openExtras(user: UserEvent) {
   await user.click(screen.getByRole('tab', { name: 'Look' }))
   await showPart(user, 'Extras')
 }
 
-describe('DesignPage: the page texture picker', () => {
-  it('offers every texture and both photo choices in picker order, named from the config words, with one line about them', async () => {
+describe('DesignPage: the page background picker', () => {
+  it('offers Plain, Your photo and Photo library in that order, named from the config words, with one line about them', async () => {
     const { user } = await renderDesign()
     await openExtras(user)
-    expect(within(group()).getAllByRole('radio').map((radio) => radio.getAttribute('value'))).toEqual([...BACKDROPS])
-    const names = ['Grain', 'Plaster', 'Marble', 'Linen', 'Weave', 'Terrazzo', 'Waves', 'Scallops', 'Deco fans', 'Gingham', 'Checker', 'Contours', 'Bloom', 'Your photo', 'Photo library']
-    for (const name of names) expect(within(group()).getByRole('radio', { name })).toBeInTheDocument()
-    expect(group()).toHaveAccessibleDescription('Drawn from your colors, so every texture stays easy to read.')
+    const choices = [
+      ['plain', 'Plain'],
+      ['picture', 'Your photo'],
+      ['stock', 'Photo library'],
+    ] as const
+    expect(within(group()).getAllByRole('radio').map((radio) => radio.getAttribute('value'))).toEqual(choices.map(([value]) => value))
+    for (const [value, name] of choices) expect(within(group()).getByRole('radio', { name })).toHaveAttribute('value', value)
+    expect(within(group()).getByRole('radio', { name: 'Plain' })).toBeChecked()
+    expect(group()).toHaveAccessibleDescription('The plain page color, or a photo behind your menu.')
+  })
+
+  it('shows Plain for a texture of an older style, which the menu draws plain, and counts it as no change', async () => {
+    const { user } = await renderDesign({ seed: seedBusiness({ theme: { ...DEFAULT_THEME, backdrop: 'terrazzo' } }) })
+    await openExtras(user)
+    expect(within(group()).getByRole('radio', { name: 'Plain' })).toBeChecked()
+    expect(previewRegion().querySelector('[data-menu-backdrop]')).toHaveAttribute('data-menu-backdrop', 'plain')
+    // The stored texture is left as it is until the owner picks another background.
+    expect(saveButton()).toBeDisabled()
   })
 
   it('shows the photo picker, its strength, fit and position only once Your photo is chosen, and the preview follows', async () => {
@@ -74,79 +76,5 @@ describe('DesignPage: the page texture picker', () => {
     const saved = (await owner.getBusiness())?.theme
     expect(saved?.backdropFit).toBe('stretch')
     expect(saved?.backdropPosition).toBe('top')
-  })
-
-  it('keeps the uploaded photo and how it is laid while trying styles: applying one changes the look, not the asset', async () => {
-    const PHOTO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
-    const { user } = await renderDesign({
-      seed: seedBusiness({
-        theme: { ...DEFAULT_THEME, backdrop: 'picture', backdropPicture: PHOTO, backdropVeil: 'strong', backdropFit: 'contain', backdropPosition: 'bottom' },
-      }),
-    })
-    await user.click(screen.getByRole('tab', { name: 'Look' }))
-    await user.click(screen.getByRole('radio', { name: 'Roast' }))
-    await showPart(user, 'Extras')
-    // The style's own backdrop took over, but the photo and its settings wait under 'Your photo'.
-    expect(within(group()).getByRole('radio', { name: 'Grain' })).toBeChecked()
-    await user.click(within(group()).getByRole('radio', { name: 'Your photo' }))
-    expect(screen.getByText('Replace the photo')).toBeInTheDocument()
-    expect(within(screen.getByRole('group', { name: 'Photo strength' })).getByRole('radio', { name: 'Strong' })).toBeChecked()
-    expect(within(screen.getByRole('group', { name: 'Photo fit' })).getByRole('radio', { name: 'Fit inside' })).toBeChecked()
-    expect(within(screen.getByRole('group', { name: 'Photo position' })).getByRole('radio', { name: 'Bottom' })).toBeChecked()
-  })
-
-  it('paints every drawn texture with its real image from the draft palette, as decoration with no tab stop', async () => {
-    const { user } = await renderDesign()
-    await openExtras(user)
-    for (const kind of NEW_BACKDROPS) {
-      const swatch = swatchOf(kind)
-      expect(swatch, kind).not.toBeNull()
-      expect(swatch!.getAttribute('aria-hidden'), kind).toBe('true')
-      expect(swatch!.hasAttribute('tabindex'), kind).toBe(false)
-      expect(swatch!.style.getPropertyValue('--swatch-image'), kind).toBe(backdropLayers(kind, SAVED).image)
-      expect(swatch!.style.getPropertyValue('--swatch-page'), kind).toBe(SAVED.background)
-    }
-  })
-
-  it('keeps the classic five on their own CSS drawing, with no image handed in', async () => {
-    const { user } = await renderDesign()
-    await openExtras(user)
-    for (const kind of ['plain', 'paper', 'dots', 'stripes', 'glow']) {
-      const swatch = swatchOf(kind)
-      expect(swatch, kind).not.toBeNull()
-      expect(swatch!.style.getPropertyValue('--swatch-image'), kind).toBe('')
-    }
-  })
-
-  it('repaints the swatches as a color is edited, and falls back while one is half typed', async () => {
-    const { user } = await renderDesign()
-    await user.click(screen.getByRole('tab', { name: 'Look' }))
-    const background = () => screen.getByLabelText('Background color')
-    await user.clear(background())
-    await user.type(background(), '#101820')
-    await showPart(user, 'Extras')
-    const dark = swatchOf('grain')!
-    expect(dark.style.getPropertyValue('--swatch-page')).toBe('#101820')
-    expect(dark.style.getPropertyValue('--swatch-image')).toBe(
-      backdropLayers('grain', { background: '#101820', text: SAVED.text, accent: SAVED.accent }).image,
-    )
-    await showPart(user, 'Colors')
-    await user.clear(background())
-    await user.type(background(), '#12')
-    await showPart(user, 'Extras')
-    // A half-typed color never reaches a style value: the swatch falls back to the default page color.
-    expect(swatchOf('grain')!.style.getPropertyValue('--swatch-page')).toBe(DEFAULT_THEME.background)
-  })
-
-  it('moves the live preview onto the texture and saves it', async () => {
-    const { user, owner } = await renderDesign()
-    await openExtras(user)
-    await user.click(within(group()).getByRole('radio', { name: 'Terrazzo' }))
-    const root = previewRegion().firstElementChild as HTMLElement
-    expect(root).toHaveAttribute('data-menu-backdrop', 'terrazzo')
-    expect(root.style.getPropertyValue('--menu-backdrop-image')).toContain('data:image/svg+xml')
-    await user.click(saveButton())
-    await screen.findByText('Your changes are saved.')
-    expect((await owner.getBusiness())?.theme.backdrop).toBe('terrazzo')
   })
 })

@@ -1,0 +1,84 @@
+/* A ruled line to write on, not an app's pill. */
+.search {
+  padding: 10px var(--tpl-gutter) 0;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  border-bottom: 1px dotted var(--menu-text);
+}
+
+.icon {
+  flex: none;
+  font-size: 1.125rem;
+}
+
+.input,
+.look {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--menu-text);
+}
+
+.input {
+  align-self: stretch;
+  padding: 0;
+  background: none;
+  border: 0;
+  outline: 0;
+  appearance: none;
+}
+
+.input::placeholder {
+  color: var(--menu-muted);
+  opacity: 1;
+}
+
+.input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.look {
+  color: var(--menu-muted);
+}
+
+.field:focus-within {
+  border-bottom-style: solid;
+}
+
+.clear {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin-right: -12px;
+  padding: 0;
+  font-size: 1.125rem;
+  color: var(--menu-text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.clear:focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: -4px;
+}
+
+.clearDot {
+  display: grid;
+}
+
+.count {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

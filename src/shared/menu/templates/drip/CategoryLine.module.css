@@ -1,0 +1,77 @@
+/* The categories on one line of the paper, over a fine rule, kept at the top of the screen. */
+.line {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--menu-bg);
+  border-bottom: 1px solid var(--menu-line);
+}
+
+.list {
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0 var(--tpl-gutter);
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.list > li {
+  flex: none;
+}
+
+.link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--menu-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* The category being read: the full ink, on a short thick rule that stands on the fine one. */
+.link[data-selected] {
+  color: var(--menu-text);
+}
+
+/* A border and not a fill: the rule grows under the new category from the left as the old one draws back. */
+.link::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  border-bottom: 2px solid var(--menu-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.link[data-selected]::after {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    color: var(--menu-text);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .link::after {
+    transition: transform var(--tpl-duration-open) var(--tpl-ease-move);
+  }
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: -4px;
+}

@@ -1,0 +1,72 @@
+/* Drip: a coffeehouse price list. Warm paper, one chocolate ink, painted from the --menu-* variables only. */
+.sheet {
+  /* This page's script is the thin one it loads for itself (TEMPLATE_FACES), whatever pairing the owner chose for the rest. */
+  --menu-script: 'Dancing Script Variable', 'Segoe Script', 'Brush Script MT', cursive;
+  --tpl-gutter: 20px;
+  --tpl-gap: 10px;
+  --tpl-row-gap: 11px;
+  --tpl-size: 1rem;
+  --tpl-small: 0.8125rem;
+  /* One character of a price column. */
+  --tpl-char: 0.62rem;
+  /* Above the page photo, if the owner put one under the menu. */
+  position: relative;
+  z-index: 1;
+}
+
+.sheet ::selection {
+  color: var(--menu-on-surface);
+  background: var(--menu-surface);
+}
+
+.sections {
+  padding: 0 var(--tpl-gutter);
+}
+
+/* Grid on a phone: the same list, tighter. */
+.sheet[data-layout='grid'] {
+  --tpl-row-gap: 7px;
+  --tpl-size: 0.9375rem;
+  --tpl-small: 0.75rem;
+  --tpl-char: 0.58rem;
+}
+
+/* The narrowest phones: three columns of prices leave the name little room, so everything gives a little back. */
+@container (max-width: 359.98px) {
+  .sheet {
+    --tpl-gutter: 16px;
+    --tpl-gap: 6px;
+    --tpl-size: 0.9375rem;
+    --tpl-small: 0.75rem;
+    --tpl-char: 0.58rem;
+  }
+}
+
+/* A wide sheet: a list keeps a width the eye can follow, and the grid sets two columns of it. */
+@container (min-width: 560px) {
+  .sheet {
+    --tpl-gutter: 32px;
+  }
+
+  .sheet[data-layout='list'] .sections {
+    max-width: 34rem;
+    margin-inline: auto;
+    padding: 0;
+  }
+
+  .sheet[data-layout='grid'] {
+    --tpl-row-gap: 11px;
+    --tpl-size: 1rem;
+    --tpl-small: 0.8125rem;
+    --tpl-char: 0.62rem;
+  }
+
+  .sheet[data-layout='grid'] .sections {
+    columns: 2;
+    column-gap: 36px;
+  }
+
+  .sheet[data-layout='grid'] .sections > section {
+    break-inside: avoid;
+  }
+}

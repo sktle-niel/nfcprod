@@ -33,16 +33,18 @@ describe('the owner preview', () => {
     expect(screen.getByRole('navigation', { name: shell.menu })).toBeInTheDocument()
   })
 
-  it('shows a draft in the style the owner chose, and says that only the owner can see it', async () => {
+  it("shows a draft in the plain look with the owner's colors, and says that only the owner can see it", async () => {
+    const theme = styleTheme('sunny', 'light')
     await renderDashboardApp('/dashboard/preview', {
       seed: async (owner) => {
-        await owner.saveBusiness({ theme: styleTheme('sunny', 'light') })
+        await owner.saveBusiness({ theme })
       },
     })
     await screen.findByRole('heading', { level: 1, name: 'Kape Kanto' })
-    const root = document.querySelector('[data-menu-card]')
-    expect(root).toHaveAttribute('data-menu-card', 'badge')
-    expect(root).toHaveAttribute('data-menu-header', 'awning')
+    const root = document.querySelector<HTMLElement>('[data-menu-card]')
+    expect(root).toHaveAttribute('data-menu-card', 'row')
+    expect(root).toHaveAttribute('data-menu-header', 'plain')
+    expect(root?.style.getPropertyValue('--menu-bg').toLowerCase()).toBe(theme.background.toLowerCase())
     expect(screen.getByText(text.note)).toBeInTheDocument()
     expect(screen.queryByText(text.notePaused)).not.toBeInTheDocument()
   })

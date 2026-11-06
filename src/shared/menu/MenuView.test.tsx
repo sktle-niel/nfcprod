@@ -421,11 +421,12 @@ describe('MenuView and the page photo', () => {
 })
 
 describe('MenuPreviewFrame', () => {
-  it('holds the menu in a labelled region that scrolls', () => {
+  // The frame draws a retired style as Daybreak, a chunk of its own: wait for it, or a check on the frame looks at an empty box.
+  it('holds the menu in a labelled region that scrolls', async () => {
     render(<MenuPreviewFrame business={business()} menu={menu()} />)
     const frame = screen.getByRole('region', { name: text.previewLabel })
     expect(frame).toHaveAttribute('tabindex', '0')
-    expect(within(frame).getByRole('heading', { level: 2, name: 'Cafe Luna' })).toBeInTheDocument()
+    expect(await within(frame).findByRole('heading', { level: 2, name: 'Cafe Luna' })).toBeInTheDocument()
   })
 
   it('has no link and no tab stop inside, only the frame itself', async () => {
@@ -435,6 +436,7 @@ describe('MenuPreviewFrame', () => {
       <MenuPreviewFrame business={business({ phone: '+63 917 555 0142', social })} menu={menu()} />,
     )
     const frame = screen.getByRole('region', { name: text.previewLabel })
+    await within(frame).findByRole('heading', { level: 2, name: 'Cafe Luna' })
     expect(frame.querySelector('a, button, input, select, textarea, summary, [href], [tabindex]')).toBeNull()
     await user.tab()
     expect(frame).toHaveFocus()

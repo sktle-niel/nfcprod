@@ -1,10 +1,10 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { OwnerError } from '@/data/ownerRepository'
 import { IMAGE_MAX_BYTES } from '@/entities/menu/menu'
 import { sampleImageFile } from '@/test/ownerFixtures'
-import { discardButton, previewRegion, renderDesign, saveButton, seedBusiness, spyOnSave } from './designTestkit'
+import { discardButton, previewDrawn, previewLogo, renderDesign, saveButton, seedBusiness, spyOnSave } from './designTestkit'
 
 // The test picks files the file input would refuse by its `accept` list: the page must refuse them itself.
 const picker = () => userEvent.setup({ applyAccept: false })
@@ -26,7 +26,8 @@ describe('DesignPage: the logo', () => {
 
     const logo = await screen.findByRole('img', { name: 'Your logo' })
     expect(logo).toHaveAttribute('src', expect.stringMatching(new RegExp(`^data:image/${kind};base64,`)))
-    expect(previewRegion().querySelector('header img')).toHaveAttribute('src', logo.getAttribute('src'))
+    // The masthead of the page template draws the logo (a 72 px picture with no alt: it is decoration beside the name).
+    await waitFor(() => expect(previewLogo()).toHaveAttribute('src', logo.getAttribute('src')))
     expect(saveButton()).toBeEnabled()
     expect(await owner.getBusiness().then((b) => b?.logo)).toBeNull()
 
@@ -82,9 +83,11 @@ describe('DesignPage: the logo', () => {
       wrapOwner: spy.wrap,
       seed: seedBusiness({ logo: 'https://images.example.com/logo.png' }),
     })
+    await previewDrawn('Kape Kanto')
+    expect(previewLogo()).toHaveAttribute('src', 'https://images.example.com/logo.png')
     await user.click(screen.getByRole('button', { name: 'Remove logo' }))
     expect(screen.getByText('No logo yet')).toBeInTheDocument()
-    expect(previewRegion().querySelector('header img')).toBeNull()
+    expect(previewLogo()).toBeNull()
 
     await user.click(discardButton())
     expect(screen.getByRole('img', { name: 'Your logo' })).toBeInTheDocument()

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import type { Font, Theme } from '@/entities/theme/theme'
+import { FONTS, isTemplateStyle, type Font, type TemplateStyleId, type Theme } from '@/entities/theme/theme'
+import { isOneOf } from '@/shared/lib/checks'
 
 /**
  * Fonts the menu loads on demand. Urbanist and Instrument Serif are part of the app (main.tsx) and the system stack needs no
@@ -8,7 +9,7 @@ import type { Font, Theme } from '@/entities/theme/theme'
  * The static packages offer a latin-only sheet. The two variable packages have no such sheet, but their @font-face rules carry
  * a unicode-range, so the browser fetches the latin file only (and the others only when a character needs them).
  */
-export type MenuFace = 'playfair' | 'dmSerif' | 'anton' | 'fredoka' | 'pacifico'
+export type MenuFace = 'playfair' | 'dmSerif' | 'anton' | 'fredoka' | 'pacifico' | 'inter' | 'poppins' | 'mulish' | 'sourceSerif' | 'dancing'
 
 export const FACE_LOADERS: Readonly<Record<MenuFace, () => Promise<unknown>>> = {
   playfair: () => import('@fontsource-variable/playfair-display/wght.css'),
@@ -16,6 +17,19 @@ export const FACE_LOADERS: Readonly<Record<MenuFace, () => Promise<unknown>>> = 
   anton: () => import('@fontsource/anton/latin-400.css'),
   fredoka: () => import('@fontsource-variable/fredoka/wght.css'),
   pacifico: () => import('@fontsource/pacifico/latin-400.css'),
+  // Upright and italic: Daybreak's headline slants its last words.
+  inter: () => Promise.all([import('@fontsource-variable/inter/wght.css'), import('@fontsource-variable/inter/wght-italic.css')]),
+  // Static files: the weights the templates use (regular, medium, semibold, bold), latin only.
+  poppins: () =>
+    Promise.all([
+      import('@fontsource/poppins/latin-400.css'),
+      import('@fontsource/poppins/latin-500.css'),
+      import('@fontsource/poppins/latin-600.css'),
+      import('@fontsource/poppins/latin-700.css'),
+    ]),
+  mulish: () => import('@fontsource-variable/mulish/wght.css'),
+  sourceSerif: () => import('@fontsource-variable/source-serif-4/wght.css'),
+  dancing: () => import('@fontsource-variable/dancing-script/wght.css'),
 }
 
 /** The lazy faces of each pairing (its display face; the body face is Urbanist or the system stack). */
@@ -28,14 +42,26 @@ export const PAIRING_FACES: Readonly<Record<Font, readonly MenuFace[]>> = {
   anton: ['anton'],
   fredoka: ['fredoka'],
   pacifico: ['pacifico'],
+  inter: ['inter'],
+  poppins: ['poppins'],
+  mulish: ['mulish'],
+  sourceSerif: ['sourceSerif', 'inter'],
 }
 
-type FontLook = Pick<Theme, 'font' | 'title' | 'header'>
+/** The faces a page template draws with whatever pairing the owner picked: Drip's thin script title. */
+export const TEMPLATE_FACES: Readonly<Partial<Record<TemplateStyleId, readonly MenuFace[]>>> = {
+  drip: ['dancing'],
+  marmalade: ['pacifico'],
+}
 
-/** The faces a theme needs: its pairing's, plus the script face when a title or the header is drawn in script. */
+type FontLook = Pick<Theme, 'font' | 'title' | 'header'> & { style?: Theme['style'] | undefined }
+
+/** The faces a theme needs: its pairing's, plus the script face when a title or the header is drawn in script, plus its template's own. */
 export function facesOf(theme: FontLook): MenuFace[] {
-  const faces = new Set<MenuFace>(PAIRING_FACES[theme.font] ?? [])
+  // A value that is somehow not on its list needs no face and is never used as a key: '__proto__' would find the table's prototype.
+  const faces = new Set<MenuFace>(isOneOf(FONTS, theme.font) ? PAIRING_FACES[theme.font] : [])
   if (theme.title === 'script' || theme.header === 'script') faces.add('pacifico')
+  if (isTemplateStyle(theme.style)) for (const face of TEMPLATE_FACES[theme.style] ?? []) faces.add(face)
   return [...faces]
 }
 

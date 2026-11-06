@@ -1,0 +1,119 @@
+/* The foot of the placemat: the solid block of the sheet (see --tpl-solid), each fact on a fine rule. */
+.root {
+  padding: 36px var(--tpl-gutter) 16px;
+  color: var(--tpl-on-solid);
+  background: var(--tpl-solid);
+  border-top: 4px double var(--tpl-solid-edge);
+  scroll-margin-top: var(--tpl-band);
+}
+
+.root:focus {
+  outline: none;
+}
+
+.heading {
+  margin: 0 0 22px;
+  font-family: var(--menu-display);
+  font-size: 2.25rem;
+  font-weight: 400;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.facts {
+  gap: 0;
+}
+
+/* The label on the left of each rule, the fact beside it. */
+.fact {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  column-gap: 14px;
+  align-content: start;
+  padding: 13px 0;
+  border-top: 1px solid var(--tpl-hair-solid);
+}
+
+.fact > * {
+  grid-column: 2;
+}
+
+.fact > .label {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.label {
+  margin: 0;
+  padding-top: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--tpl-on-solid);
+}
+
+.value {
+  font-size: 1rem;
+  line-height: 1.45;
+  font-variant-numeric: lining-nums;
+  text-wrap: balance;
+}
+
+/* The word sits on the line of its label; the rest of the 44px target reaches down over the padding of the fact. */
+.link {
+  align-items: flex-start;
+  min-height: 44px;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.45;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.fact > .link {
+  margin-bottom: -13px;
+}
+
+.value + .link {
+  padding-top: 6px;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--tpl-on-solid);
+  outline-offset: 2px;
+}
+
+.social {
+  gap: 0 18px;
+  margin-bottom: -13px;
+}
+
+/* A narrow sheet has no room beside the labels: the fact goes under its label, so hours keep their lines. */
+@container (max-width: 359px) {
+  .fact {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2px;
+  }
+
+  .fact > * {
+    grid-column: 1;
+  }
+
+  .fact > .label {
+    grid-column: 1;
+    grid-row: auto;
+    padding-top: 0;
+  }
+}
+
+@container (min-width: 600px) {
+  .root {
+    padding: 44px var(--tpl-gutter) 24px;
+  }
+
+  .facts {
+    column-gap: 40px;
+  }
+}

@@ -31,6 +31,10 @@ const DM_SERIF = "'DM Serif Display', Georgia, 'Times New Roman', serif"
 const ANTON = "Anton, 'Arial Narrow', Impact, sans-serif"
 const FREDOKA = "'Fredoka Variable', 'Trebuchet MS', system-ui, sans-serif"
 const PACIFICO = "Pacifico, 'Brush Script MT', cursive"
+const INTER = "'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+const POPPINS = "Poppins, 'Segoe UI', system-ui, sans-serif"
+const MULISH = "'Mulish Variable', 'Segoe UI', system-ui, sans-serif"
+const SOURCE_SERIF = "'Source Serif 4 Variable', Georgia, 'Times New Roman', serif"
 
 const FONT_STACKS: Record<Font, FontStacks> = {
   urbanist: { body: SANS, display: SANS, script: PACIFICO },
@@ -41,6 +45,10 @@ const FONT_STACKS: Record<Font, FontStacks> = {
   anton: { body: SANS, display: ANTON, script: PACIFICO },
   fredoka: { body: SANS, display: FREDOKA, script: PACIFICO },
   pacifico: { body: SANS, display: PACIFICO, script: PACIFICO },
+  inter: { body: INTER, display: INTER, script: PACIFICO },
+  poppins: { body: POPPINS, display: POPPINS, script: PACIFICO },
+  mulish: { body: MULISH, display: MULISH, script: PACIFICO },
+  sourceSerif: { body: INTER, display: SOURCE_SERIF, script: PACIFICO },
 }
 
 const RADII: Record<ButtonStyle, string> = { rounded: '12px', square: '4px', pill: '999px' }

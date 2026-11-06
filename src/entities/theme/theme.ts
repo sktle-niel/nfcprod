@@ -2,7 +2,20 @@ import { isDarkColor } from './color'
 import type { StockId } from './stockPhotos'
 
 /** Font pairings the app ships, by name (display, body and script together). No other font name ever reaches a style. */
-export const FONTS = ['urbanist', 'instrumentSerif', 'system', 'playfair', 'dmSerif', 'anton', 'fredoka', 'pacifico'] as const
+export const FONTS = [
+  'urbanist',
+  'instrumentSerif',
+  'system',
+  'playfair',
+  'dmSerif',
+  'anton',
+  'fredoka',
+  'pacifico',
+  'inter',
+  'poppins',
+  'mulish',
+  'sourceSerif',
+] as const
 export type Font = (typeof FONTS)[number]
 
 /** The corner of the menu's buttons and chips. */
@@ -16,6 +29,13 @@ export type Layout = (typeof LAYOUTS)[number]
 /** Light or dark menu. Switching it (`withMode`) moves the page and text colors when the page does not suit the new mode. */
 export const MODES = ['light', 'dark'] as const
 export type Mode = (typeof MODES)[number]
+
+/**
+ * The page templates: each draws a whole menu page of its own (src/shared/menu/templates), in the owner's colors, font and
+ * menu layout. They replace the older styles, which are retired: a menu saved in one of those is drawn Classic.
+ */
+export const TEMPLATE_STYLE_IDS = ['daybreak', 'beanhouse', 'marmalade', 'sandstone', 'drip', 'nightglass', 'lightbox'] as const
+export type TemplateStyleId = (typeof TEMPLATE_STYLE_IDS)[number]
 
 /** The ready-made looks an owner starts from. Each one sets every choice below (`styleTheme` in styles.ts). */
 export const STYLE_IDS = [
@@ -32,8 +52,16 @@ export const STYLE_IDS = [
   'diner',
   'noir',
   'catalog',
+  ...TEMPLATE_STYLE_IDS,
 ] as const
 export type StyleId = (typeof STYLE_IDS)[number]
+
+/** The looks the Design page offers: the plain Classic page, and the templates. */
+export const GALLERY_STYLE_IDS = TEMPLATE_STYLE_IDS
+
+/** Whether `style` is one of the page templates (a value that is not on the list is not). */
+export const isTemplateStyle = (style: unknown): style is TemplateStyleId =>
+  (TEMPLATE_STYLE_IDS as readonly unknown[]).includes(style)
 
 /** How one product is drawn. */
 export const CARDS = ['row', 'leader', 'tile', 'badge', 'outline', 'soft', 'plate', 'poster'] as const

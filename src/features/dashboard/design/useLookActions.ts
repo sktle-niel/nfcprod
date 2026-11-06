@@ -4,7 +4,7 @@ import type { Business } from '@/entities/business/business'
 import { isDarkColor } from '@/entities/theme/color'
 import type { StockId } from '@/entities/theme/stockPhotos'
 import { STYLES, styleTheme } from '@/entities/theme/styles'
-import { MODES, STYLE_IDS, withMode, type Mode, type ModeColors, type StyleId, type Theme } from '@/entities/theme/theme'
+import { GALLERY_STYLE_IDS, MODES, STYLE_IDS, withMode, type Mode, type ModeColors, type StyleId, type Theme } from '@/entities/theme/theme'
 import { mergePresets } from '@/presets'
 import { isOneOf } from '@/shared/lib/checks'
 import { fill } from '@/shared/lib/fill'
@@ -30,14 +30,21 @@ export function styleOf(theme: Theme): StyleId {
   return isOneOf(STYLE_IDS, theme.style) ? theme.style : 'classic'
 }
 
+/** The look a menu is drawn in, for the panel to name: a retired style is drawn as Daybreak (`plainTheme`), so it is Daybreak here too. */
+export function shownStyleOf(theme: Theme): StyleId {
+  const id = styleOf(theme)
+  return (GALLERY_STYLE_IDS as readonly StyleId[]).includes(id) ? id : 'daybreak'
+}
+
 /**
- * `next` with the owner's page photo as it is in `from`: the picture, the library photo, their strength, their fit and their
- * position. The photo is an asset and its settings go with it, not a choice of a style, so they survive trying styles and
- * going back to one.
+ * `next` with the owner's page photo as it is in `from`: the picture, the library photo, whether the page shows one, their
+ * strength, their fit and their position. The photo is the owner's, not a choice of a style, so it stays on the page while they try
+ * styles and go back to one.
  */
 function withOwnerPhoto(next: Theme, from: Theme): Theme {
-  const { backdropPicture, backdropStock, backdropVeil, backdropFit, backdropPosition } = from
-  return { ...next, backdropPicture, backdropStock, backdropVeil, backdropFit, backdropPosition }
+  const { backdrop, backdropPicture, backdropStock, backdropVeil, backdropFit, backdropPosition } = from
+  const shows = backdrop === 'picture' || backdrop === 'stock'
+  return { ...next, backdrop: shows ? backdrop : next.backdrop, backdropPicture, backdropStock, backdropVeil, backdropFit, backdropPosition }
 }
 
 function samePalette(theme: Theme, palette: Palette): boolean {
@@ -115,7 +122,7 @@ export function useLookActions({ draft, business, busy, theme, setNote }: Contex
       replace(withOwnerPhoto(styleTheme(id, draft.theme.mode), draft.theme), fill(words.styles.applied, { style: styleName(id) })),
     /** Back to the style the look started from, every choice and color — the page photo stays, like on applyStyle. */
     resetStyle: () => {
-      const id = styleOf(draft.theme)
+      const id = shownStyleOf(draft.theme)
       const next = withOwnerPhoto(styleTheme(id, draft.theme.mode), draft.theme)
       const style = styleName(id)
       replace(next, fill(savedOr(next, words.styles.resetStyleNote, words.styles.resetStyleNoteSame), { style }))

@@ -17,7 +17,7 @@ type Props = { id: StyleId; mode: Mode; business: ThumbBusiness; menu: Menu }
 /**
  * The owner's own menu drawn small in one style: the real renderer, so the picture never lies about the look. It is only a
  * picture: hidden from screen readers (the radio's label names the style), inert (no focus, no clicks), and drawn only once
- * it comes near the screen, so thirteen menus do not weigh on the page. Memoised: typing a color does not redraw it.
+ * it comes near the screen, so the menus do not weigh on the page. Memoised: typing a color does not redraw it.
  */
 export const StyleThumb = memo(function StyleThumb({ id, mode, business, menu }: Props) {
   const box = useRef<HTMLDivElement>(null)

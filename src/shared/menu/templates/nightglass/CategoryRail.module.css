@@ -1,0 +1,74 @@
+.rail {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--menu-bg);
+  border-top: 1px solid var(--tpl-paint);
+  border-bottom: 1px solid var(--tpl-paint);
+}
+
+.list {
+  position: relative;
+  display: flex;
+  margin: 0;
+  padding: 0 calc(var(--tpl-gutter) - 10px);
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.list > li {
+  flex: none;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 10px;
+  font-family: var(--menu-display);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  color: var(--menu-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* The word being read is lit at once: only the line under it travels. */
+.link[data-selected] {
+  color: var(--tpl-lit);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: -4px;
+}
+
+/* One line, stretched and moved by useRailMark. */
+.list > .mark {
+  position: absolute;
+  bottom: 7px;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  background: var(--tpl-paint);
+  transform-origin: left;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    color: var(--menu-text);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .list > .mark[data-placed] {
+    transition: transform var(--tpl-duration-open) var(--tpl-ease-move);
+  }
+}

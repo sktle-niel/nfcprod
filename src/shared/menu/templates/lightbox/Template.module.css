@@ -1,0 +1,90 @@
+/* Lightbox: a calm gallery of the food. Painted from the --menu-* variables only. */
+.page {
+  /* The wall is the page color warmed with a little of the accent, the panels the page color itself: they are the lit thing. */
+  --tpl-frame: color-mix(in srgb, var(--menu-accent) 12%, var(--menu-bg));
+  --tpl-panel: var(--menu-bg);
+  /* The closing panel is one more lit panel, in the words of the panels: the gallery ends in its own light, on no dark band. */
+  --tpl-closing: var(--tpl-panel);
+  --tpl-on-closing: var(--menu-text);
+  --tpl-rail: 16px;
+  --tpl-seam: 20px;
+  /* Above the page photo, if the owner put one under the menu. */
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  /* Over the 24px the menu root keeps under every page, so the closing panel reaches the end of the screen. */
+  margin-bottom: -24px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Dark: the lights are down. The page color is the wall and the panels are mixed from it; the closing panel follows them, low, not a bright end. */
+.page[data-mode='dark'] {
+  --tpl-frame: var(--menu-bg);
+  --tpl-panel: color-mix(in srgb, var(--menu-accent) 12%, var(--menu-bg));
+}
+
+.page ::selection {
+  color: var(--menu-on-fill);
+  background: var(--menu-fill);
+}
+
+.fixture {
+  flex: 1;
+  padding-bottom: 40px;
+  color: var(--menu-text);
+  background: var(--tpl-frame);
+}
+
+/* The strip is 45px high. */
+.section {
+  scroll-margin-top: 45px;
+}
+
+.section:focus {
+  outline: none;
+}
+
+.title {
+  margin: 0;
+  padding: 36px var(--tpl-rail) 16px;
+  font-family: var(--menu-display);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.list {
+  display: grid;
+  gap: var(--tpl-seam);
+  margin: 0;
+  padding: 0 var(--tpl-rail);
+  list-style: none;
+}
+
+/* Grid: panels side by side, two on a phone. Each panel takes three rows of the list, so the words of a row line up. */
+.page[data-layout='grid'] {
+  --tpl-seam: 12px;
+}
+
+.page[data-layout='grid'] .list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@container (min-width: 640px) {
+  .page {
+    --tpl-rail: 24px;
+  }
+
+  .page[data-layout='grid'] {
+    --tpl-seam: 16px;
+  }
+
+  .page[data-layout='grid'] .list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

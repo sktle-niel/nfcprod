@@ -5,7 +5,7 @@ import type { Preset } from './types'
 export const fineDiningPreset: Preset = {
   type: 'fineDining',
   categories: ['Starters', 'Mains', 'Desserts', 'Wine', 'Tasting Menu'],
-  theme: styleTheme('gourmet', 'dark'),
+  theme: styleTheme('sandstone', 'light'),
   groups: [
     {
       name: 'Doneness',

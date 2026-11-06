@@ -12,9 +12,9 @@ import { sampleBusiness, sampleMenu } from '@/test/ownerFixtures'
 import styles from './LookTabPage.module.css'
 
 /**
- * A developer's page of the Design page's Look tab, with no sign-in, to look at the style picker and the controls in a real
- * browser (`/__look`, development server only). `?style=<id>` and `?mode=light|dark` start from a saved style, `?part=colors|cards|
- * headings|extras` opens a part, `?width=360` sets the width. Save keeps the change in this page only.
+ * A developer's page of the Design page's Look tab, with no sign-in, to look at the controls in a real browser (`/__look`,
+ * development server only). `?style=<id>` and `?mode=light|dark` start from a saved style (the menu itself is drawn in the
+ * plain look), `?part=colors|extras` opens a part, `?width=360` sets the width. Save keeps the change in this page only.
  */
 export function LookTabPage() {
   const params = new URLSearchParams(window.location.search)

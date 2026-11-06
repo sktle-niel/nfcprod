@@ -1,0 +1,101 @@
+/* The fascia runs edge to edge; the lined-out board sits inside it. */
+.fascia {
+  padding: 2px 10px 12px;
+}
+
+.sign {
+  display: grid;
+  justify-items: center;
+  padding: 28px 18px 26px;
+  text-align: center;
+}
+
+/* The top links sit above the board: with none, the board keeps its margin from the top edge. */
+.fascia > .sign:first-child {
+  margin-top: 10px;
+}
+
+.logo {
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 14px;
+}
+
+.logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0;
+}
+
+/*
+ * Lettered in gilt with a fine shade to the lower right, as a sign painter lifts a name off the board. The shade is the gilt sunk
+ * into the ground, so it follows the owner's colors and never reads as a second outline.
+ */
+.name {
+  max-width: 100%;
+  margin: 0;
+  color: var(--tpl-gilt);
+  font-family: var(--menu-display);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  text-shadow: 1px 1px 0 color-mix(in srgb, var(--tpl-gilt) 34%, var(--menu-surface));
+}
+
+.name[data-size='l'] {
+  font-size: min(12cqi, 4.75rem);
+}
+
+.name[data-size='m'] {
+  font-size: min(9.5cqi, 3.75rem);
+}
+
+.name[data-size='s'] {
+  font-size: min(7.5cqi, 3rem);
+}
+
+.rule {
+  width: min(58%, 260px);
+  margin-top: 16px;
+}
+
+.tagline {
+  max-width: 32ch;
+  margin: 14px 0 0;
+  font-size: 1rem;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+  hanging-punctuation: first;
+}
+
+/* The second step of the sign's moment: the rule is pulled across, from the left as the brush travels. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  .drawn {
+    transform-origin: left center;
+    animation: draw var(--tpl-duration-opening) var(--tpl-ease) var(--tpl-stagger) backwards;
+  }
+}
+
+@keyframes draw {
+  from {
+    opacity: 0;
+    transform: scaleX(0.6);
+  }
+}
+
+@container (min-width: 600px) {
+  .fascia {
+    padding: 2px 16px 16px;
+  }
+
+  .sign {
+    padding: 44px 28px 40px;
+  }
+}

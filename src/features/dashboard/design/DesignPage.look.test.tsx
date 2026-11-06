@@ -8,7 +8,7 @@ import { ACCENT_CONTRAST_MIN, TEXT_CONTRAST_MIN } from '@/entities/theme/validat
 import { BUSINESS_TYPES } from '@/entities/business/business'
 import { presetFor } from '@/presets'
 import { sampleBusiness } from '@/test/ownerFixtures'
-import { discardButton, previewRegion, renderDesign, saveButton, seedBusiness, showPart, spyOnSave } from './designTestkit'
+import { previewRegion, renderDesign, saveButton, seedBusiness, showPart, spyOnSave } from './designTestkit'
 
 const COLOR_WORDS = 'Use a color like #8b5a2b, or pick one with the square.'
 
@@ -26,7 +26,7 @@ async function typeColor(user: UserEvent, field: HTMLElement, value: string) {
 }
 
 describe('DesignPage: the Look tab', () => {
-  it('shows the saved colors, the style choices and the mode', async () => {
+  it('shows the saved colors, the font, the layout and the mode', async () => {
     const { user } = await renderDesign()
     await openLook(user)
     expect(accent()).toHaveValue('#8b5a2b')
@@ -36,7 +36,6 @@ describe('DesignPage: the Look tab', () => {
     expect(screen.getByLabelText('Pick the accent color')).toBeInTheDocument()
     await showPart(user, 'Extras')
     expect(screen.getByRole('radio', { name: 'Urbanist' })).toBeChecked()
-    expect(screen.getByRole('radio', { name: 'Rounded' })).toBeChecked()
     expect(screen.getByRole('radio', { name: 'Grid' })).toBeChecked()
     expect(screen.getByRole('button', { name: 'Light' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByRole('button', { name: 'Dark' })).toHaveAttribute('aria-pressed', 'false')
@@ -247,7 +246,7 @@ describe('DesignPage: light and dark', () => {
   })
 })
 
-describe('DesignPage: font, buttons and layout', () => {
+describe('DesignPage: font and layout', () => {
   it('writes each font option in its own font', async () => {
     const { user } = await renderDesign()
     await openLook(user)
@@ -257,33 +256,18 @@ describe('DesignPage: font, buttons and layout', () => {
     expect(screen.getByText('Device default').style.fontFamily).toContain('system-ui')
   })
 
-  it('draws a sample button with the radius of each style', async () => {
-    const { user } = await renderDesign()
-    await openLook(user)
-    await showPart(user, 'Extras')
-    const radius = (name: string) => {
-      const sample = screen.getByRole('radio', { name }).parentElement?.querySelector<HTMLElement>('[aria-hidden="true"] > span')
-      return sample?.style.borderRadius
-    }
-    expect(radius('Rounded')).toBe('12px')
-    expect(radius('Square')).toBe('4px')
-    expect(radius('Pill')).toBe('999px')
-  })
-
-  it('saves a new font, button style and layout in the theme', async () => {
+  it('saves a new font and layout in the theme', async () => {
     const spy = spyOnSave()
     const { user, owner } = await renderDesign({ wrapOwner: spy.wrap })
     await openLook(user)
     await showPart(user, 'Extras')
     await user.click(screen.getByRole('radio', { name: 'Instrument Serif' }))
-    await user.click(screen.getByRole('radio', { name: 'Pill' }))
     await user.click(screen.getByRole('radio', { name: 'List' }))
     const root = previewRegion().firstElementChild as HTMLElement
     expect(root).toHaveAttribute('data-menu-layout', 'list')
-    expect(root.style.getPropertyValue('--menu-radius')).toBe('999px')
     await user.click(saveButton())
     await screen.findByText('Your changes are saved.')
-    expect((await owner.getBusiness())?.theme).toMatchObject({ font: 'instrumentSerif', buttonStyle: 'pill', layout: 'list' })
+    expect((await owner.getBusiness())?.theme).toMatchObject({ font: 'instrumentSerif', layout: 'list' })
     expect(spy.patches).toHaveLength(1)
   })
 
@@ -291,9 +275,9 @@ describe('DesignPage: font, buttons and layout', () => {
     const { user } = await renderDesign()
     await openLook(user)
     await showPart(user, 'Extras')
-    screen.getByRole('radio', { name: 'Rounded' }).focus()
+    screen.getByRole('radio', { name: 'Grid' }).focus()
     await user.keyboard('{ArrowRight}')
-    expect(screen.getByRole('radio', { name: 'Square' })).toBeChecked()
+    expect(screen.getByRole('radio', { name: 'List' })).toBeChecked()
     expect(saveButton()).toBeEnabled()
   })
 
@@ -304,75 +288,5 @@ describe('DesignPage: font, buttons and layout', () => {
     await user.click(screen.getByRole('radio', { name: 'List' }))
     await user.click(screen.getByRole('radio', { name: 'Grid' }))
     expect(saveButton()).toBeDisabled()
-  })
-})
-
-describe('DesignPage: reset to the look of the business type', () => {
-  it('puts the preset look in the draft, says so, and keeps it unsaved until Save', async () => {
-    const preset = presetFor('coffee').theme
-    const { user, owner } = await renderDesign({
-      seed: seedBusiness({ theme: { ...DEFAULT_THEME, primary: '#ff0000', font: 'system', layout: 'list', mode: 'dark' } }),
-    })
-    await openLook(user)
-    expect(accent()).toHaveValue('#ff0000')
-    await user.click(screen.getByRole('button', { name: 'Reset to the look of my business type' }))
-    expect(accent()).toHaveValue(preset.primary)
-    expect(textColor()).toHaveValue(preset.secondary)
-    expect(background()).toHaveValue(preset.background)
-    await showPart(user, 'Extras')
-    expect(screen.getByRole('radio', { name: preset.font === 'urbanist' ? 'Urbanist' : preset.font === 'system' ? 'Device default' : 'Instrument Serif' })).toBeChecked()
-    expect(screen.getByText('Look reset to your business type. Save to keep it.')).toBeInTheDocument()
-    expect((await owner.getBusiness())?.theme.primary).toBe('#ff0000')
-
-    await user.click(saveButton())
-    await screen.findByText('Your changes are saved.')
-    expect((await owner.getBusiness())?.theme).toEqual(preset)
-  })
-
-  it('is undone by Discard', async () => {
-    const { user } = await renderDesign({ seed: seedBusiness({ theme: { ...DEFAULT_THEME, primary: '#ff0000' } }) })
-    await openLook(user)
-    await user.click(screen.getByRole('button', { name: 'Reset to the look of my business type' }))
-    expect(accent()).not.toHaveValue('#ff0000')
-    await user.click(discardButton())
-    expect(accent()).toHaveValue('#ff0000')
-    expect(screen.queryByText(/Look reset/)).not.toBeInTheDocument()
-  })
-
-  it('says so when the look already was the preset, and stays clean', async () => {
-    const { user } = await renderDesign({ look: 'preset' })
-    await openLook(user)
-    await showPart(user, 'Extras')
-    const [same, other] = presetFor('coffee').theme.layout === 'grid' ? ['Grid', 'List'] : ['List', 'Grid']
-    await user.click(screen.getByRole('radio', { name: other }))
-    await user.click(screen.getByRole('button', { name: 'Reset to the look of my business type' }))
-    expect(screen.getByRole('radio', { name: same })).toBeChecked()
-    expect(screen.getByText('Look reset to your business type. It is the same as what is saved.')).toBeInTheDocument()
-    expect(saveButton()).toBeDisabled()
-  })
-
-  it('leaves the details alone and uses the first type of a business with several', async () => {
-    const { user } = await renderDesign({
-      business: { types: ['bakery', 'coffee'] },
-      seed: seedBusiness({ theme: { ...DEFAULT_THEME, primary: '#ff0000' } }),
-    })
-    await openLook(user)
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
-    await user.type(screen.getByLabelText('Business name'), '!')
-    await user.click(screen.getByRole('tab', { name: 'Look' }))
-    await user.click(screen.getByRole('button', { name: 'Reset to the look of my business type' }))
-    expect(accent()).toHaveValue(presetFor('bakery').theme.primary)
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
-    expect(screen.getByLabelText('Business name')).toHaveValue('Kape Kanto!')
-  })
-
-  it('clears a color error', async () => {
-    const { user } = await renderDesign()
-    await openLook(user)
-    await typeColor(user, accent(), '#12')
-    await user.click(saveButton())
-    await screen.findByText(COLOR_WORDS)
-    await user.click(screen.getByRole('button', { name: 'Reset to the look of my business type' }))
-    expect(screen.queryByText(COLOR_WORDS)).not.toBeInTheDocument()
   })
 })

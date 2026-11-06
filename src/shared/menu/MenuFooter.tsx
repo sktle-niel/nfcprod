@@ -1,26 +1,16 @@
 import { copy } from '@/config/copy'
 import type { Business } from '@/entities/business/business'
-import { LINK_MAX, SOCIAL_NETWORKS } from '@/entities/business/social'
-import { parseHttpsUrl } from '@/shared/lib/url'
+import { dialHref, socialLinks } from './contact'
 import styles from './MenuView.module.css'
 
 const text = copy.menu.view
 
 type Props = { business: Pick<Business, 'phone' | 'address' | 'hours' | 'social'>; interactive?: boolean }
 
-/** A phone number as a dial link: digits and a leading plus only. Null when there is nothing to dial. */
-function dialHref(phone: string): string | null {
-  const dial = phone.replace(/[^\d+]/g, '')
-  return /\d/.test(dial) ? `tel:${dial}` : null
-}
-
 export function MenuFooter({ business, interactive = true }: Props) {
   const dial = dialHref(business.phone)
   // The component does not trust its input: a link that is not a clean https link is not drawn.
-  const links = SOCIAL_NETWORKS.flatMap((network) => {
-    const url = parseHttpsUrl(business.social[network], LINK_MAX)
-    return url ? [{ network, href: url.href }] : []
-  })
+  const links = socialLinks(business.social)
   if (business.phone.trim() === '' && business.address === '' && business.hours === '' && links.length === 0) return null
   return (
     <footer className={styles.footer}>

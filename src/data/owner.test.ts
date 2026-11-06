@@ -1,3 +1,4 @@
+import { presetPhoto } from '@/presets/samplePhotos'
 import { describe, expect, it } from 'vitest'
 import { BUSINESS_TYPES, type BusinessPatch, type BusinessType, type NewBusinessInput } from '@/entities/business/business'
 import { isValidSlug } from '@/entities/business/slug'
@@ -149,7 +150,7 @@ describe('createBusiness', () => {
         price: sample.price,
         tags: sample.tags,
         available: true,
-        image: null,
+        image: presetPhoto(sample.name),
         groupIds: [],
       })
     }
@@ -432,7 +433,7 @@ describe('categories', () => {
     const { owner, iced } = await withCoffee()
     const moved = await owner.moveCategory(iced, -1)
     expect(names(moved.categories)).toEqual(['Iced', 'Hot', 'Blended', 'Pastries'])
-    expect(names(moved.products)).toEqual(['Iced Caramel Macchiato', 'Americano', 'Spanish Latte', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(moved.products)).toEqual(['Iced Caramel Macchiato', 'Americano', 'Spanish Latte', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(await owner.moveCategory(iced, -1)).toEqual(moved)
     expect(await owner.moveCategory('gone', 1)).toEqual(moved)
     expect(await owner.getMenu()).toEqual(moved)
@@ -442,7 +443,7 @@ describe('categories', () => {
     const { owner, hot } = await withCoffee()
     const menu = await owner.deleteCategory(hot)
     expect(names(menu.categories)).toEqual(['Iced', 'Blended', 'Pastries'])
-    expect(names(menu.products)).toEqual(['Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(menu.products)).toEqual(['Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(await owner.deleteCategory(hot)).toEqual(menu)
   })
 })
@@ -455,7 +456,7 @@ describe('products', () => {
       { label: 'S', price: 13500 },
     ]
     const menu = await owner.saveProduct(productInput({ categoryId: hot, price: 0, variants, tags: ['new'] }))
-    expect(names(menu.products)).toEqual(['Americano', 'Spanish Latte', 'Flat White', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(menu.products)).toEqual(['Americano', 'Spanish Latte', 'Flat White', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(productNamed(menu, 'Flat White')).toEqual({
       id: expect.stringMatching(MADE_ID),
       categoryId: hot,
@@ -498,7 +499,7 @@ describe('products', () => {
   it('moves a product to the end of its new category when its category changes', async () => {
     const { owner, menu, iced } = await withCoffee()
     const moved = await owner.saveProduct({ ...productNamed(menu, 'Americano'), categoryId: iced })
-    expect(names(moved.products)).toEqual(['Spanish Latte', 'Iced Caramel Macchiato', 'Americano', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(moved.products)).toEqual(['Spanish Latte', 'Iced Caramel Macchiato', 'Americano', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(productNamed(moved, 'Americano').categoryId).toBe(iced)
   })
 
@@ -506,7 +507,7 @@ describe('products', () => {
     const { owner, menu } = await withCoffee()
     const latte = productNamed(menu, 'Spanish Latte').id
     const moved = await owner.moveProduct(latte, -1)
-    expect(names(moved.products)).toEqual(['Spanish Latte', 'Americano', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(moved.products)).toEqual(['Spanish Latte', 'Americano', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(await owner.moveProduct(latte, -1)).toEqual(moved)
     expect(await owner.moveProduct(productNamed(menu, 'Iced Caramel Macchiato').id, -1)).toEqual(moved)
     expect(await owner.moveProduct('gone', 1)).toEqual(moved)
@@ -569,7 +570,7 @@ describe('products', () => {
     const { owner, menu } = await withCoffee()
     const latte = productNamed(menu, 'Spanish Latte').id
     const after = await owner.deleteProduct(latte)
-    expect(names(after.products)).toEqual(['Americano', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada'])
+    expect(names(after.products)).toEqual(['Americano', 'Iced Caramel Macchiato', 'Mocha Frappe', 'Ensaymada', 'Butter Croissant'])
     expect(await owner.deleteProduct(latte)).toEqual(after)
   })
 })

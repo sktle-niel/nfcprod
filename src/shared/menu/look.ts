@@ -10,6 +10,7 @@ import {
   PHOTO_FITS,
   PHOTO_POSITIONS,
   PHOTOS,
+  STYLE_IDS,
   TITLES,
   type Theme,
 } from '@/entities/theme/theme'
@@ -17,7 +18,7 @@ import {
 /** What the renderer reads from a theme to decide how the menu is drawn (the colors and fonts travel as CSS variables). */
 export type Look = Pick<
   Theme,
-  'card' | 'photo' | 'title' | 'header' | 'decor' | 'backdrop' | 'backdropFit' | 'backdropPosition' | 'spotlight' | 'layout'
+  'style' | 'card' | 'photo' | 'title' | 'header' | 'decor' | 'backdrop' | 'backdropFit' | 'backdropPosition' | 'spotlight' | 'layout'
 >
 
 /**
@@ -26,6 +27,7 @@ export type Look = Pick<
  */
 export function lookOf(theme: Theme): Look {
   return {
+    style: isOneOf(STYLE_IDS, theme.style) ? theme.style : DEFAULT_THEME.style,
     card: isOneOf(CARDS, theme.card) ? theme.card : DEFAULT_THEME.card,
     photo: isOneOf(PHOTOS, theme.photo) ? theme.photo : DEFAULT_THEME.photo,
     title: isOneOf(TITLES, theme.title) ? theme.title : DEFAULT_THEME.title,

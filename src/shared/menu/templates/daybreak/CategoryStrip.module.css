@@ -1,0 +1,77 @@
+/* The solid band of the sheet (see --tpl-solid). */
+.strip {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  color: var(--tpl-on-solid);
+  background: var(--tpl-solid);
+  border-block: 1px solid var(--tpl-solid-edge);
+}
+
+.list {
+  display: flex;
+  gap: 2px;
+  margin: 0;
+  padding: 0 8px;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.list > li {
+  flex: none;
+}
+
+.link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  text-transform: uppercase;
+  color: var(--tpl-on-solid);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* The mark of the category being read: one draws in from the left as the last one draws back. */
+.link::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  bottom: 9px;
+  left: 10px;
+  height: 2px;
+  background: var(--tpl-on-solid);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.link[data-selected]::after {
+  transform: scaleX(1);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--tpl-on-solid);
+  outline-offset: -4px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .link::after {
+    transition: transform var(--tpl-duration-open) var(--tpl-ease-move);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover::after {
+    transform: scaleX(1);
+  }
+}

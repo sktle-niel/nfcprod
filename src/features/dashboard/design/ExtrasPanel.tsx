@@ -1,16 +1,14 @@
 import { useRef, type CSSProperties } from 'react'
 import { dashboardCopy } from '@/config/dashboardCopy'
 import type { BusinessType } from '@/entities/business/business'
-import { NEW_BACKDROPS, type NewBackdropKind } from '@/entities/theme/backdrop'
 import { toCssVars } from '@/entities/theme/cssVars'
-import { BACKDROPS, BUTTON_STYLES, DECORS, DEFAULT_THEME, FONTS, LAYOUTS, type BackdropKind, type Font } from '@/entities/theme/theme'
+import { DEFAULT_THEME, FONTS, LAYOUTS, type BackdropKind, type Font } from '@/entities/theme/theme'
 import { useMenuFonts } from '@/shared/menu/fonts'
 import { Panel } from '@/shared/ui/Panel'
 import { ChoiceRadios } from './ChoiceRadios'
 import { TextureGlyph } from './Glyph'
 import { PagePhotoFields } from './PagePhotoFields'
 import { StockPhotoFields } from './StockPhotoFields'
-import { TextureSwatch } from './TextureSwatch'
 import type { DesignForm } from './useDesignDraft'
 import choice from './ChoiceRadios.module.css'
 import styles from './Form.module.css'
@@ -23,9 +21,11 @@ const sampleVars = (patch: Partial<typeof DEFAULT_THEME>) => toCssVars({ ...DEFA
 // A pairing is shown by its display face: the one names and titles are written in.
 const fontStyle = (font: Font): CSSProperties => ({ fontFamily: sampleVars({ font })['--menu-display'] })
 
-/** The drawn textures get a live swatch; the classic five keep their CSS drawing (`TextureGlyph`). */
-const isDrawnBackdrop = (backdrop: BackdropKind): backdrop is NewBackdropKind =>
-  (NEW_BACKDROPS as readonly BackdropKind[]).includes(backdrop)
+/** What the page behind the menu can be while the menu styles are redesigned: the page color alone, or a photo under a veil of it. */
+const PAGE_BACKGROUNDS = ['plain', 'picture', 'stock'] as const satisfies readonly BackdropKind[]
+type PageBackground = (typeof PAGE_BACKGROUNDS)[number]
+// A texture of an older style is not drawn any more (`plainTheme`), so the page shows as the plain one.
+const pageBackgroundOf = (backdrop: BackdropKind): PageBackground => (backdrop === 'picture' || backdrop === 'stock' ? backdrop : 'plain')
 
 /** "Aa" in a pairing's display face, loaded on demand like the menu loads it. */
 function FontSample({ font }: { font: Font }) {
@@ -39,10 +39,11 @@ type Props = {
   types?: readonly BusinessType[] | undefined
 }
 
-/** The finishing touches: line art, page texture, font, corners and layout. */
+/** What is left to set while the menu styles are redesigned: the page background (plain or a photo), the font and the menu layout. */
 export function ExtrasPanel({ form, types }: Props) {
   const { theme } = form.draft
   const stack = useRef<HTMLDivElement>(null)
+  const background = pageBackgroundOf(theme.backdrop)
 
   // Removing the library photo takes its picker off the page, and the focus with it: it goes back to the choice that opened it.
   const focusLibraryChoice = () => stack.current?.querySelector<HTMLInputElement>('input[type="radio"][value="stock"]')?.focus()
@@ -51,26 +52,18 @@ export function ExtrasPanel({ form, types }: Props) {
     <Panel title={text.extrasTitle}>
       <div ref={stack} className={styles.stack}>
         <ChoiceRadios
-          legend={text.decor.legend}
-          hint={text.decor.hint}
-          value={theme.decor}
-          onChange={(decor) => form.setChoice('decor', decor)}
-          options={DECORS.map((decor) => ({ value: decor, label: text.decor.options[decor] }))}
-        />
-        <ChoiceRadios
           legend={text.backdrop.legend}
           hint={text.backdrop.hint}
-          value={theme.backdrop}
+          value={background}
           onChange={(backdrop) => form.setChoice('backdrop', backdrop)}
-          options={BACKDROPS.map((backdrop) => ({
+          options={PAGE_BACKGROUNDS.map((backdrop) => ({
             value: backdrop,
             label: text.backdrop.options[backdrop],
-            // The drawn textures show their real image in the draft's own colors; the classic five keep their CSS drawing.
-            sample: isDrawnBackdrop(backdrop) ? <TextureSwatch kind={backdrop} theme={theme} /> : <TextureGlyph kind={backdrop} />,
+            sample: <TextureGlyph kind={backdrop} />,
           }))}
         />
-        {theme.backdrop === 'picture' && <PagePhotoFields form={form} />}
-        {theme.backdrop === 'stock' && <StockPhotoFields form={form} types={types} onRemoved={focusLibraryChoice} />}
+        {background === 'picture' && <PagePhotoFields form={form} />}
+        {background === 'stock' && <StockPhotoFields form={form} types={types} onRemoved={focusLibraryChoice} />}
         <ChoiceRadios
           legend={text.font.legend}
           value={theme.font}
@@ -80,21 +73,6 @@ export function ExtrasPanel({ form, types }: Props) {
             label: text.font.options[font],
             sample: <FontSample font={font} />,
             labelStyle: fontStyle(font),
-          }))}
-        />
-        <ChoiceRadios
-          legend={text.buttonStyle.legend}
-          hint={text.buttonStyle.hint}
-          value={theme.buttonStyle}
-          onChange={(style) => form.setChoice('buttonStyle', style)}
-          options={BUTTON_STYLES.map((style) => ({
-            value: style,
-            label: text.buttonStyle.options[style],
-            sample: (
-              <span className={choice.button} style={{ borderRadius: sampleVars({ buttonStyle: style })['--menu-radius'] }}>
-                {text.buttonStyle.sample}
-              </span>
-            ),
           }))}
         />
         <ChoiceRadios

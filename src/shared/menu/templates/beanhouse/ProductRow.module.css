@@ -1,0 +1,232 @@
+/* Text on the label uses the card pair: --menu-on-surface and --menu-card-muted on --menu-surface. */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  align-content: start;
+  padding: 18px 0;
+  border-top: 1px solid var(--menu-card-line);
+}
+
+.row:first-child {
+  border-top: 0;
+}
+
+.row[data-photo] {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+
+/* A small photo set square on the label, in a thin line. The box keeps its place while the picture is on its way. */
+.photo {
+  display: block;
+  aspect-ratio: 1;
+  margin-top: 3px;
+  background: color-mix(in srgb, var(--menu-on-surface) 8%, var(--menu-surface));
+  box-shadow: 0 0 0 1px var(--menu-card-line);
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+[data-sold-out] .photo img {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.name {
+  margin: 0;
+  min-width: 0;
+  font-family: var(--menu-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.price {
+  flex: none;
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+
+.description {
+  margin: 5px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--menu-card-muted);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.sizes {
+  margin: 6px 0 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.soldOut {
+  display: inline-block;
+  margin: 7px 0 2px;
+  padding: 1px 7px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid var(--menu-on-surface);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags > li {
+  color: var(--menu-card-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  margin-bottom: -12px;
+  padding: 0;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--menu-on-surface);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.more[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.more:focus-visible {
+  outline: 2px solid var(--menu-accent);
+  outline-offset: 2px;
+}
+
+/* Stays on the page, so opening it only unfolds what is there. Closed, it is out of sight and out of a screen reader's reach. */
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+
+.panel[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+.panelClip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panelBody {
+  padding-top: 12px;
+}
+
+/* Grid: two columns on the label, the photo across its column and the price under the name. */
+.row[data-layout='grid'],
+.row[data-layout='grid'][data-photo] {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.row[data-layout='grid'] {
+  border-top: 0;
+}
+
+.row[data-layout='grid'] .photo {
+  aspect-ratio: 4 / 3;
+}
+
+.row[data-layout='grid'] .head {
+  display: block;
+}
+
+.row[data-layout='grid'] .name {
+  overflow-wrap: break-word;
+}
+
+.row[data-layout='grid'] .price {
+  display: block;
+  margin-top: 2px;
+}
+
+@container (max-width: 359px) {
+  .row[data-photo] {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .photo img {
+    transition: opacity var(--tpl-duration-reveal) var(--tpl-ease);
+  }
+
+  .photo img[data-arriving] {
+    opacity: 0;
+  }
+
+  .more {
+    transition: transform var(--tpl-duration-press) var(--tpl-ease);
+  }
+
+  .more:active {
+    transform: scale(0.98);
+  }
+
+  .more svg {
+    transition: transform var(--tpl-duration-open) var(--tpl-ease);
+  }
+
+  .panel {
+    transition:
+      grid-template-rows var(--tpl-duration-open) var(--tpl-ease),
+      visibility 0s linear var(--tpl-duration-open);
+  }
+
+  .panel[data-open] {
+    transition-delay: 0s;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .more:hover {
+    text-decoration-thickness: 2px;
+  }
+}

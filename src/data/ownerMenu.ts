@@ -1,3 +1,5 @@
+import { presetPhoto } from '@/presets/samplePhotos'
+import { samplePicture } from '@/entities/menu/samplePictures'
 import { isTrustedPicture } from '@/config/pictures'
 import { LIMITS, type Category, type Menu, type ModifierGroup, type Product } from '@/entities/menu/menu'
 import { validateCategoryInput, validateGroupInput, type PricedItem } from '@/entities/menu/validate'
@@ -79,7 +81,7 @@ export function putProduct(menu: Menu, input: unknown, newId: NewId): Menu {
   if (!checked.ok) throw invalid(checked.errors)
   const { id, categoryId, name, description, price, variants, tags, available, image, groupIds } = checked.value
   // The server only keeps pictures from its own storage. The mock keeps the same rule.
-  if (image !== null && !isTrustedPicture(image)) throw invalid({ image: 'invalid' })
+  if (image !== null && samplePicture(image) === null && !isTrustedPicture(image)) throw invalid({ image: 'invalid' })
   const index = indexOf(menu.products, id)
   const old = menu.products[index]
   const product: Product = {
@@ -127,7 +129,7 @@ function sampleInput(sample: PresetSample, preset: MergedPreset, categories: rea
     variants: sizes.map((label, step) => ({ label, price: Math.min(LIMITS.priceMax, sample.price + step * SIZE_STEP) })),
     tags: sample.tags,
     available: true,
-    image: null,
+    image: presetPhoto(sample.name),
     groupIds: [],
   }
 }

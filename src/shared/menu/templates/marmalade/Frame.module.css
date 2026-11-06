@@ -1,0 +1,36 @@
+/*
+ * A painted panel: the ground of the sign, and one fine gilt line inside its edge with the corners cut, as a shop fascia is lined out.
+ * The line is two layers behind the content (a clip on the panel would cut its focus rings). --tpl-frame-y and -x inset it.
+ */
+.ground {
+  /* The paint of the sign. Gilt is the owner's accent lifted toward the letters, so the pair is made for this ground and not the wall. */
+  --tpl-gilt: color-mix(in oklab, var(--menu-accent) 78%, var(--menu-on-surface));
+  --tpl-paint: color-mix(in oklab, var(--menu-on-surface) 84%, var(--menu-accent));
+  position: relative;
+  isolation: isolate;
+  color: var(--tpl-paint);
+  background: var(--menu-surface);
+}
+
+.lined {
+  position: relative;
+  isolation: isolate;
+}
+
+.lined::before,
+.lined::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px), calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px);
+}
+
+.lined::before {
+  inset: var(--tpl-frame-y, 0) var(--tpl-frame-x, 0);
+  background: var(--tpl-gilt);
+}
+
+.lined::after {
+  inset: calc(var(--tpl-frame-y, 0px) + 1px) calc(var(--tpl-frame-x, 0px) + 1px);
+  background: var(--menu-surface);
+}
